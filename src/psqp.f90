@@ -96,7 +96,7 @@
 !         GRADIENT OF THE CONSTRAINT FUNCTION.
 !
       SUBROUTINE PSQPN(Nf,Nb,Nc,X,Ix,Xl,Xu,Cf,Ic,Cl,Cu,Ipar,Rpar,F,Gmax,&
-                     & Cmax,Iprnt,Iterm)
+                       Cmax,Iprnt,Iterm)
       IMPLICIT NONE
 !
 !     POINTERS FOR AUXILIARY ARRAYS
@@ -104,11 +104,11 @@
       DOUBLE PRECISION F , Cmax , Gmax
       INTEGER Iprnt , Iterm , Nb , Nc , Nf
       DOUBLE PRECISION Cf(*) , Cl(*) , Cu(*) , Rpar(5) , X(*) , Xl(*) , &
-                     & Xu(*)
+                       Xu(*)
       INTEGER Ic(*) , Ipar(6) , Ix(*)
       INTEGER NADd , NDEc , NFG , NFH , NFV , NIT , NREm , NREs
       INTEGER lcfd , lcfo , lcg , lcp , lcr , lcz , lg , lgc , lgf ,    &
-            & lgo , lh , lia , ls , lxo
+              lgo , lh , lia , ls , lxo
       COMMON /STAT  / NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
       INTEGER ia(:)
       DOUBLE PRECISION ra(:)
@@ -129,10 +129,10 @@
       lgo = lxo + Nf
       lia = 1
       CALL PSQP(Nf,Nb,Nc,X,Ix,Xl,Xu,Cf,Ic,Cl,Cu,ra,ra(lcfo),ra(lcfd),   &
-              & ra(lgc),ia,ra(lcr),ra(lcz),ra(lcp),ra(lgf),ra(lg),ra(lh)&
-              & ,ra(ls),ra(lxo),ra(lgo),Rpar(1),Rpar(2),Rpar(3),Rpar(4),&
-              & Rpar(5),Cmax,Gmax,F,Ipar(1),Ipar(2),Ipar(5),Ipar(6),    &
-              & Iprnt,Iterm)
+                ra(lgc),ia,ra(lcr),ra(lcz),ra(lcp),ra(lgf),ra(lg),ra(lh)&
+                ,ra(ls),ra(lxo),ra(lgo),Rpar(1),Rpar(2),Rpar(3),Rpar(4),&
+                Rpar(5),Cmax,Gmax,F,Ipar(1),Ipar(2),Ipar(5),Ipar(6),    &
+                Iprnt,Iterm)
       DEALLOCATE (ia,ra)
       END
 
@@ -273,27 +273,27 @@
 ! UPDATE.
 !
       SUBROUTINE PSQP(Nf,Nb,Nc,X,Ix,Xl,Xu,Cf,Ic,Cl,Cu,Cg,Cfo,Cfd,Gc,Ica,&
-                    & Cr,Cz,Cp,Gf,G,H,S,Xo,Go,Xmax,Tolx,Tolc,Tolg,Rpf,  &
-                    & Cmax,Gmax,F,Mit,Mfv,Met,Mec,Iprnt,Iterm)
+                      Cr,Cz,Cp,Gf,G,H,S,Xo,Go,Xmax,Tolx,Tolc,Tolg,Rpf,  &
+                      Cmax,Gmax,F,Mit,Mfv,Met,Mec,Iprnt,Iterm)
       IMPLICIT NONE
       DOUBLE PRECISION F , Cmax , Gmax , Rpf , Tolc , told , Tolg ,     &
-                     & tols , Tolx , Xmax
+                       tols , Tolx , Xmax
       INTEGER Iprnt , Iterm , Met , met1 , Mec , mes , Mfv , Mit , Nb , &
-            & Nc , Nf
+              Nc , Nf
       DOUBLE PRECISION Cf(*) , Cfd(*) , Cfo(*) , Cg(*) , Cl(*) , Cp(*) ,&
-                     & Cr(*) , Cz(*) , Cu(*) , G(*) , Gc(*) , Gf(*) ,   &
-                     & Go(*) , H(*) , S(*) , X(*) , Xl(*) , Xo(*) ,     &
-                     & Xu(*)
+                       Cr(*) , Cz(*) , Cu(*) , G(*) , Gc(*) , Gf(*) ,   &
+                       Go(*) , H(*) , S(*) , X(*) , Xl(*) , Xo(*) ,     &
+                       Xu(*)
       INTEGER Ic(*) , Ica(*) , Ix(*)
       INTEGER NADd , NDEc , NFG , NFH , NFV , NIT , NREm , NREs
       DOUBLE PRECISION alf1 , alf2 , cmaxo , dmax , eps7 , eps9 , eta0 ,&
-                     & eta2 , eta9 , fmax , fmin , fo , gnorm , p , po ,&
-                     & r , rmax , rmin , ro , snorm , tolb , tolf ,     &
-                     & umax , rp , fp , pp , ff , fc
+                       eta2 , eta9 , fmax , fmin , fo , gnorm , p , po ,&
+                       r , rmax , rmin , ro , snorm , tolb , tolf ,     &
+                       umax , rp , fp , pp , ff , fc
       INTEGER i , idecf , iext , irest , iterd , iterl , iterh , iterq ,&
-            & iters , kbc , kbf , kc , kd , kit , ld , mred , mtesf ,   &
-            & mtesx , n , k , ntesx , iest , inits , kters , maxst ,    &
-            & isys , mfp , nred , ipom , lds
+              iters , kbc , kbf , kc , kd , kit , ld , mred , mtesf ,   &
+              mtesx , n , k , ntesx , iest , inits , kters , maxst ,    &
+              isys , mfp , nred , ipom , lds
       DOUBLE PRECISION MXVDOT , MXVMAX
       COMMON /STAT  / NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
       IF ( ABS(Iprnt)>1 ) WRITE (6,'(1X,''ENTRY TO PSQP :'')')
@@ -410,9 +410,9 @@
       CALL PC1F01(Nf,Nc,X,fc,Cf,Cl,Cu,Ic,Gc,Cg,Cmax,kd,ld)
       Cf(Nc+1) = F
       IF ( ABS(Iprnt)>1 ) WRITE (6,                                     &
-     &'(1X,''NIT='',I4,2X,''NFV='',I4,2X,''NFG='',I4,2X,       ''F='',G1&
-     &2.6,2X,''C='',E7.1,2X,''G='',E7.1)') NIT , NFV , NFG , F , Cmax , &
-    & Gmax
+      '(1X,''NIT='',I4,2X,''NFV='',I4,2X,''NFG='',I4,2X,       ''F='',G1&
+      2.6,2X,''C='',E7.1,2X,''G='',E7.1)') NIT , NFV , NFG , F , Cmax , &
+      Gmax
 !
 !     START OF THE ITERATION WITH TESTS FOR TERMINATION.
 !
@@ -464,8 +464,8 @@
       mfp = 2
       ipom = 0
  300  CALL PLQDB1(Nf,Nc,X,Ix,Xl,Xu,Cf,Cfd,Ic,Ica,Cl,Cu,Cg,Cr,Cz,G,Gf,H, &
-                & S,mfp,kbf,kbc,idecf,eta2,eta9,eps7,eps9,umax,Gmax,n,  &
-                & iterq)
+                  S,mfp,kbf,kbc,idecf,eta2,eta9,eps7,eps9,umax,Gmax,n,  &
+                  iterq)
       IF ( iterq<0 ) THEN
          IF ( ipom<10 ) THEN
             ipom = ipom + 1
@@ -518,8 +518,8 @@
 !     LINE SEARCH WITHOUT DIRECTIONAL DERIVATIVES
 !
  450     CALL PS0L02(r,ro,rp,F,fo,fp,po,pp,fmin,fmax,rmin,rmax,tols,kd, &
-                   & ld,NIT,kit,nred,mred,maxst,iest,inits,iters,kters, &
-                   & mes,isys)
+                     ld,NIT,kit,nred,mred,maxst,iest,inits,iters,kters, &
+                     mes,isys)
          IF ( isys==0 ) THEN
             kd = 1
 !
@@ -552,7 +552,7 @@
 !
             CALL MXVCOP(Nf,Gf,G)
             CALL PYTRND(Nf,n,X,Xo,Ica,Cg,Cz,G,Go,r,F,fo,p,po,Cmax,cmaxo,&
-                      & dmax,kd,ld,iters)
+                        dmax,kd,ld,iters)
 !
 !     VARIABLE METRIC UPDATE
 !
@@ -577,10 +577,10 @@
 
  500  IF ( Iprnt>1 .OR. Iprnt<0 ) WRITE (6,'(1X,''EXIT FROM PSQP :'')')
       IF ( Iprnt/=0 ) WRITE (6,                                         &
-     &'(1X,''NIT='',I4,2X,''NFV='',I4,2X,''NFG='',I4,2X,       ''F='',G1&
-     &2.6,2X,''C='',E7.1,2X,''G='',E7.1,2X,''ITERM='',I3)') NIT , NFV , &
-    & NFG , F , Cmax , Gmax , Iterm
+      '(1X,''NIT='',I4,2X,''NFV='',I4,2X,''NFG='',I4,2X,       ''F='',G1&
+      2.6,2X,''C='',E7.1,2X,''G='',E7.1,2X,''ITERM='',I3)') NIT , NFV , &
+      NFG , F , Cmax , Gmax , Iterm
       IF ( Iprnt<0 ) WRITE (6,                                          &
-                           &'(1X,''X='',5(G14.7,1X):/(3X,5(G14.7,1X)))')&
-                          & (X(i),i=1,Nf)
+                            '(1X,''X='',5(G14.7,1X):/(3X,5(G14.7,1X)))')&
+                            (X(i),i=1,Nf)
       END

@@ -250,9 +250,9 @@
                pom = 0.0D0
                temp = Cf(kc)
                IF ( Ic(kc)==1 .OR. Ic(kc)>=3 )                          &
-                  & pom = MIN(pom,temp-Cl(kc))
+                    pom = MIN(pom,temp-Cl(kc))
                IF ( Ic(kc)==2 .OR. Ic(kc)>=3 )                          &
-                  & pom = MIN(pom,Cu(kc)-temp)
+                    pom = MIN(pom,Cu(kc)-temp)
                IF ( pom<0.0D0 ) Cmax = MAX(Cmax,-pom)
             ENDIF
  20         IF ( Kd>=1 ) THEN
@@ -355,7 +355,7 @@
 !         PLANE ROTATION.
 !
       SUBROUTINE PLADB0(Nf,N,Ica,Cg,Cr,Cz,S,Eps7,Gmax,Umax,Inew,Nadd,   &
-                      & Ier)
+                        Ier)
       IMPLICIT NONE
       INTEGER Nf , N , Ica(*) , Inew , Nadd , Ier
       DOUBLE PRECISION Cg(*) , Cr(*) , Cz(*) , S(*) , Eps7 , Gmax , Umax
@@ -426,11 +426,11 @@
 !         PLANE ROTATION.
 !
       SUBROUTINE PLADB4(Nf,N,Ica,Cg,Cr,Cz,H,S,Eps7,Gmax,Umax,Idecf,Inew,&
-                      & Nadd,Ier)
+                        Nadd,Ier)
       IMPLICIT NONE
       INTEGER Nf , N , Ica(*) , Idecf , Inew , Nadd , Ier
       DOUBLE PRECISION Cg(*) , Cr(*) , Cz(*) , H(*) , S(*) , Eps7 ,     &
-                     & Gmax , Umax
+                       Gmax , Umax
       DOUBLE PRECISION ck , cl
       INTEGER i , j , k , l , n1
       IF ( Idecf/=0 .AND. Idecf/=9 ) THEN
@@ -636,17 +636,17 @@
 !  S   MXVSET  INITIATION OF A VECTOR.
 !
       SUBROUTINE PLLPB1(Nf,Nc,X,Ix,Xo,Xl,Xu,Cf,Cfd,Ic,Ica,Cl,Cu,Cg,Cr,  &
-                      & Cz,G,Go,S,Mfp,Kbf,Kbc,Eta9,Eps7,Eps9,Umax,Gmax, &
-                      & N,Iterl)
+                        Cz,G,Go,S,Mfp,Kbf,Kbc,Eta9,Eps7,Eps9,Umax,Gmax, &
+                        N,Iterl)
       IMPLICIT NONE
       INTEGER Nf , Nc , Ix(*) , Ic(*) , Ica(*) , Mfp , Kbf , Kbc , N ,  &
-            & Iterl
+              Iterl
       DOUBLE PRECISION X(*) , Xo(*) , Xl(*) , Xu(*) , Cf(*) , Cfd(*) ,  &
-                     & Cl(*) , Cu(*) , Cg(*) , Cr(*) , Cz(*) , G(*) ,   &
-                     & Go(*) , S(*) , Eta9 , Eps7 , Eps9 , Umax , Gmax
+                       Cl(*) , Cu(*) , Cg(*) , Cr(*) , Cz(*) , G(*) ,   &
+                       Go(*) , S(*) , Eta9 , Eps7 , Eps9 , Umax , Gmax
       DOUBLE PRECISION pom , con , dmax
       INTEGER nca , ncr , ncz , ipom , i , k , iold , inew , ier ,      &
-            & krem , kc , nred
+              krem , kc , nred
       INTEGER NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
       COMMON /STAT  / NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
       con = Eta9
@@ -693,7 +693,7 @@
                inew = 0
                CALL PLNEWL(kc,Cf,Ic,Cl,Cu,Eps9,inew)
                CALL PLADB0(Nf,N,Ica,Cg,Cr,Cz,S,Eps7,Gmax,Umax,inew,NADd,&
-                         & ier)
+                           ier)
                CALL MXVIND(Ic,kc,ier)
                IF ( Ic(kc)<-10 ) ipom = 1
             ENDIF
@@ -748,14 +748,14 @@
                inew = 0
                CALL PLNEWL(kc,Cf,Ic,Cl,Cu,Eps9,inew)
                CALL PLADB0(Nf,N,Ica,Cg,Cr,Cz,S,Eps7,Gmax,Umax,inew,NADd,&
-                         & ier)
+                           ier)
                CALL MXVIND(Ic,kc,ier)
             ELSEIF ( inew+Nf>=0 ) THEN
                i = -inew
                inew = 0
                CALL PLNEWS(X,Ix,Xl,Xu,Eps9,i,inew)
                CALL PLADB0(Nf,N,Ica,Cg,Cr,Cz,S,Eps7,Gmax,Umax,inew,NADd,&
-                         & ier)
+                           ier)
                CALL MXVIND(Ix,i,ier)
             ENDIF
             dmax = pom
@@ -878,7 +878,7 @@
          kc = Ica(j)
          IF ( kc>0 ) THEN
             CALL MXVDIR(Nf,Cr(ncr+j),Cg((kc-1)*Nf+1),Cz(ncz+1),Cz(ncz+1)&
-                      & )
+                        )
          ELSE
             i = -kc
             Cz(ncz+i) = Cz(ncz+i) + Cr(ncr+j)
@@ -969,19 +969,19 @@
 !  S   MXVNEG  COPYING OF A VECTOR WITH CHANGE OF THE SIGN.
 !
       SUBROUTINE PLQDB1(Nf,Nc,X,Ix,Xl,Xu,Cf,Cfd,Ic,Ica,Cl,Cu,Cg,Cr,Cz,G,&
-                      & Go,H,S,Mfp,Kbf,Kbc,Idecf,Eta2,Eta9,Eps7,Eps9,   &
-                      & Umax,Gmax,N,Iterq)
+                        Go,H,S,Mfp,Kbf,Kbc,Idecf,Eta2,Eta9,Eps7,Eps9,   &
+                        Umax,Gmax,N,Iterq)
       IMPLICIT NONE
       INTEGER Nf , Nc , Ix(*) , Ic(*) , Ica(*) , Mfp , Kbf , Kbc ,      &
-            & Idecf , N , Iterq
+              Idecf , N , Iterq
       DOUBLE PRECISION X(*) , Xl(*) , Xu(*) , Cf(*) , Cfd(*) , Cl(*) ,  &
-                     & Cu(*) , Cg(*) , Cr(*) , Cz(*) , G(*) , Go(*) ,   &
-                     & H(*) , S(*) , Eta2 , Eta9 , Eps7 , Eps9 , Umax , &
-                     & Gmax
+                       Cu(*) , Cg(*) , Cr(*) , Cz(*) , G(*) , Go(*) ,   &
+                       H(*) , S(*) , Eta2 , Eta9 , Eps7 , Eps9 , Umax , &
+                       Gmax
       DOUBLE PRECISION con , temp , step , step1 , step2 , dmax , par , &
-                     & snorm
+                       snorm
       INTEGER nca , ncr , i , j , k , iold , jold , inew , jnew , knew ,&
-            & inf , ier , krem , kc , nred
+              inf , ier , krem , kc , nred
       INTEGER NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
       COMMON /STAT  / NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
       con = Eta9
@@ -1056,7 +1056,7 @@
 !     STEPSIZE DETERMINATION
 !
          CALL PLADR1(Nf,N,Ica,Cg,Cr,H,S,G,Eps7,Gmax,Umax,Idecf,inew,    &
-                   & NADd,ier,1)
+                     NADd,ier,1)
          CALL MXDPRB(nca,Cr,G,-1)
          IF ( knew<0 ) CALL MXVNEG(nca,G,G)
 !
@@ -1213,11 +1213,11 @@
 !  RF  MXVDOT  DOT PRODUCT OF TWO VECTORS.
 !
       SUBROUTINE PLADR1(Nf,N,Ica,Cg,Cr,H,S,G,Eps7,Gmax,Umax,Idecf,Inew, &
-                      & Nadd,Ier,Job)
+                        Nadd,Ier,Job)
       IMPLICIT NONE
       INTEGER Nf , N , Ica(*) , Idecf , Inew , Nadd , Ier , Job
       DOUBLE PRECISION Cg(*) , Cr(*) , H(*) , S(*) , G(*) , Eps7 ,      &
-                     & Gmax , Umax
+                       Gmax , Umax
       DOUBLE PRECISION MXVDOT
       INTEGER nca , ncr , jcg , j , k , l
       Ier = 0
@@ -1426,7 +1426,7 @@
       IMPLICIT NONE
       INTEGER Nf , Nc , Ic(*) , Kbc , Krem , Inew
       DOUBLE PRECISION Cf(*) , Cfd(*) , Cl(*) , Cu(*) , Cg(*) , S(*) ,  &
-                     & Step
+                       Step
       DOUBLE PRECISION temp , MXVDOT
       INTEGER jcg , kc
       IF ( Kbc>0 ) THEN
@@ -1458,7 +1458,7 @@
                Cfd(kc) = temp
                IF ( temp>0.0D0 ) THEN
                   IF ( Ic(kc)==-11 .OR. Ic(kc)==-13 .OR. Ic(kc)==-15 )  &
-                     & THEN
+                       THEN
                      temp = (Cl(kc)-Cf(kc))/temp
                      IF ( temp<=Step ) THEN
                         Inew = kc
@@ -1467,7 +1467,7 @@
                   ENDIF
                ELSEIF ( temp<0.0D0 ) THEN
                   IF ( Ic(kc)==-12 .OR. Ic(kc)==-14 .OR. Ic(kc)==-16 )  &
-                     & THEN
+                       THEN
                      temp = (Cu(kc)-Cf(kc))/temp
                      IF ( temp<=Step ) THEN
                         Inew = kc
@@ -1644,11 +1644,11 @@
 !  RF  MXVDOT  DOT PRODUCT OF TWO VECTORS.
 !
       SUBROUTINE PLMINN(Nf,Nc,Cf,Cfd,Ic,Cl,Cu,Cg,S,Eps9,Par,Kbc,Inew,   &
-                      & Knew)
+                        Knew)
       IMPLICIT NONE
       INTEGER Nf , Nc , Ic(*) , Kbc , Inew , Knew
       DOUBLE PRECISION Cf(*) , Cfd(*) , Cl(*) , Cu(*) , Cg(*) , S(*) ,  &
-                     & Eps9 , Par
+                       Eps9 , Par
       DOUBLE PRECISION temp , pom , MXVDOT
       INTEGER jcg , kc
       IF ( Kbc>0 ) THEN
@@ -2054,7 +2054,7 @@
          IF ( k<=-5 ) THEN
          ELSEIF ( (k==-1 .OR. k==-3) .AND. Umax+temp>=0.0D0 ) THEN
          ELSEIF ( .NOT.((k==-2 .OR. k==-4) .AND. Umax-temp>=0.0D0) )    &
-                & THEN
+                  THEN
             Iold = j
             Umax = ABS(temp)
          ENDIF
@@ -2104,11 +2104,11 @@
 !  S   MXVSET  INITIATION OF A VECTOR.
 !
       SUBROUTINE PLTRBG(Nf,N,Nc,Ix,Ic,Ica,Cg,Cr,Cz,G,Gn,Eps7,Gmax,Umax, &
-                      & Iold)
+                        Iold)
       IMPLICIT NONE
       INTEGER Nf , N , Nc , Ix(*) , Ic(*) , Ica(*) , Iold
       DOUBLE PRECISION Cg(*) , Cr(*) , Cz(*) , G(*) , Gn(*) , Eps7 ,    &
-                     & Gmax , Umax
+                       Gmax , Umax
       DOUBLE PRECISION MXVMAX
       INTEGER nca , ncz
       Gmax = 0.0D0
@@ -2320,9 +2320,9 @@
       SUBROUTINE PNINT3(Ro,Rl,Ru,Ri,Fo,Fl,Fu,Fi,Po,R,Mode,Mtyp,Merr)
       IMPLICIT NONE
       DOUBLE PRECISION ZERO , HALF , ONE , TWO , THREE , C1L , C1U ,    &
-                     & C2L , C2U , C3L
+                       C2L , C2U , C3L
       PARAMETER (ZERO=0.0D0,HALF=0.5D0,ONE=1.0D0,TWO=2.0D0,THREE=3.0D0, &
-               & C1L=1.1D0,C1U=1.0D3,C2L=1.0D-2,C2U=0.9D0,C3L=1.0D-1)
+                 C1L=1.1D0,C1U=1.0D3,C2L=1.0D-2,C2U=0.9D0,C3L=1.0D-1)
       DOUBLE PRECISION Fi , Fl , Fo , Fu , Po , R , Ri , Rl , Ro , Ru
       INTEGER Merr , Mode , Mtyp
       DOUBLE PRECISION ai , al , au , den , dis
@@ -2486,9 +2486,9 @@
             pom = 0.0D0
             temp = Cf(kc)
             IF ( Ic(kc)==1 .OR. Ic(kc)==3 .OR. Ic(kc)==5 )              &
-               & pom = MIN(pom,temp-Cl(kc))
+                 pom = MIN(pom,temp-Cl(kc))
             IF ( Ic(kc)==2 .OR. Ic(kc)==4 .OR. Ic(kc)==6 )              &
-               & pom = MAX(pom,temp-Cu(kc))
+                 pom = MAX(pom,temp-Cu(kc))
             Fc = Fc - Cz(j)*pom
          ENDIF
       ENDDO
@@ -2593,14 +2593,14 @@
 ! CONVERGENCE PROPERTIES, SIAM J. NUMER.ANAL. 22 (1985) PP. 47-67.
 !
       SUBROUTINE PS0G01(R,F,Fo,Po,Pp,Xdel,Xdelo,Xmax,Rmax,Snorm,Bet1,   &
-                      & Bet2,Gam1,Gam2,Eps4,Eps5,Kd,Ld,Idir,Iters,Iterd,&
-                      & Maxst,Nred,Mred,Kters,Mes1,Mes2,Mes3,Isys)
+                        Bet2,Gam1,Gam2,Eps4,Eps5,Kd,Ld,Idir,Iters,Iterd,&
+                        Maxst,Nred,Mred,Kters,Mes1,Mes2,Mes3,Isys)
       IMPLICIT NONE
       INTEGER Kd , Ld , Idir , Iters , Iterd , Maxst , Nred , Mred ,    &
-            & Kters , Mes1 , Mes2 , Mes3 , Isys
+              Kters , Mes1 , Mes2 , Mes3 , Isys
       DOUBLE PRECISION R , F , Fo , Po , Pp , Xdel , Xdelo , Xmax ,     &
-                     & Rmax , Snorm , Bet1 , Bet2 , Gam1 , Gam2 , Eps4 ,&
-                     & Eps5
+                       Rmax , Snorm , Bet1 , Bet2 , Gam1 , Gam2 , Eps4 ,&
+                       Eps5
       DOUBLE PRECISION df , dfpred
       INTEGER nred1 , nred2
       SAVE nred1 , nred2
@@ -2747,13 +2747,13 @@
 ! CRITERIA.
 !
       SUBROUTINE PS0L02(R,Ro,Rp,F,Fo,Fp,Po,Pp,Fmin,Fmax,Rmin,Rmax,Tols, &
-                      & Kd,Ld,Nit,Kit,Nred,Mred,Maxst,Iest,Inits,Iters, &
-                      & Kters,Mes,Isys)
+                        Kd,Ld,Nit,Kit,Nred,Mred,Maxst,Iest,Inits,Iters, &
+                        Kters,Mes,Isys)
       IMPLICIT NONE
       INTEGER Kd , Ld , Nit , Kit , Nred , Mred , Maxst , Iest , Inits ,&
-            & Iters , Kters , Mes , Isys
+              Iters , Kters , Mes , Isys
       DOUBLE PRECISION R , Ro , Rp , F , Fo , Fp , Po , Pp , Fmin ,     &
-                     & Fmax , Rmin , Rmax , Tols
+                       Fmax , Rmin , Rmax , Tols
       DOUBLE PRECISION rl , fl , ru , fu , ri , fi , rtemp , TOL
       INTEGER mtyp , merr , mode , init1 , mes1 , mes2
       LOGICAL l1 , l2 , l3 , l4 , l6 , l7
@@ -2848,7 +2848,7 @@
             Isys = 0
             GOTO 99999
          ELSEIF ( l3 .AND. l4 .AND. l7 .AND.                            &
-                & (Kters==2 .OR. Kters==3 .OR. Kters==4) ) THEN
+                  (Kters==2 .OR. Kters==3 .OR. Kters==4) ) THEN
             Iters = 2
             Isys = 0
             GOTO 99999
@@ -2999,13 +2999,13 @@
 ! CRITERIA.
 !
       SUBROUTINE PS1L01(R,Rp,F,Fo,Fp,P,Po,Pp,Fmin,Fmax,Rmin,Rmax,Tols,  &
-                      & Tolp,Par1,Par2,Kd,Ld,Nit,Kit,Nred,Mred,Maxst,   &
-                      & Iest,Inits,Iters,Kters,Mes,Isys)
+                        Tolp,Par1,Par2,Kd,Ld,Nit,Kit,Nred,Mred,Maxst,   &
+                        Iest,Inits,Iters,Kters,Mes,Isys)
       IMPLICIT NONE
       INTEGER Kd , Ld , Nit , Kit , Nred , Mred , Maxst , Iest , Inits ,&
-            & Iters , Kters , Mes , Isys
+              Iters , Kters , Mes , Isys
       DOUBLE PRECISION R , Rp , F , Fo , Fp , P , Po , Pp , Fmin ,      &
-                     & Fmax , Rmin , Rmax , Tols , Tolp , Par1 , Par2
+                       Fmax , Rmin , Rmax , Tols , Tolp , Par1 , Par2
       DOUBLE PRECISION rl , fl , pl , ru , fu , pu , rtemp
       INTEGER mtyp , merr , mode , init1 , mes1 , mes2 , mes3
       LOGICAL l1 , l2 , l3 , l5 , l7 , m1 , m2 , m3
@@ -3037,12 +3037,12 @@
                m3 = l3
                IF ( mes3>=1 ) THEN
                   m1 = ABS(P)<=CON*ABS(Po) .AND. Fo - F>=(CON1/CON)     &
-                     & *ABS(Fo)
+                       *ABS(Fo)
                   l3 = l3 .OR. m1
                ENDIF
                IF ( mes3>=2 ) THEN
                   m2 = ABS(P)<=0.5D0*ABS(Po) .AND. ABS(Fo-F)            &
-                     & <=2.0D0*CON1*ABS(Fo)
+                       <=2.0D0*CON1*ABS(Fo)
                   l3 = l3 .OR. m2
                ENDIF
                Maxst = 0
@@ -3349,7 +3349,7 @@
 ! VARIOUS VARIABLE METRIC UPDATES INCLUDING BFGS UPDATE.
 !
       SUBROUTINE PUDBI1(N,H,S,Xo,Go,R,Po,Par1,Par2,F,Fo,P,Nit,Kit,Met,  &
-                      & Met1,Met2,Idecf,Iterd,Iterh)
+                        Met1,Met2,Idecf,Iterd,Iterh)
       IMPLICIT NONE
       INTEGER N , Nit , Kit , Met , Met1 , Met2 , Idecf , Iterd , Iterh
       DOUBLE PRECISION H(*) , S(*) , Xo(*) , Go(*) , R , Po
@@ -3358,7 +3358,7 @@
       DOUBLE PRECISION aa , cc
       DOUBLE PRECISION MXVDOT
       DOUBLE PRECISION dis , pom , pom3 , pom4 , a , b , c , gam , rho ,&
-                     & par
+                       par
       DOUBLE PRECISION den
       LOGICAL l1 , l2 , l3
       IF ( Met>0 ) THEN
@@ -3532,11 +3532,11 @@
 ! BASIC VARIABLE METRIC METHODS.
 !
       SUBROUTINE PUDBM2(Nf,N,H,Hh,S,Xo,Go,So,Fo,Par,Met1,Met3,Idecf,    &
-                      & Iterh)
+                        Iterh)
       IMPLICIT NONE
       INTEGER Nf , N , Met1 , Met3 , Idecf , Iterh
       DOUBLE PRECISION H(Nf*(Nf+1)/2) , Hh(Nf*(Nf+1)/2) , S(Nf) , Xo(Nf)&
-                     & , Go(Nf) , So(Nf) , Fo , Par
+                       , Go(Nf) , So(Nf) , Fo , Par
       DOUBLE PRECISION den , a , b , c , gam , pom , MXVDOT
       LOGICAL l1
       DOUBLE PRECISION CON
@@ -3697,11 +3697,11 @@
 !  FLETCHER'S COMBINATION OF THE GAUSS-NEWTON AND THE BFGS METHODS.
 !
       SUBROUTINE PUDFM1(N,B,S,Xo,Go,F,Fo,Eta5,Ipom1,Ipom2,Met1,Idecf,   &
-                      & Iterh)
+                        Iterh)
       IMPLICIT NONE
       INTEGER N , Ipom1 , Ipom2 , Met1 , Idecf , Iterh
       DOUBLE PRECISION B(N*(N+1)/2) , S(N) , Xo(N) , Go(N) , F , Fo ,   &
-                     & Eta5
+                       Eta5
       DOUBLE PRECISION MXVDOT
       DOUBLE PRECISION ab , bb , cb , gam , par
       LOGICAL l1
@@ -3727,7 +3727,7 @@
          RETURN
       ENDIF
       l1 = Met1==4 .OR. Met1==3 .AND. Ipom2>=1 .OR. Met1==2 .AND.       &
-         & Ipom2==1
+           Ipom2==1
       IF ( Fo-F>=Eta5*Fo ) THEN
          Ipom1 = 0
       ELSE
@@ -4015,14 +4015,14 @@
 !  S   MXVIND  CHANGE OF THE INTEGER VECTOR FOR CONSTRAINT ADDITION.
 !
       SUBROUTINE PYADB4(Nf,N,Nc,X,Ix,Xl,Xu,Cf,Cfd,Ic,Ica,Cl,Cu,Cg,Cr,Cz,&
-                      & H,S,R,Eps7,Eps9,Gmax,Umax,Kbf,Kbc,Inew,Ier,     &
-                      & Iterm)
+                        H,S,R,Eps7,Eps9,Gmax,Umax,Kbf,Kbc,Inew,Ier,     &
+                        Iterm)
       IMPLICIT NONE
       INTEGER Nf , N , Nc , Ix(*) , Ic(*) , Ica(*) , Kbf , Kbc , Inew , &
-            & Ier , Iterm
+              Ier , Iterm
       DOUBLE PRECISION X(*) , Xl(*) , Xu(*) , Cf(*) , Cfd(*) , Cl(*) ,  &
-                     & Cu(*) , Cg(*) , Cr(*) , Cz(*) , H(*) , S(*) , R ,&
-                     & Eps7 , Eps9 , Gmax , Umax
+                       Cu(*) , Cg(*) , Cr(*) , Cz(*) , H(*) , S(*) , R ,&
+                       Eps7 , Eps9 , Gmax , Umax
       INTEGER i , j , k , l , ij , ik , kc , kj , kk , ll
       DOUBLE PRECISION den , temp
       INTEGER NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
@@ -4035,7 +4035,7 @@
                   Inew = 0
                   CALL PLNEWS(X,Ix,Xl,Xu,Eps9,i,Inew)
                   CALL PLADB4(Nf,N,Ica,Cg,Cr,Cz,H,S,Eps7,Gmax,Umax,9,   &
-                            & Inew,NADd,Ier)
+                              Inew,NADd,Ier)
                   CALL MXVIND(Ix,i,Ier)
                   IF ( Ier<0 ) THEN
                      Iterm = -15
@@ -4047,7 +4047,7 @@
                Inew = 0
                CALL PLNEWL(kc,Cf,Ic,Cl,Cu,Eps9,Inew)
                CALL PLADB4(Nf,N,Ica,Cg,Cr,Cz,H,S,Eps7,Gmax,Umax,9,Inew, &
-                         & NADd,Ier)
+                           NADd,Ier)
                CALL MXVIND(Ic,kc,Ier)
                IF ( Ier<0 ) THEN
                   Iterm = -15
@@ -4084,7 +4084,7 @@
                         ENDIF
                         ij = ij + 1
                         IF ( i/=k .AND. j/=k ) H(ij) = H(ij)            &
-                           & + temp*H(ik)
+                             + temp*H(ik)
                      ENDDO
                   ENDDO
                ENDIF
@@ -4152,14 +4152,14 @@
 !         COMPUTED FUNCTION VALUES.
 !
       SUBROUTINE PYFUT1(N,F,Fo,Umax,Gmax,Dmax,Tolx,Tolf,Tolb,Tolg,Kd,   &
-                      & Nit,Kit,Mit,Nfv,Mfv,Nfg,Mfg,Ntesx,Mtesx,Ntesf,  &
-                      & Mtesf,Ites,Ires1,Ires2,Irest,Iters,Iterm)
+                        Nit,Kit,Mit,Nfv,Mfv,Nfg,Mfg,Ntesx,Mtesx,Ntesf,  &
+                        Mtesf,Ites,Ires1,Ires2,Irest,Iters,Iterm)
       IMPLICIT NONE
       INTEGER N , Kd , Nit , Kit , Mit , Nfv , Mfv , Nfg , Mfg , Ntesx ,&
-            & Mtesx , Ntesf , Mtesf , Ites , Ires1 , Ires2 , Irest ,    &
-            & Iters , Iterm
+              Mtesx , Ntesf , Mtesf , Ites , Ires1 , Ires2 , Irest ,    &
+              Iters , Iterm
       DOUBLE PRECISION F , Fo , Umax , Gmax , Dmax , Tolx , Tolf ,      &
-                     & Tolg , Tolb
+                       Tolg , Tolb
       DOUBLE PRECISION temp
       IF ( Iterm<0 ) RETURN
       IF ( Ites>0 ) THEN
@@ -4259,12 +4259,12 @@
 !  S   MXVSET  INITIATION OF A VECTOR.
 !
       SUBROUTINE PYRMB1(Nf,N,Ix,Ic,Ica,Cg,Cr,Cz,G,Gn,H,Eps8,Umax,Gmax,  &
-                      & Kbf,Kbc,Iold,Kold,Krem,Ier,Iterm)
+                        Kbf,Kbc,Iold,Kold,Krem,Ier,Iterm)
       IMPLICIT NONE
       INTEGER Nf , N , Ix(*) , Ic(*) , Ica(*) , Kbf , Kbc , Iold ,      &
-            & Kold , Krem , Ier , Iterm
+              Kold , Krem , Ier , Iterm
       DOUBLE PRECISION Cg(*) , Cr(*) , Cz(*) , G(*) , Gn(*) , H(*) ,    &
-                     & Eps8 , Umax , Gmax
+                       Eps8 , Umax , Gmax
       INTEGER i , j , k , kc , l
       INTEGER NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
       COMMON /STAT  / NREs , NDEc , NREm , NADd , NIT , NFV , NFG , NFH
@@ -4365,11 +4365,11 @@
 !  S   MXVSCL  SCALING OF A VECTOR.
 !
       SUBROUTINE PYTRBD(Nf,N,X,Ix,Xo,G,Go,Cz,Sn,R,F,Fo,P,Po,Dmax,Iters, &
-                      & Kbf,Kbc)
+                        Kbf,Kbc)
       IMPLICIT NONE
       INTEGER Nf , N , Ix(*) , Iters , Kbf , Kbc
       DOUBLE PRECISION X(*) , Xo(*) , G(*) , Go(*) , Cz(*) , Sn(*) , R ,&
-                     & F , Fo , P , Po , Dmax
+                       F , Fo , P , Po , Dmax
       INTEGER i , k
       IF ( Iters>0 ) THEN
          CALL MXVDIF(Nf,X,Xo,Xo)
@@ -4452,11 +4452,11 @@
 !  S   MXVMUL  DIAGONAL PREMULTIPLICATION OF A VECTOR.
 !
       SUBROUTINE PYTRBG(Nf,N,Ix,Ic,Ica,Cg,Cr,Cz,G,Gn,Umax,Gmax,Kbf,Kbc, &
-                      & Iold,Kold)
+                        Iold,Kold)
       IMPLICIT NONE
       INTEGER Nf , N , Ix(*) , Ic(*) , Ica(*) , Kbf , Kbc , Iold , Kold
       DOUBLE PRECISION Cg(*) , Cr(*) , Cz(*) , G(*) , Gn(*) , Umax ,    &
-                     & Gmax
+                       Gmax
       DOUBLE PRECISION temp , MXVMAX , MXVDOT
       INTEGER nca , ncz , i , j , k , kc
       Iold = 0
@@ -4490,7 +4490,7 @@
                IF ( k<=-5 ) THEN
                ELSEIF ( (k==-1 .OR. k==-3) .AND. Umax+temp>=0.0D0 ) THEN
                ELSEIF ( .NOT.((k==-2 .OR. k==-4) .AND. Umax-temp>=0.0D0)&
-                      & ) THEN
+                        ) THEN
                   Iold = j
                   Umax = ABS(temp)
                ENDIF
@@ -4514,7 +4514,7 @@
             ELSEIF ( k<=-5 ) THEN
             ELSEIF ( (k==-1 .OR. k==-3) .AND. Umax+temp>=0.0D0 ) THEN
             ELSEIF ( .NOT.((k==-2 .OR. k==-4) .AND. Umax-temp>=0.0D0) ) &
-                   & THEN
+                     THEN
                Iold = i
                Kold = j + 1
                Umax = ABS(temp)
@@ -4655,12 +4655,12 @@
 !  S   MXVSET  INITIATION OF A VECTOR.
 !
       SUBROUTINE PYTRBS(Nf,N,Nc,X,Ix,Xo,Xl,Xu,G,Go,Cf,Cfd,Ic,Cl,Cu,Cg,  &
-                      & Cz,Sn,S,Ro,Fp,Fo,F,Po,P,Rmax,Kbf,Kbc,Krem,Inew)
+                        Cz,Sn,S,Ro,Fp,Fo,F,Po,P,Rmax,Kbf,Kbc,Krem,Inew)
       IMPLICIT NONE
       INTEGER Nf , N , Nc , Ix(*) , Ic(*) , Kbf , Kbc , Krem , Inew
       DOUBLE PRECISION X(*) , Xo(*) , Xl(*) , Xu(*) , G(*) , Go(*) ,    &
-                     & Cf(*) , Cfd(*) , Cl(*) , Cu(*) , Cg(*) , Cz(*) , &
-                     & Sn(*) , S(*) , Ro , Fp , Fo , F , Po , P , Rmax
+                       Cf(*) , Cfd(*) , Cl(*) , Cu(*) , Cg(*) , Cz(*) , &
+                       Sn(*) , S(*) , Ro , Fp , Fo , F , Po , P , Rmax
       INTEGER i , k
       Fp = Fo
       Ro = 0.0D0
@@ -4738,12 +4738,12 @@
 !         SUBSTRACTED ONE.
 !
       SUBROUTINE PYTRFD(Nf,Nc,X,Xo,Iaa,Ag,Az,Cg,G,Go,N,Kd,Ld,R,F,Fo,P,  &
-                      & Po,Dmax,Iters)
+                        Po,Dmax,Iters)
       IMPLICIT NONE
       DOUBLE PRECISION Dmax , F , Fo , P , Po , R
       INTEGER Iters , Kd , Ld , N , Nc , Nf
       DOUBLE PRECISION Ag(*) , Az(*) , Cg(*) , G(*) , Go(*) , X(*) ,    &
-                     & Xo(*)
+                       Xo(*)
       INTEGER Iaa(*)
       INTEGER i , j , l
       CALL MXVSET(Nf,0.0D0,G)
@@ -4825,12 +4825,12 @@
 !         SUBSTRACTED ONE.
 !
       SUBROUTINE PYTRND(Nf,N,X,Xo,Ica,Cg,Cz,G,Go,R,F,Fo,P,Po,Cmax,Cmaxo,&
-                      & Dmax,Kd,Ld,Iters)
+                        Dmax,Kd,Ld,Iters)
       IMPLICIT NONE
       INTEGER Nf , N , Kd , Ld , Iters
       INTEGER Ica(*)
       DOUBLE PRECISION X(*) , Xo(*) , Cg(*) , Cz(*) , G(*) , Go(*) , R ,&
-                     & F , Fo , P , Po , Cmax , Cmaxo , Dmax
+                       F , Fo , P , Po , Cmax , Cmaxo , Dmax
       INTEGER i , j , l
       DO j = 1 , Nf - N
          l = Ica(j)
@@ -4896,7 +4896,7 @@
       IMPLICIT NONE
       INTEGER Nf , Kd , Ld , Iters
       DOUBLE PRECISION X(*) , Xo(*) , G(*) , Go(*) , R , F , Fo , P ,   &
-                     & Po , Dmax
+                       Po , Dmax
       INTEGER i
       IF ( Iters>0 ) THEN
          CALL MXVDIF(Nf,X,Xo,Xo)
@@ -4952,7 +4952,7 @@
       IMPLICIT NONE
       INTEGER Nf , Na , Kd , Ld , Iters
       DOUBLE PRECISION X(*) , Xo(*) , Af(*) , Afo(*) , R , F , Fo , P , &
-                     & Po , Dmax
+                       Po , Dmax
       INTEGER i
       IF ( Iters>0 ) THEN
          CALL MXVDIF(Nf,X,Xo,Xo)
