@@ -1,4 +1,12 @@
 
+   module matrix_routines
+
+      implicit NONE
+
+      public
+
+   contains
+
 ! SUBROUTINE MXDCMM               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
 ! 91/12/01 LU : ORIGINAL VERSION
@@ -30,7 +38,7 @@
          CALL MXVDIR(N,X(j),A(k+1),Y,Y)
          k = k + N
       ENDDO
-      END
+      END SUBROUTINE MXDCMM
 
 ! SUBROUTINE MXDPGB                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -96,7 +104,7 @@
             ii = ii - i
          ENDDO
       ENDIF
-      END
+      END SUBROUTINE MXDPGB
 
 ! SUBROUTINE MXDPGD                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -148,7 +156,7 @@
          ENDDO
          ii = ii - i
       ENDDO
-      END
+      END SUBROUTINE MXDPGD
 
 ! SUBROUTINE MXDPGF                ALL SYSTEMS                89/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -253,7 +261,7 @@
          ENDDO
       ENDDO
       IF ( l>0 .AND. ABS(Alf)>del ) Inf = l
-      END
+      END SUBROUTINE MXDPGF
 
 ! SUBROUTINE MXDPGN                ALL SYSTEMS               91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -287,7 +295,7 @@
       IMPLICIT NONE
       INTEGER N , Job
       DOUBLE PRECISION A(N*(N+1)/2) , X(N) , Alf
-      DOUBLE PRECISION xp , xm , fp , fm , MXVDOT
+      DOUBLE PRECISION xp , xm , fp , fm !, MXVDOT
       INTEGER i , k , ik , kk
       DOUBLE PRECISION ZERO , ONE
       PARAMETER (ZERO=0.0D0,ONE=1.0D0)
@@ -392,7 +400,7 @@
       DO i = 1 , N
          X(i) = X(i)/fm
       ENDDO
-      END
+      END SUBROUTINE MXDPGN
 
 ! FUNCTION MXDPGP                  ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -424,7 +432,7 @@
          temp = temp + X(i)*Y(i)/A(j)
       ENDDO
       MXDPGP = temp
-      END
+      END FUNCTION MXDPGP
 
 ! SUBROUTINE MXDPGS                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -451,7 +459,7 @@
          j = j + i
          A(j) = A(j)*Alf
       ENDDO
-      END
+      END SUBROUTINE MXDPGS
 
 ! SUBROUTINE MXDPGU                ALL SYSTEMS                89/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -563,7 +571,7 @@
             ii = ii - i
          ENDDO
       ENDIF
-      END
+      END SUBROUTINE MXDPGU
 
 ! SUBROUTINE MXDPRB                ALL SYSTEMS                89/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -619,7 +627,7 @@
             ii = ii - i
          ENDDO
       ENDIF
-      END
+      END SUBROUTINE MXDPRB
 
 ! SUBROUTINE MXDPRC                ALL SYSTEMS                92/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -659,7 +667,7 @@
             Inf = -1
          ENDIF
       ENDDO
-      END
+      END SUBROUTINE MXDPRC
 
 ! SUBROUTINE MXDPRM                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -711,7 +719,7 @@
             ij = ij - 1
          ENDDO
       ENDIF
-      END
+      END SUBROUTINE MXDPRM
 
 ! SUBROUTINE MXDRGR               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -748,7 +756,7 @@
          il = il + 1
          CALL MXVROT(A(ik),A(il),Ck,Cl,Ier)
       ENDDO
-      END
+      END SUBROUTINE MXDRGR
 
 ! SUBROUTINE MXDRMD               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -783,7 +791,7 @@
          Z(j) = temp
          k = k + N
       ENDDO
-      END
+      END SUBROUTINE MXDRMD
 
 ! SUBROUTINE MXDRMI               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -814,7 +822,7 @@
          ENDDO
          k = k + N
       ENDDO
-      END
+      END SUBROUTINE MXDRMI
 
 ! SUBROUTINE MXDRMM               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -847,7 +855,7 @@
          Y(j) = temp
          k = k + N
       ENDDO
-      END
+      END SUBROUTINE MXDRMM
 
 ! FUNCTION  MXDRMN               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -888,7 +896,7 @@
          ENDDO
       ENDIF
       MXDRMN = den*SQRT(pom)
-      END
+      END FUNCTION MXDRMN
 
 ! SUBROUTINE MXDRMV               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -917,7 +925,7 @@
          X(j) = A(i)
          i = i + N
       ENDDO
-      END
+      END SUBROUTINE MXDRMV
 
 ! SUBROUTINE MXDRQF               ALL SYSTEMS                92/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -946,7 +954,7 @@
       IMPLICIT NONE
       INTEGER N , M
       DOUBLE PRECISION Q(M*N) , R(N*(N+1)/2)
-      DOUBLE PRECISION alf , pom , MXDRMN
+      DOUBLE PRECISION alf , pom
       INTEGER i , j , k , l , jp , kp , nm
       DOUBLE PRECISION ZERO , ONE
       PARAMETER (ZERO=0.0D0,ONE=1.0D0)
@@ -1022,7 +1030,7 @@
          ENDIF
          Q(kp+k) = Q(kp+k) + ONE
       ENDDO
-      END
+      END SUBROUTINE MXDRQF
 
 ! SUBROUTINE MXDRQU               ALL SYSTEMS                92/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1058,7 +1066,7 @@
       IMPLICIT NONE
       INTEGER N , M , Inf
       DOUBLE PRECISION Q(M*N) , R(N*(N+1)/2) , Alf , X(M) , Y(N) , Z(N)
-      DOUBLE PRECISION ck , cl , zk , zl , MXVNOR
+      DOUBLE PRECISION ck , cl , zk , zl !, MXVNOR
       INTEGER j , k , l , kj , kk , ier
       DOUBLE PRECISION ONE , CON
       PARAMETER (ONE=1.0D0,CON=1.0D-10)
@@ -1160,7 +1168,7 @@
             ENDDO
          ENDIF
       ENDIF
-      END
+      END SUBROUTINE MXDRQU
 
 ! SUBROUTINE MXDSDA                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1185,7 +1193,7 @@
          j = j + i
          A(j) = A(j) + Alf
       ENDDO
-      END
+      END SUBROUTINE MXDSDA
 
 ! FUNCTION MXDSDL                  ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1218,7 +1226,7 @@
          ENDIF
       ENDDO
       MXDSDL = temp
-      END
+      END FUNCTION MXDSDL
 
 ! SUBROUTINE MXDSMA             ALL SYSTEMS                 91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1242,7 +1250,7 @@
       DO i = 1 , N*(N+1)/2
          C(i) = B(i) + Alf*A(i)
       ENDDO
-      END
+      END SUBROUTINE MXDSMA
 
 ! SUBROUTINE MXDSMC                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1266,7 +1274,7 @@
       DO i = 1 , m
          B(i) = A(i)
       ENDDO
-      END
+      END SUBROUTINE MXDSMC
 
 ! SUBROUTINE MXDSMG                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1309,7 +1317,7 @@
          Amax = MAX(Amax,A(k)+temp)
          Amin = MIN(Amin,A(k)-temp)
       ENDDO
-      END
+      END SUBROUTINE MXDSMG
 
 ! SUBROUTINE MXDSMI                ALL SYSTEMS                88/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1338,7 +1346,7 @@
          m = m + i
          A(m) = 1.0D0
       ENDDO
-      END
+      END SUBROUTINE MXDSMI
 
 ! SUBROUTINE MXDSMM                ALL SYSTEMS                89/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1374,7 +1382,7 @@
          Y(i) = temp
          k = k + i
       ENDDO
-      END
+      END SUBROUTINE MXDSMM
 
 ! FUNCTION MXDSMQ                  ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1412,7 +1420,7 @@
          temp = temp + X(i)*(temp2+A(k)*Y(i)) + Y(i)*temp1
       ENDDO
       MXDSMQ = temp
-      END
+      END FUNCTION MXDSMQ
 
 ! SUBROUTINE MXDSMR               ALL SYSTEMS                92/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1478,7 +1486,7 @@
          A(kk) = A(ll)
          A(ll) = akk
       ENDIF
-      END
+      END SUBROUTINE MXDSMR
 
 ! SUBROUTINE MXDSMS                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1502,7 +1510,7 @@
       DO i = 1 , m
          A(i) = A(i)*Alf
       ENDDO
-      END
+      END SUBROUTINE MXDSMS
 
 ! SUBROUTINE MXDSMU                ALL SYSTEMS                89/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1533,7 +1541,7 @@
             A(k) = A(k) + temp*X(j)
          ENDDO
       ENDDO
-      END
+      END SUBROUTINE MXDSMU
 
 ! SUBROUTINE MXDSMV                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1562,7 +1570,7 @@
          ENDIF
          X(i) = A(l)
       ENDDO
-      END
+      END SUBROUTINE MXDSMV
 
 ! SUBROUTINE MXVCOP                ALL SYSTEMS                88/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1584,7 +1592,7 @@
       DO i = 1 , N
          Y(i) = X(i)
       ENDDO
-      END
+      END SUBROUTINE MXVCOP
 
 ! SUBROUTINE MXVDIF                ALL SYSTEMS                88/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1606,7 +1614,7 @@
       DO i = 1 , N
          Z(i) = X(i) - Y(i)
       ENDDO
-      END
+      END SUBROUTINE MXVDIF
 
 ! SUBROUTINE MXVDIR                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1631,7 +1639,7 @@
       DO i = 1 , N
          Z(i) = Y(i) + A*X(i)
       ENDDO
-      END
+      END SUBROUTINE MXVDIR
 
 ! FUNCTION MXVDOT                  ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1657,7 +1665,7 @@
          temp = temp + X(i)*Y(i)
       ENDDO
       MXVDOT = temp
-      END
+      END FUNCTION MXVDOT
 
 ! SUBROUTINE MXVINA             ALL SYSTEMS                   90/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1680,7 +1688,7 @@
          Ix(i) = ABS(Ix(i))
          IF ( Ix(i)>10 ) Ix(i) = Ix(i) - 10
       ENDDO
-      END
+      END SUBROUTINE MXVINA
 
 ! SUBROUTINE MXVIND               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1698,7 +1706,7 @@
       IMPLICIT NONE
       INTEGER Ix(*) , I , Job
       IF ( Job==0 ) Ix(I) = 10 - Ix(I)
-      END
+      END SUBROUTINE MXVIND
 
 ! SUBROUTINE MXVINS             ALL SYSTEMS                   90/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1719,7 +1727,7 @@
       DO i = 1 , N
          Ix(i) = Ip
       ENDDO
-      END
+      END SUBROUTINE MXVINS
 
 ! SUBROUTINE MXVINV               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1741,7 +1749,7 @@
       IF ( (Ix(I)==3 .OR. Ix(I)==5) .AND. Job<0 ) Ix(I) = Ix(I) + 1
       IF ( (Ix(I)==4 .OR. Ix(I)==6) .AND. Job>0 ) Ix(I) = Ix(I) - 1
       Ix(I) = -Ix(I)
-      END
+      END SUBROUTINE MXVINV
 
 ! FUNCTION MXVMAX               ALL SYSTEMS                   91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1764,7 +1772,7 @@
       DO i = 1 , N
          MXVMAX = MAX(MXVMAX,ABS(X(i)))
       ENDDO
-      END
+      END FUNCTION MXVMAX
 
 ! SUBROUTINE MXVNEG                ALL SYSTEMS                88/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1786,7 +1794,7 @@
       DO i = 1 , N
          Y(i) = -X(i)
       ENDDO
-      END
+      END SUBROUTINE MXVNEG
 
 ! FUNCTION  MXVNOR               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1819,7 +1827,7 @@
          ENDDO
       ENDIF
       MXVNOR = den*SQRT(pom)
-      END
+      END FUNCTION MXVNOR
 
 ! SUBROUTINE MXVORT               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1866,7 +1874,7 @@
          Xl = 0.0D0
          Ier = 0
       ENDIF
-      END
+      END SUBROUTINE MXVORT
 
 ! SUBROUTINE MXVROT               ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1898,7 +1906,7 @@
          Xk = Xl
          Xl = yk
       ENDIF
-      END
+      END SUBROUTINE MXVROT
 
 ! SUBROUTINE MXVSAV                ALL SYSTEMS                91/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1923,7 +1931,7 @@
          Y(i) = X(i) - Y(i)
          X(i) = temp
       ENDDO
-      END
+      END SUBROUTINE MXVSAV
 
 ! SUBROUTINE MXVSCL                ALL SYSTEMS                88/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1947,7 +1955,7 @@
       DO i = 1 , N
          Y(i) = A*X(i)
       ENDDO
-      END
+      END SUBROUTINE MXVSCL
 
 ! SUBROUTINE MXVSET                ALL SYSTEMS                88/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1970,7 +1978,7 @@
       DO i = 1 , N
          X(i) = A
       ENDDO
-      END
+      END SUBROUTINE MXVSET
 
 ! SUBROUTINE MXVSUM                ALL SYSTEMS                88/12/01
 ! PORTABILITY : ALL SYSTEMS
@@ -1993,4 +2001,6 @@
       DO i = 1 , N
          Z(i) = X(i) + Y(i)
       ENDDO
-      END
+      END SUBROUTINE MXVSUM
+
+    end module matrix_routines
