@@ -576,11 +576,9 @@
       ENDIF
 
  500  IF ( Iprnt>1 .OR. Iprnt<0 ) WRITE (6,'(1X,''EXIT FROM PSQP :'')')
-      IF ( Iprnt/=0 ) WRITE (6,                                         &
-      '(1X,''NIT='',I4,2X,''NFV='',I4,2X,''NFG='',I4,2X,       ''F='',G1&
-      2.6,2X,''C='',E7.1,2X,''G='',E7.1,2X,''ITERM='',I3)') NIT , NFV , &
-      NFG , F , Cmax , Gmax , Iterm
-      IF ( Iprnt<0 ) WRITE (6,                                          &
-                            '(1X,''X='',5(G14.7,1X):/(3X,5(G14.7,1X)))')&
-                            (X(i),i=1,Nf)
+      IF ( Iprnt/=0 ) &
+         WRITE (6,'(1X,''NIT='',I4,2X,''NFV='',I4,2X,''NFG='',I4,2X,''F='',&
+                  G12.6,2X,''C='',E7.1,2X,''G='',E7.1,2X,''ITERM='',I3)') &
+                  NIT , NFV , NFG , F , Cmax , Gmax , Iterm
+      IF ( Iprnt<0 ) WRITE (6,'(1X,''X='',5(G14.7,1X):/(3X,5(G14.7,1X)))') (X(i),i=1,Nf)
       END
