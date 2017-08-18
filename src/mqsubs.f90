@@ -1,2006 +1,2006 @@
 
    module matrix_routines
 
-      implicit NONE
+      implicit none
 
       public
 
    contains
 
-! SUBROUTINE MXDCMM               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdcmm               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! MULTIPLICATION OF A COLUMNWISE STORED DENSE RECTANGULAR MATRIX A
-! BY A VECTOR X.
+! purpose :
+! multiplication of a columnwise stored dense rectangular matrix a
+! by a vector x.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF ROWS OF THE MATRIX A.
-!  II  M  NUMBER OF COLUMNS OF THE MATRIX A.
-!  RI  A(N*M)  RECTANGULAR MATRIX STORED COLUMNWISE IN THE
-!         ONE-DIMENSIONAL ARRAY.
-!  RI  X(M)  INPUT VECTOR.
-!  RO  Y(N)  OUTPUT VECTOR EQUAL TO A*X.
+! parameters :
+!  ii  n  number of rows of the matrix a.
+!  ii  m  number of columns of the matrix a.
+!  ri  a(n*m)  rectangular matrix stored columnwise in the
+!         one-dimensional array.
+!  ri  x(m)  input vector.
+!  ro  y(n)  output vector equal to a*x.
 !
-! SUBPROGRAMS USED :
-!  S   MXVDIR  VECTOR AUGMENTED BY THE SCALED VECTOR.
-!  S   MXVSET  INITIATION OF A VECTOR.
+! subprograms used :
+!  s   mxvdir  vector augmented by the scaled vector.
+!  s   mxvset  initiation of a vector.
 !
-      SUBROUTINE MXDCMM(N,M,A,X,Y)
-      IMPLICIT NONE
-      INTEGER N , M
-      DOUBLE PRECISION A(*) , X(*) , Y(*)
-      INTEGER j , k
-      CALL MXVSET(N,0.0D0,Y)
+      subroutine mxdcmm(n,m,a,x,y)
+      implicit none
+      integer n , m
+      double precision a(*) , x(*) , y(*)
+      integer j , k
+      call mxvset(n,0.0d0,y)
       k = 0
-      DO j = 1 , M
-         CALL MXVDIR(N,X(j),A(k+1),Y,Y)
-         k = k + N
-      ENDDO
-      END SUBROUTINE MXDCMM
+      do j = 1 , m
+         call mxvdir(n,x(j),a(k+1),y,y)
+         k = k + n
+      enddo
+      end subroutine mxdcmm
 
-! SUBROUTINE MXDPGB                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdpgb                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! SOLUTION OF A SYSTEM OF LINEAR EQUATIONS WITH A DENSE SYMMETRIC
-! POSITIVE DEFINITE MATRIX A+E USING THE FACTORIZATION A+E=L*D*TRANS(L)
-! OBTAINED BY THE SUBROUTINE MXDPGF.
+! purpose :
+! solution of a system of linear equations with a dense symmetric
+! positive definite matrix a+e using the factorization a+e=l*d*trans(l)
+! obtained by the subroutine mxdpgf.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2) FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE
-!         SUBROUTINE MXDPGF.
-!  RU  X(N)  ON INPUT THE RIGHT HAND SIDE OF A SYSTEM OF LINEAR
-!         EQUATIONS. ON OUTPUT THE SOLUTION OF A SYSTEM OF LINEAR
-!         EQUATIONS.
-!  II  JOB  OPTION. IF JOB=0 THEN X:=(A+E)**(-1)*X. IF JOB>0 THEN
-!         X:=L**(-1)*X. IF JOB<0 THEN X:=TRANS(L)**(-1)*X.
+! parameters :
+!  ii  n order of the matrix a.
+!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
+!         subroutine mxdpgf.
+!  ru  x(n)  on input the right hand side of a system of linear
+!         equations. on output the solution of a system of linear
+!         equations.
+!  ii  job  option. if job=0 then x:=(a+e)**(-1)*x. if job>0 then
+!         x:=l**(-1)*x. if job<0 then x:=trans(l)**(-1)*x.
 !
-! METHOD :
-! BACK SUBSTITUTION
+! method :
+! back substitution
 !
-      SUBROUTINE MXDPGB(N,A,X,Job)
-      IMPLICIT NONE
-      INTEGER Job , N
-      DOUBLE PRECISION A(*) , X(*)
-      INTEGER i , ii , ij , j
-      IF ( Job>=0 ) THEN
+      subroutine mxdpgb(n,a,x,job)
+      implicit none
+      integer job , n
+      double precision a(*) , x(*)
+      integer i , ii , ij , j
+      if ( job>=0 ) then
 !
-!     PHASE 1 : X:=L**(-1)*X
+!     phase 1 : x:=l**(-1)*x
 !
          ij = 0
-         DO i = 1 , N
-            DO j = 1 , i - 1
+         do i = 1 , n
+            do j = 1 , i - 1
                ij = ij + 1
-               X(i) = X(i) - A(ij)*X(j)
-            ENDDO
+               x(i) = x(i) - a(ij)*x(j)
+            enddo
             ij = ij + 1
-         ENDDO
-      ENDIF
-      IF ( Job==0 ) THEN
+         enddo
+      endif
+      if ( job==0 ) then
 !
-!     PHASE 2 : X:=D**(-1)*X
+!     phase 2 : x:=d**(-1)*x
 !
          ii = 0
-         DO i = 1 , N
+         do i = 1 , n
             ii = ii + i
-            X(i) = X(i)/A(ii)
-         ENDDO
-      ENDIF
-      IF ( Job<=0 ) THEN
+            x(i) = x(i)/a(ii)
+         enddo
+      endif
+      if ( job<=0 ) then
 !
-!     PHASE 3 : X:=TRANS(L)**(-1)*X
+!     phase 3 : x:=trans(l)**(-1)*x
 !
-         ii = N*(N-1)/2
-         DO i = N - 1 , 1 , -1
+         ii = n*(n-1)/2
+         do i = n - 1 , 1 , -1
             ij = ii
-            DO j = i + 1 , N
+            do j = i + 1 , n
                ij = ij + j - 1
-               X(i) = X(i) - A(ij)*X(j)
-            ENDDO
+               x(i) = x(i) - a(ij)*x(j)
+            enddo
             ii = ii - i
-         ENDDO
-      ENDIF
-      END SUBROUTINE MXDPGB
+         enddo
+      endif
+      end subroutine mxdpgb
 
-! SUBROUTINE MXDPGD                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdpgd                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! COMPUTATION OF A DIRECTION OF NEGATIVE CURVATURE WITH RESPECT TO A
-! DENSE SYMMETRIC MATRIX A USING THE FACTORIZATION A+E=L*D*TRANS(L)
-!         OBTAINED BY THE SUBROUTINE MXDPGF.
+! purpose :
+! computation of a direction of negative curvature with respect to a
+! dense symmetric matrix a using the factorization a+e=l*d*trans(l)
+!         obtained by the subroutine mxdpgf.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2) FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE
-!         SUBROUTINE MXDPGF.
-!  RO  X(N)  COMPUTED DIRECTION OF NEGATIVE CURVATURE (I.E.
-!         TRANS(X)*A*X<0) IF IT EXISTS.
-!  II  INF  INFORMATION OBTAINED IN THE FACTORIZATION PROCESS. THE
-!         DIRECTION OF NEGATIVE CURVATURE EXISTS ONLY IF INF>0.
+! parameters :
+!  ii  n order of the matrix a.
+!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
+!         subroutine mxdpgf.
+!  ro  x(n)  computed direction of negative curvature (i.e.
+!         trans(x)*a*x<0) if it exists.
+!  ii  inf  information obtained in the factorization process. the
+!         direction of negative curvature exists only if inf>0.
 !
-! METHOD :
-! P.E.GILL, W.MURRAY : NEWTON TYPE METHODS FOR UNCONSTRAINED AND
-! LINEARLY CONSTRAINED OPTIMIZATION, MATH. PROGRAMMING 28 (1974)
-! PP. 311-350.
+! method :
+! p.e.gill, w.murray : newton type methods for unconstrained and
+! linearly constrained optimization, math. programming 28 (1974)
+! pp. 311-350.
 !
-      SUBROUTINE MXDPGD(N,A,X,Inf)
-      IMPLICIT NONE
-      INTEGER N , Inf
-      DOUBLE PRECISION A(N*(N+1)/2) , X(N)
-      INTEGER i , j , ii , ij
-      DOUBLE PRECISION ZERO , ONE
-      PARAMETER (ZERO=0.0D0,ONE=1.0D0)
+      subroutine mxdpgd(n,a,x,inf)
+      implicit none
+      integer n , inf
+      double precision a(n*(n+1)/2) , x(n)
+      integer i , j , ii , ij
+      double precision zero , one
+      parameter (zero=0.0d0,one=1.0d0)
 !
-!     RIGHT HAND SIDE FORMATION
+!     right hand side formation
 !
-      DO i = 1 , N
-         X(i) = ZERO
-      ENDDO
-      IF ( Inf<=0 ) RETURN
-      X(Inf) = ONE
+      do i = 1 , n
+         x(i) = zero
+      enddo
+      if ( inf<=0 ) return
+      x(inf) = one
 !
-!     BACK SUBSTITUTION
+!     back substitution
 !
-      ii = Inf*(Inf-1)/2
-      DO i = Inf - 1 , 1 , -1
+      ii = inf*(inf-1)/2
+      do i = inf - 1 , 1 , -1
          ij = ii
-         DO j = i + 1 , Inf
+         do j = i + 1 , inf
             ij = ij + j - 1
-            X(i) = X(i) - A(ij)*X(j)
-         ENDDO
+            x(i) = x(i) - a(ij)*x(j)
+         enddo
          ii = ii - i
-      ENDDO
-      END SUBROUTINE MXDPGD
+      enddo
+      end subroutine mxdpgd
 
-! SUBROUTINE MXDPGF                ALL SYSTEMS                89/12/01
-! PORTABILITY : ALL SYSTEMS
-! 89/12/01 LU : ORIGINAL VERSION
+! subroutine mxdpgf                all systems                89/12/01
+! portability : all systems
+! 89/12/01 lu : original version
 !
-! PURPOSE :
-! FACTORIZATION A+E=L*D*TRANS(L) OF A DENSE SYMMETRIC POSITIVE DEFINITE
-! MATRIX A+E WHERE D AND E ARE DIAGONAL POSITIVE DEFINITE MATRICES AND
-! L IS A LOWER TRIANGULAR MATRIX. IF A IS SUFFICIENTLY POSITIVE
-! DEFINITE THEN E=0.
+! purpose :
+! factorization a+e=l*d*trans(l) of a dense symmetric positive definite
+! matrix a+e where d and e are diagonal positive definite matrices and
+! l is a lower triangular matrix. if a is sufficiently positive
+! definite then e=0.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2)  ON INPUT A GIVEN DENSE SYMMETRIC (USUALLY POSITIVE
-!         DEFINITE) MATRIX A STORED IN THE PACKED FORM. ON OUTPUT THE
-!         COMPUTED FACTORIZATION A+E=L*D*TRANS(L).
-!  IO  INF  AN INFORMATION OBTAINED IN THE FACTORIZATION PROCESS. IF
-!         INF=0 THEN A IS SUFFICIENTLY POSITIVE DEFINITE AND E=0. IF
-!         INF<0 THEN A IS NOT SUFFICIENTLY POSITIVE DEFINITE AND E>0. IF
-!         INF>0 THEN A IS INDEFINITE AND INF IS AN INDEX OF THE
-!         MOST NEGATIVE DIAGONAL ELEMENT USED IN THE FACTORIZATION
-!         PROCESS.
-!  RU  ALF  ON INPUT A DESIRED TOLERANCE FOR POSITIVE DEFINITENESS. ON
-!         OUTPUT THE MOST NEGATIVE DIAGONAL ELEMENT USED IN THE
-!         FACTORIZATION PROCESS (IF INF>0).
-!  RO  TAU  MAXIMUM DIAGONAL ELEMENT OF THE MATRIX E.
+! parameters :
+!  ii  n order of the matrix a.
+!  ru  a(n*(n+1)/2)  on input a given dense symmetric (usually positive
+!         definite) matrix a stored in the packed form. on output the
+!         computed factorization a+e=l*d*trans(l).
+!  io  inf  an information obtained in the factorization process. if
+!         inf=0 then a is sufficiently positive definite and e=0. if
+!         inf<0 then a is not sufficiently positive definite and e>0. if
+!         inf>0 then a is indefinite and inf is an index of the
+!         most negative diagonal element used in the factorization
+!         process.
+!  ru  alf  on input a desired tolerance for positive definiteness. on
+!         output the most negative diagonal element used in the
+!         factorization process (if inf>0).
+!  ro  tau  maximum diagonal element of the matrix e.
 !
-! METHOD :
-! P.E.GILL, W.MURRAY : NEWTON TYPE METHODS FOR UNCONSTRAINED AND
-! LINEARLY CONSTRAINED OPTIMIZATION, MATH. PROGRAMMING 28 (1974)
-! PP. 311-350.
+! method :
+! p.e.gill, w.murray : newton type methods for unconstrained and
+! linearly constrained optimization, math. programming 28 (1974)
+! pp. 311-350.
 !
-      SUBROUTINE MXDPGF(N,A,Inf,Alf,Tau)
-      IMPLICIT NONE
-      DOUBLE PRECISION Alf , Tau
-      INTEGER Inf , N
-      DOUBLE PRECISION A(*)
-      DOUBLE PRECISION bet , del , gam , rho , sig , tol
-      INTEGER i , ij , ik , j , k , kj , kk , l
+      subroutine mxdpgf(n,a,inf,alf,tau)
+      implicit none
+      double precision alf , tau
+      integer inf , n
+      double precision a(*)
+      double precision bet , del , gam , rho , sig , tol
+      integer i , ij , ik , j , k , kj , kk , l
       l = 0
-      Inf = 0
-      tol = Alf
+      inf = 0
+      tol = alf
 !
-!     ESTIMATION OF THE MATRIX NORM
+!     estimation of the matrix norm
 !
-      Alf = 0.0D0
-      bet = 0.0D0
-      gam = 0.0D0
-      Tau = 0.0D0
+      alf = 0.0d0
+      bet = 0.0d0
+      gam = 0.0d0
+      tau = 0.0d0
       kk = 0
-      DO k = 1 , N
+      do k = 1 , n
          kk = kk + k
-         bet = MAX(bet,ABS(A(kk)))
+         bet = max(bet,abs(a(kk)))
          kj = kk
-         DO j = k + 1 , N
+         do j = k + 1 , n
             kj = kj + j - 1
-            gam = MAX(gam,ABS(A(kj)))
-         ENDDO
-      ENDDO
-      bet = MAX(tol,bet,gam/N)
-!      DEL = TOL*BET
-      del = tol*MAX(bet,1.0D0)
+            gam = max(gam,abs(a(kj)))
+         enddo
+      enddo
+      bet = max(tol,bet,gam/n)
+!      del = tol*bet
+      del = tol*max(bet,1.0d0)
       kk = 0
-      DO k = 1 , N
+      do k = 1 , n
          kk = kk + k
 !
-!     DETERMINATION OF A DIAGONAL CORRECTION
+!     determination of a diagonal correction
 !
-         sig = A(kk)
-         IF ( Alf>sig ) THEN
-            Alf = sig
+         sig = a(kk)
+         if ( alf>sig ) then
+            alf = sig
             l = k
-         ENDIF
-         gam = 0.0D0
+         endif
+         gam = 0.0d0
          kj = kk
-         DO j = k + 1 , N
+         do j = k + 1 , n
             kj = kj + j - 1
-            gam = MAX(gam,ABS(A(kj)))
-         ENDDO
+            gam = max(gam,abs(a(kj)))
+         enddo
          gam = gam*gam
-         rho = MAX(ABS(sig),gam/bet,del)
-         IF ( Tau<rho-sig ) THEN
-            Tau = rho - sig
-            Inf = -1
-         ENDIF
+         rho = max(abs(sig),gam/bet,del)
+         if ( tau<rho-sig ) then
+            tau = rho - sig
+            inf = -1
+         endif
 !
-!     GAUSSIAN ELIMINATION
+!     gaussian elimination
 !
-         A(kk) = rho
+         a(kk) = rho
          kj = kk
-         DO j = k + 1 , N
+         do j = k + 1 , n
             kj = kj + j - 1
-            gam = A(kj)
-            A(kj) = gam/rho
+            gam = a(kj)
+            a(kj) = gam/rho
             ik = kk
             ij = kj
-            DO i = k + 1 , j
+            do i = k + 1 , j
                ik = ik + i - 1
                ij = ij + 1
-               A(ij) = A(ij) - A(ik)*gam
-            ENDDO
-         ENDDO
-      ENDDO
-      IF ( l>0 .AND. ABS(Alf)>del ) Inf = l
-      END SUBROUTINE MXDPGF
+               a(ij) = a(ij) - a(ik)*gam
+            enddo
+         enddo
+      enddo
+      if ( l>0 .and. abs(alf)>del ) inf = l
+      end subroutine mxdpgf
 
-! SUBROUTINE MXDPGN                ALL SYSTEMS               91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdpgn                all systems               91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! ESTIMATION OF THE MINIMUM EIGENVALUE AND THE CORRESPONDING EIGENVECTOR
-! OF A DENSE SYMMETRIC POSITIVE DEFINITE MATRIX A+E USING THE
-! FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE SUBROUTINE MXDPGF.
+! purpose :
+! estimation of the minimum eigenvalue and the corresponding eigenvector
+! of a dense symmetric positive definite matrix a+e using the
+! factorization a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2) FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE
-!         SUBROUTINE MXDPGF.
-!  RO  X(N)  ESTIMATED EIGENVECTOR.
-!  RO  ALF  ESTIMATED EIGENVALUE.
-!  II  JOB  OPTION. IF JOB=0 THEN ONLY ESTIMATED EIGENVALUE IS
-!         COMPUTED. IS JOB>0 THEN BOTH ESTIMATED EIGENVALUE AND
-!         ESTIMATED EIGENVECTOR ARE COMPUTED BY JOB ITERATIONS.
+! parameters :
+!  ii  n order of the matrix a.
+!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
+!         subroutine mxdpgf.
+!  ro  x(n)  estimated eigenvector.
+!  ro  alf  estimated eigenvalue.
+!  ii  job  option. if job=0 then only estimated eigenvalue is
+!         computed. is job>0 then both estimated eigenvalue and
+!         estimated eigenvector are computed by job iterations.
 !
-! SUBPROGRAMS USED :
-!  S   MXDPGB  BACK SUBSTITUTION.
-!  RF  MXVDOT  DOT PRODUCT OF TWO VECTORS.
+! subprograms used :
+!  s   mxdpgb  back substitution.
+!  rf  mxvdot  dot product of two vectors.
 !
-! METHOD :
-! A.K.CLINE, C.B.MOLER, G.W.STEWART, J.H.WILKINSON : AN ESTIMATE
-! FOR THE CONDITION NUMBER OF A MATRIX. SIAM J. NUMER. ANAL. 16
+! method :
+! a.k.cline, c.b.moler, g.w.stewart, j.h.wilkinson : an estimate
+! for the condition number of a matrix. siam j. numer. anal. 16
 ! (1979) 368-373.
 !
-      SUBROUTINE MXDPGN(N,A,X,Alf,Job)
-      IMPLICIT NONE
-      INTEGER N , Job
-      DOUBLE PRECISION A(N*(N+1)/2) , X(N) , Alf
-      DOUBLE PRECISION xp , xm , fp , fm !, MXVDOT
-      INTEGER i , k , ik , kk
-      DOUBLE PRECISION ZERO , ONE
-      PARAMETER (ZERO=0.0D0,ONE=1.0D0)
+      subroutine mxdpgn(n,a,x,alf,job)
+      implicit none
+      integer n , job
+      double precision a(n*(n+1)/2) , x(n) , alf
+      double precision xp , xm , fp , fm !, mxvdot
+      integer i , k , ik , kk
+      double precision zero , one
+      parameter (zero=0.0d0,one=1.0d0)
 !
-!     COMPUTATION OF THE VECTOR V WITH POSSIBLE MAXIMUM NORM SUCH
-!     THAT  L*D**(1/2)*V=U  WHERE U HAS ELEMENTS +1 OR -1
+!     computation of the vector v with possible maximum norm such
+!     that  l*d**(1/2)*v=u  where u has elements +1 or -1
 !
-      DO i = 1 , N
-         X(i) = ZERO
-      ENDDO
+      do i = 1 , n
+         x(i) = zero
+      enddo
       kk = 0
-      DO k = 1 , N
+      do k = 1 , n
          kk = kk + k
-         xp = -X(k) + ONE
-         xm = -X(k) - ONE
-         fp = ABS(xp)
-         fm = ABS(xm)
+         xp = -x(k) + one
+         xm = -x(k) - one
+         fp = abs(xp)
+         fm = abs(xm)
          ik = kk
-         DO i = k + 1 , N
+         do i = k + 1 , n
             ik = ik + i - 1
-            fp = fp + ABS(X(i)+A(ik)*xp)
-            fm = fm + ABS(X(i)+A(ik)*xm)
-         ENDDO
-         IF ( fp>=fm ) THEN
-            X(k) = xp
+            fp = fp + abs(x(i)+a(ik)*xp)
+            fm = fm + abs(x(i)+a(ik)*xm)
+         enddo
+         if ( fp>=fm ) then
+            x(k) = xp
             ik = kk
-            DO i = k + 1 , N
+            do i = k + 1 , n
                ik = ik + i - 1
-               X(i) = X(i) + A(ik)*xp
-            ENDDO
-         ELSE
-            X(k) = xm
+               x(i) = x(i) + a(ik)*xp
+            enddo
+         else
+            x(k) = xm
             ik = kk
-            DO i = k + 1 , N
+            do i = k + 1 , n
                ik = ik + i - 1
-               X(i) = X(i) + A(ik)*xm
-            ENDDO
-         ENDIF
-      ENDDO
+               x(i) = x(i) + a(ik)*xm
+            enddo
+         endif
+      enddo
 !
-!     COMPUTATION OF THE VECTOR X SUCH THAT
-!     D**(1/2)*TRANS(L)*X=V
+!     computation of the vector x such that
+!     d**(1/2)*trans(l)*x=v
 !
-      fm = ZERO
+      fm = zero
       kk = 0
-      DO k = 1 , N
+      do k = 1 , n
          kk = kk + k
-         IF ( Job<=0 ) THEN
-            fp = SQRT(A(kk))
-            X(k) = X(k)/fp
-            fm = fm + X(k)*X(k)
-         ELSE
-            X(k) = X(k)/A(kk)
-         ENDIF
-      ENDDO
-      fp = DBLE(N)
-      IF ( Job<=0 ) THEN
+         if ( job<=0 ) then
+            fp = sqrt(a(kk))
+            x(k) = x(k)/fp
+            fm = fm + x(k)*x(k)
+         else
+            x(k) = x(k)/a(kk)
+         endif
+      enddo
+      fp = dble(n)
+      if ( job<=0 ) then
 !
-!     FIRST ESTIMATION OF THE MINIMUM EIGENVALUE BY THE FORMULA
-!     ALF=(TRANS(U)*U)/(TRANS(V)*V)
+!     first estimation of the minimum eigenvalue by the formula
+!     alf=(trans(u)*u)/(trans(v)*v)
 !
-         Alf = fp/fm
-         RETURN
-      ENDIF
-      fm = ZERO
-      kk = N*(N+1)/2
-      DO k = N , 1 , -1
+         alf = fp/fm
+         return
+      endif
+      fm = zero
+      kk = n*(n+1)/2
+      do k = n , 1 , -1
          ik = kk
-         DO i = k + 1 , N
+         do i = k + 1 , n
             ik = ik + i - 1
-            X(k) = X(k) - A(ik)*X(i)
-         ENDDO
-         fm = fm + X(k)*X(k)
+            x(k) = x(k) - a(ik)*x(i)
+         enddo
+         fm = fm + x(k)*x(k)
          kk = kk - k
-      ENDDO
-      fm = SQRT(fm)
-      IF ( Job<=1 ) THEN
+      enddo
+      fm = sqrt(fm)
+      if ( job<=1 ) then
 !
-!     SECOND ESTIMATION OF THE MINIMUM EIGENVALUE BY THE FORMULA
-!     ALF=SQRT(TRANS(U)*U)/SQRT(TRANS(X)*X)
+!     second estimation of the minimum eigenvalue by the formula
+!     alf=sqrt(trans(u)*u)/sqrt(trans(x)*x)
 !
-         Alf = SQRT(fp)/fm
-      ELSE
+         alf = sqrt(fp)/fm
+      else
 !
-!     INVERSE ITERATIONS
+!     inverse iterations
 !
-         DO k = 2 , Job
+         do k = 2 , job
 !
-!     SCALING THE VECTOR X BY ITS NORM
+!     scaling the vector x by its norm
 !
-            DO i = 1 , N
-               X(i) = X(i)/fm
-            ENDDO
-            CALL MXDPGB(N,A,X,0)
-            fm = SQRT(MXVDOT(N,X,X))
-         ENDDO
-         Alf = ONE/fm
-      ENDIF
+            do i = 1 , n
+               x(i) = x(i)/fm
+            enddo
+            call mxdpgb(n,a,x,0)
+            fm = sqrt(mxvdot(n,x,x))
+         enddo
+         alf = one/fm
+      endif
 !
-!     SCALING THE VECTOR X BY ITS NORM
+!     scaling the vector x by its norm
 !
-      DO i = 1 , N
-         X(i) = X(i)/fm
-      ENDDO
-      END SUBROUTINE MXDPGN
+      do i = 1 , n
+         x(i) = x(i)/fm
+      enddo
+      end subroutine mxdpgn
 
-! FUNCTION MXDPGP                  ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! function mxdpgp                  all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! COMPUTATION OF THE NUMBER MXDPGP=TRANS(X)*D**(-1)*Y WHERE D IS A
-! DIAGONAL MATRIX IN THE FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE
-! SUBROUTINE MXDPGF.
+! purpose :
+! computation of the number mxdpgp=trans(x)*d**(-1)*y where d is a
+! diagonal matrix in the factorization a+e=l*d*trans(l) obtained by the
+! subroutine mxdpgf.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2) FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE
-!         SUBROUTINE MXDPGF.
-!  RI  X(N)  INPUT VECTOR.
-!  RI  Y(N)  INPUT VECTOR.
-!  RR  MXDPGP  COMPUTED NUMBER MXDPGP=TRANS(X)*D**(-1)*Y.
+! parameters :
+!  ii  n order of the matrix a.
+!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
+!         subroutine mxdpgf.
+!  ri  x(n)  input vector.
+!  ri  y(n)  input vector.
+!  rr  mxdpgp  computed number mxdpgp=trans(x)*d**(-1)*y.
 !
-      FUNCTION MXDPGP(N,A,X,Y)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(*) , X(*) , Y(*) , MXDPGP
-      DOUBLE PRECISION temp
-      INTEGER i , j
+      function mxdpgp(n,a,x,y)
+      implicit none
+      integer n
+      double precision a(*) , x(*) , y(*) , mxdpgp
+      double precision temp
+      integer i , j
       j = 0
-      temp = 0.0D0
-      DO i = 1 , N
+      temp = 0.0d0
+      do i = 1 , n
          j = j + i
-         temp = temp + X(i)*Y(i)/A(j)
-      ENDDO
-      MXDPGP = temp
-      END FUNCTION MXDPGP
+         temp = temp + x(i)*y(i)/a(j)
+      enddo
+      mxdpgp = temp
+      end function mxdpgp
 
-! SUBROUTINE MXDPGS                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdpgs                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! SCALING OF A DENSE SYMMETRIC POSITIVE DEFINITE MATRIX A+E USING THE
-! FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE SUBROUTINE MXDPGF.
+! purpose :
+! scaling of a dense symmetric positive definite matrix a+e using the
+! factorization a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2) FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE
-!         SUBROUTINE MXDPGF.
-!  RI  ALF  SCALING FACTOR.
+! parameters :
+!  ii  n order of the matrix a.
+!  ru  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
+!         subroutine mxdpgf.
+!  ri  alf  scaling factor.
 !
-      SUBROUTINE MXDPGS(N,A,Alf)
-      IMPLICIT NONE
-      DOUBLE PRECISION Alf
-      INTEGER N
-      DOUBLE PRECISION A(*)
-      INTEGER i , j
+      subroutine mxdpgs(n,a,alf)
+      implicit none
+      double precision alf
+      integer n
+      double precision a(*)
+      integer i , j
       j = 0
-      DO i = 1 , N
+      do i = 1 , n
          j = j + i
-         A(j) = A(j)*Alf
-      ENDDO
-      END SUBROUTINE MXDPGS
+         a(j) = a(j)*alf
+      enddo
+      end subroutine mxdpgs
 
-! SUBROUTINE MXDPGU                ALL SYSTEMS                89/12/01
-! PORTABILITY : ALL SYSTEMS
-! 89/12/01 LU : ORIGINAL VERSION
+! subroutine mxdpgu                all systems                89/12/01
+! portability : all systems
+! 89/12/01 lu : original version
 !
-! PURPOSE :
-! CORRECTION OF A DENSE SYMMETRIC POSITIVE DEFINITE MATRIX A+E IN THE
-! FACTORED FORM A+E=L*D*TRANS(L) OBTAINED BY THE SUBROUTINE MXDPGF.
-! THE CORRECTION IS DEFINED AS A+E:=A+E+ALF*X*TRANS(X) WHERE ALF IS A
-! GIVEN SCALING FACTOR AND X IS A GIVEN VECTOR.
+! purpose :
+! correction of a dense symmetric positive definite matrix a+e in the
+! factored form a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
+! the correction is defined as a+e:=a+e+alf*x*trans(x) where alf is a
+! given scaling factor and x is a given vector.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2) FACTORIZATION A+E=L*D*TRANS(L) OBTAINED BY THE
-!         SUBROUTINE MXDPGF.
-!  RI  ALF  SCALING FACTOR IN THE CORRECTION TERM.
-!  RI  X(N)  VECTOR IN THE CORRECTION TERM.
-!  RA  Y(N) AUXILIARY VECTOR.
+! parameters :
+!  ii  n order of the matrix a.
+!  ru  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
+!         subroutine mxdpgf.
+!  ri  alf  scaling factor in the correction term.
+!  ri  x(n)  vector in the correction term.
+!  ra  y(n) auxiliary vector.
 !
-! METHOD :
-! P.E.GILL, W.MURRAY, M.SAUNDERS: METHODS FOR COMPUTING AND MODIFYING
-! THE LDV FACTORS OF A MATRIX, MATH. OF COMP. 29 (1974) PP. 1051-1077.
+! method :
+! p.e.gill, w.murray, m.saunders: methods for computing and modifying
+! the ldv factors of a matrix, math. of comp. 29 (1974) pp. 1051-1077.
 !
-      SUBROUTINE MXDPGU(N,A,Alf,X,Y)
-      IMPLICIT NONE
-      DOUBLE PRECISION ZERO , ONE , FOUR , CON
-      PARAMETER (ZERO=0.0D0,ONE=1.0D0,FOUR=4.0D0,CON=1.0D-8)
-      DOUBLE PRECISION Alf , alfr
-      INTEGER N
-      DOUBLE PRECISION A(*) , X(*) , Y(*)
-      DOUBLE PRECISION b , d , p , r , t , to
-      INTEGER i , ii , ij , j
-      IF ( Alf>=ZERO ) THEN
+      subroutine mxdpgu(n,a,alf,x,y)
+      implicit none
+      double precision zero , one , four , con
+      parameter (zero=0.0d0,one=1.0d0,four=4.0d0,con=1.0d-8)
+      double precision alf , alfr
+      integer n
+      double precision a(*) , x(*) , y(*)
+      double precision b , d , p , r , t , to
+      integer i , ii , ij , j
+      if ( alf>=zero ) then
 !
-!     FORWARD CORRECTION IN CASE WHEN THE SCALING FACTOR IS NONNEGATIVE
+!     forward correction in case when the scaling factor is nonnegative
 !
-         alfr = SQRT(Alf)
-         CALL MXVSCL(N,alfr,X,Y)
-         to = ONE
+         alfr = sqrt(alf)
+         call mxvscl(n,alfr,x,y)
+         to = one
          ii = 0
-         DO i = 1 , N
+         do i = 1 , n
             ii = ii + i
-            d = A(ii)
-            p = Y(i)
+            d = a(ii)
+            p = y(i)
             t = to + p*p/d
             r = to/t
-            A(ii) = d/r
+            a(ii) = d/r
             b = p/(d*t)
-            IF ( A(ii)<=FOUR*d ) THEN
+            if ( a(ii)<=four*d ) then
 !
-!     AN EASY FORMULA FOR LIMITED DIAGONAL ELEMENT
-!
-               ij = ii
-               DO j = i + 1 , N
-                  ij = ij + j - 1
-                  d = A(ij)
-                  Y(j) = Y(j) - p*d
-                  A(ij) = d + b*Y(j)
-               ENDDO
-            ELSE
-!
-!     A MORE COMPLICATE BUT NUMERICALLY STABLE FORMULA FOR UNLIMITED
-!     DIAGONAL ELEMENT
+!     an easy formula for limited diagonal element
 !
                ij = ii
-               DO j = i + 1 , N
+               do j = i + 1 , n
                   ij = ij + j - 1
-                  d = A(ij)
-                  A(ij) = r*d + b*Y(j)
-                  Y(j) = Y(j) - p*d
-               ENDDO
-            ENDIF
+                  d = a(ij)
+                  y(j) = y(j) - p*d
+                  a(ij) = d + b*y(j)
+               enddo
+            else
+!
+!     a more complicate but numerically stable formula for unlimited
+!     diagonal element
+!
+               ij = ii
+               do j = i + 1 , n
+                  ij = ij + j - 1
+                  d = a(ij)
+                  a(ij) = r*d + b*y(j)
+                  y(j) = y(j) - p*d
+               enddo
+            endif
             to = t
-         ENDDO
-      ELSE
+         enddo
+      else
 !
-!     BACKWARD CORRECTION IN CASE WHEN THE SCALING FACTOR IS NEGATIVE
+!     backward correction in case when the scaling factor is negative
 !
-         alfr = SQRT(-Alf)
-         CALL MXVSCL(N,alfr,X,Y)
-         to = ONE
+         alfr = sqrt(-alf)
+         call mxvscl(n,alfr,x,y)
+         to = one
          ij = 0
-         DO i = 1 , N
-            d = Y(i)
-            DO j = 1 , i - 1
+         do i = 1 , n
+            d = y(i)
+            do j = 1 , i - 1
                ij = ij + 1
-               d = d - A(ij)*Y(j)
-            ENDDO
-            Y(i) = d
+               d = d - a(ij)*y(j)
+            enddo
+            y(i) = d
             ij = ij + 1
-            to = to - d*d/A(ij)
-         ENDDO
-         IF ( to<=ZERO ) to = CON
-         ii = N*(N+1)/2
-         DO i = N , 1 , -1
-            d = A(ii)
-            p = Y(i)
+            to = to - d*d/a(ij)
+         enddo
+         if ( to<=zero ) to = con
+         ii = n*(n+1)/2
+         do i = n , 1 , -1
+            d = a(ii)
+            p = y(i)
             t = to + p*p/d
-            A(ii) = d*to/t
+            a(ii) = d*to/t
             b = -p/(d*to)
             to = t
             ij = ii
-            DO j = i + 1 , N
+            do j = i + 1 , n
                ij = ij + j - 1
-               d = A(ij)
-               A(ij) = d + b*Y(j)
-               Y(j) = Y(j) + p*d
-            ENDDO
+               d = a(ij)
+               a(ij) = d + b*y(j)
+               y(j) = y(j) + p*d
+            enddo
             ii = ii - i
-         ENDDO
-      ENDIF
-      END SUBROUTINE MXDPGU
+         enddo
+      endif
+      end subroutine mxdpgu
 
-! SUBROUTINE MXDPRB                ALL SYSTEMS                89/12/01
-! PORTABILITY : ALL SYSTEMS
-! 89/12/01 LU : ORIGINAL VERSION
+! subroutine mxdprb                all systems                89/12/01
+! portability : all systems
+! 89/12/01 lu : original version
 !
-! PURPOSE :
-! SOLUTION OF A SYSTEM OF LINEAR EQUATIONS WITH A DENSE SYMMETRIC
-! POSITIVE DEFINITE MATRIX A USING THE FACTORIZATION A=TRANS(R)*R.
+! purpose :
+! solution of a system of linear equations with a dense symmetric
+! positive definite matrix a using the factorization a=trans(r)*r.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2) FACTORIZATION A=TRANS(R)*R.
-!  RU  X(N)  ON INPUT THE RIGHT HAND SIDE OF A SYSTEM OF LINEAR
-!         EQUATIONS. ON OUTPUT THE SOLUTION OF A SYSTEM OF LINEAR
-!         EQUATIONS.
-!  II  JOB  OPTION. IF JOB=0 THEN X:=A**(-1)*X. IF JOB>0 THEN
-!         X:=TRANS(R)**(-1)*X. IF JOB<0 THEN X:=R**(-1)*X.
+! parameters :
+!  ii  n order of the matrix a.
+!  ri  a(n*(n+1)/2) factorization a=trans(r)*r.
+!  ru  x(n)  on input the right hand side of a system of linear
+!         equations. on output the solution of a system of linear
+!         equations.
+!  ii  job  option. if job=0 then x:=a**(-1)*x. if job>0 then
+!         x:=trans(r)**(-1)*x. if job<0 then x:=r**(-1)*x.
 !
-! METHOD :
-! BACK SUBSTITUTION
+! method :
+! back substitution
 !
-      SUBROUTINE MXDPRB(N,A,X,Job)
-      IMPLICIT NONE
-      INTEGER Job , N
-      DOUBLE PRECISION A(*) , X(*)
-      INTEGER i , ii , ij , j
-      IF ( Job>=0 ) THEN
+      subroutine mxdprb(n,a,x,job)
+      implicit none
+      integer job , n
+      double precision a(*) , x(*)
+      integer i , ii , ij , j
+      if ( job>=0 ) then
 !
-!     PHASE 1 : X:=TRANS(R)**(-1)*X
+!     phase 1 : x:=trans(r)**(-1)*x
 !
          ij = 0
-         DO i = 1 , N
-            DO j = 1 , i - 1
+         do i = 1 , n
+            do j = 1 , i - 1
                ij = ij + 1
-               X(i) = X(i) - A(ij)*X(j)
-            ENDDO
+               x(i) = x(i) - a(ij)*x(j)
+            enddo
             ij = ij + 1
-            X(i) = X(i)/A(ij)
-         ENDDO
-      ENDIF
-      IF ( Job<=0 ) THEN
+            x(i) = x(i)/a(ij)
+         enddo
+      endif
+      if ( job<=0 ) then
 !
-!     PHASE 2 : X:=R**(-1)*X
+!     phase 2 : x:=r**(-1)*x
 !
-         ii = N*(N+1)/2
-         DO i = N , 1 , -1
+         ii = n*(n+1)/2
+         do i = n , 1 , -1
             ij = ii
-            DO j = i + 1 , N
+            do j = i + 1 , n
                ij = ij + j - 1
-               X(i) = X(i) - A(ij)*X(j)
-            ENDDO
-            X(i) = X(i)/A(ii)
+               x(i) = x(i) - a(ij)*x(j)
+            enddo
+            x(i) = x(i)/a(ii)
             ii = ii - i
-         ENDDO
-      ENDIF
-      END SUBROUTINE MXDPRB
+         enddo
+      endif
+      end subroutine mxdprb
 
-! SUBROUTINE MXDPRC                ALL SYSTEMS                92/12/01
-! PORTABILITY : ALL SYSTEMS
-! 92/12/01 LU : ORIGINAL VERSION
+! subroutine mxdprc                all systems                92/12/01
+! portability : all systems
+! 92/12/01 lu : original version
 !
-! PURPOSE :
-! CORRECTION OF A SINGULAR DENSE SYMMETRIC POSITIVE SEMIDEFINITE MATRIX
-! A DECOMPOSED AS A=TRANS(R)*R.
+! purpose :
+! correction of a singular dense symmetric positive semidefinite matrix
+! a decomposed as a=trans(r)*r.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  IO  INF  AN INFORMATION OBTAINED IN THE CORRECTION PROCESS. IF
-!         INF=0 THEN A IS SUFFICIENTLY POSITIVE DEFINITE. IF
-!         INF<0 THEN A IS NOT SUFFICIENTLY POSITIVE DEFINITE.
-!         PROCESS.
-!  RI  TOL  DESIRED TOLERANCE FOR POSITIVE DEFINITENESS.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  io  inf  an information obtained in the correction process. if
+!         inf=0 then a is sufficiently positive definite. if
+!         inf<0 then a is not sufficiently positive definite.
+!         process.
+!  ri  tol  desired tolerance for positive definiteness.
 !
-      SUBROUTINE MXDPRC(N,A,Inf,Tol)
-      IMPLICIT NONE
-      INTEGER N , Inf
-      DOUBLE PRECISION A(N*(N+1)/2) , Tol
-      DOUBLE PRECISION tol1 , temp
-      INTEGER l , i
-      Inf = 0
-      tol1 = SQRT(Tol)
+      subroutine mxdprc(n,a,inf,tol)
+      implicit none
+      integer n , inf
+      double precision a(n*(n+1)/2) , tol
+      double precision tol1 , temp
+      integer l , i
+      inf = 0
+      tol1 = sqrt(tol)
       temp = tol1
-      DO i = 1 , N*(N+1)/2
-         temp = MAX(temp,ABS(A(i)))
-      ENDDO
+      do i = 1 , n*(n+1)/2
+         temp = max(temp,abs(a(i)))
+      enddo
       temp = temp*tol1
       l = 0
-      DO i = 1 , N
+      do i = 1 , n
          l = l + i
-         IF ( ABS(A(l))<=temp ) THEN
-            A(l) = SIGN(temp,A(l))
-            Inf = -1
-         ENDIF
-      ENDDO
-      END SUBROUTINE MXDPRC
+         if ( abs(a(l))<=temp ) then
+            a(l) = sign(temp,a(l))
+            inf = -1
+         endif
+      enddo
+      end subroutine mxdprc
 
-! SUBROUTINE MXDPRM                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdprm                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! MULTIPLICATION OF A GIVEN VECTOR X BY A DENSE SYMMETRIC POSITIVE
-! DEFINITE MATRIX A USING THE FACTORIZATION A=TRANS(R)*R.
+! purpose :
+! multiplication of a given vector x by a dense symmetric positive
+! definite matrix a using the factorization a=trans(r)*r.
 !
-! PARAMETERS :
-!  II  N ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2) FACTORIZATION A=TRANS(R)*R.
-!  RU  X(N)  ON INPUT THE GIVEN VECTOR. ON OUTPUT THE RESULT OF
-!         MULTIPLICATION.
-!  II  JOB  OPTION. IF JOB=0 THEN X:=A*X. IF JOB>0 THEN X:=R*X.
-!         IF JOB<0 THEN X:=TRANS(R)*X.
+! parameters :
+!  ii  n order of the matrix a.
+!  ri  a(n*(n+1)/2) factorization a=trans(r)*r.
+!  ru  x(n)  on input the given vector. on output the result of
+!         multiplication.
+!  ii  job  option. if job=0 then x:=a*x. if job>0 then x:=r*x.
+!         if job<0 then x:=trans(r)*x.
 !
-      SUBROUTINE MXDPRM(N,A,X,Job)
-      IMPLICIT NONE
-      INTEGER N , Job
-      DOUBLE PRECISION A(N*(N+1)/2) , X(N)
-      INTEGER i , j , ii , ij
-      IF ( Job>=0 ) THEN
+      subroutine mxdprm(n,a,x,job)
+      implicit none
+      integer n , job
+      double precision a(n*(n+1)/2) , x(n)
+      integer i , j , ii , ij
+      if ( job>=0 ) then
 !
-!     PHASE 1 : X:=R*X
+!     phase 1 : x:=r*x
 !
          ii = 0
-         DO i = 1 , N
+         do i = 1 , n
             ii = ii + i
-            X(i) = A(ii)*X(i)
+            x(i) = a(ii)*x(i)
             ij = ii
-            DO j = i + 1 , N
+            do j = i + 1 , n
                ij = ij + j - 1
-               X(i) = X(i) + A(ij)*X(j)
-            ENDDO
-         ENDDO
-      ENDIF
-      IF ( Job<=0 ) THEN
+               x(i) = x(i) + a(ij)*x(j)
+            enddo
+         enddo
+      endif
+      if ( job<=0 ) then
 !
-!     PHASE 2 : X:=TRANS(R)*X
+!     phase 2 : x:=trans(r)*x
 !
-         ij = N*(N+1)/2
-         DO i = N , 1 , -1
-            X(i) = A(ij)*X(i)
-            DO j = i - 1 , 1 , -1
+         ij = n*(n+1)/2
+         do i = n , 1 , -1
+            x(i) = a(ij)*x(i)
+            do j = i - 1 , 1 , -1
                ij = ij - 1
-               X(i) = X(i) + A(ij)*X(j)
-            ENDDO
+               x(i) = x(i) + a(ij)*x(j)
+            enddo
             ij = ij - 1
-         ENDDO
-      ENDIF
-      END SUBROUTINE MXDPRM
+         enddo
+      endif
+      end subroutine mxdprm
 
-! SUBROUTINE MXDRGR               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdrgr               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! PLANE ROTATION IS APPLIED TO A ROWWISE STORED DENSE RECTANGULAR
-! MATRIX A.
+! purpose :
+! plane rotation is applied to a rowwise stored dense rectangular
+! matrix a.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX A.
-!  RU  A(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE
-!         ONE-DIMENSIONAL ARRAY.
-!  II  K  FIRST INDEX OF THE PLANE ROTATION.
-!  II  L  SECOND INDEX OF THE PLANE ROTATION.
-!  RI  CK  DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  RI  CL  OFF-DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  II  IER  TYPE OF THE PLANE ROTATION. IER=0-GENERAL PLANE ROTATION.
-!         IER=1-PERMUTATION. IER=2-TRANSFORMATION SUPPRESSED.
+! parameters :
+!  ii  n  number of columns of the matrix a.
+!  ru  a(m*n)  rectangular matrix stored rowwise in the
+!         one-dimensional array.
+!  ii  k  first index of the plane rotation.
+!  ii  l  second index of the plane rotation.
+!  ri  ck  diagonal element of the elementary orthogonal matrix.
+!  ri  cl  off-diagonal element of the elementary orthogonal matrix.
+!  ii  ier  type of the plane rotation. ier=0-general plane rotation.
+!         ier=1-permutation. ier=2-transformation suppressed.
 !
-! SUBPROGRAMS USED :
-!  S   MXVROT  PLANE ROTATION APPLIED TO TWO ELEMENTS.
+! subprograms used :
+!  s   mxvrot  plane rotation applied to two elements.
 !
-      SUBROUTINE MXDRGR(N,A,K,L,Ck,Cl,Ier)
-      IMPLICIT NONE
-      INTEGER N , K , L , Ier
-      DOUBLE PRECISION A(*) , Ck , Cl
-      INTEGER i , ik , il
-      IF ( Ier/=0 .AND. Ier/=1 ) RETURN
-      ik = (K-1)*N
-      il = (L-1)*N
-      DO i = 1 , N
+      subroutine mxdrgr(n,a,k,l,ck,cl,ier)
+      implicit none
+      integer n , k , l , ier
+      double precision a(*) , ck , cl
+      integer i , ik , il
+      if ( ier/=0 .and. ier/=1 ) return
+      ik = (k-1)*n
+      il = (l-1)*n
+      do i = 1 , n
          ik = ik + 1
          il = il + 1
-         CALL MXVROT(A(ik),A(il),Ck,Cl,Ier)
-      ENDDO
-      END SUBROUTINE MXDRGR
+         call mxvrot(a(ik),a(il),ck,cl,ier)
+      enddo
+      end subroutine mxdrgr
 
-! SUBROUTINE MXDRMD               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdrmd               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! MULTIPLICATION OF A ROWWISE STORED DENSE RECTANGULAR MATRIX A BY
-! A VECTOR X AND ADDITION OF A SCALED VECTOR ALF*Y.
+! purpose :
+! multiplication of a rowwise stored dense rectangular matrix a by
+! a vector x and addition of a scaled vector alf*y.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX A.
-!  II  M  NUMBER OF ROWS OF THE MATRIX A.
-!  RI  A(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE
-!         ONE-DIMENSIONAL ARRAY.
-!  RI  X(N)  INPUT VECTOR.
-!  RI  ALF  SCALING FACTOR.
-!  RI  Y(M)  INPUT VECTOR.
-!  RO  Z(M)  OUTPUT VECTOR EQUAL TO A*X+ALF*Y.
+! parameters :
+!  ii  n  number of columns of the matrix a.
+!  ii  m  number of rows of the matrix a.
+!  ri  a(m*n)  rectangular matrix stored rowwise in the
+!         one-dimensional array.
+!  ri  x(n)  input vector.
+!  ri  alf  scaling factor.
+!  ri  y(m)  input vector.
+!  ro  z(m)  output vector equal to a*x+alf*y.
 !
-      SUBROUTINE MXDRMD(N,M,A,X,Alf,Y,Z)
-      IMPLICIT NONE
-      INTEGER N , M
-      DOUBLE PRECISION A(M*N) , X(N) , Alf , Y(M) , Z(M)
-      DOUBLE PRECISION temp
-      INTEGER i , j , k
+      subroutine mxdrmd(n,m,a,x,alf,y,z)
+      implicit none
+      integer n , m
+      double precision a(m*n) , x(n) , alf , y(m) , z(m)
+      double precision temp
+      integer i , j , k
       k = 0
-      DO j = 1 , M
-         temp = Alf*Y(j)
-         DO i = 1 , N
-            temp = temp + A(k+i)*X(i)
-         ENDDO
-         Z(j) = temp
-         k = k + N
-      ENDDO
-      END SUBROUTINE MXDRMD
+      do j = 1 , m
+         temp = alf*y(j)
+         do i = 1 , n
+            temp = temp + a(k+i)*x(i)
+         enddo
+         z(j) = temp
+         k = k + n
+      enddo
+      end subroutine mxdrmd
 
-! SUBROUTINE MXDRMI               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdrmi               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! ROWWISE STORED DENSE RECTANGULAR MATRIX A IS SET TO BE A PART OF THE
-! UNIT MATRIX.
+! purpose :
+! rowwise stored dense rectangular matrix a is set to be a part of the
+! unit matrix.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX A.
-!  II  M  NUMBER OF ROWS OF THE MATRIX A.
-!  RO  A(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE ONE-DIMENSIONAL
-!          ARRAY. THIS MATRIX IS SET TO TRANS([I,0]).
+! parameters :
+!  ii  n  number of columns of the matrix a.
+!  ii  m  number of rows of the matrix a.
+!  ro  a(m*n)  rectangular matrix stored rowwise in the one-dimensional
+!          array. this matrix is set to trans([i,0]).
 !
-      SUBROUTINE MXDRMI(N,M,A)
-      IMPLICIT NONE
-      INTEGER N , M
-      DOUBLE PRECISION A(M*N)
-      INTEGER i , j , k
-      DOUBLE PRECISION ZERO , ONE
-      PARAMETER (ZERO=0.0D0,ONE=1.0D0)
+      subroutine mxdrmi(n,m,a)
+      implicit none
+      integer n , m
+      double precision a(m*n)
+      integer i , j , k
+      double precision zero , one
+      parameter (zero=0.0d0,one=1.0d0)
       k = 0
-      DO j = 1 , M
-         DO i = 1 , N
-            A(i+k) = ZERO
-            IF ( i==j ) A(i+k) = ONE
-         ENDDO
-         k = k + N
-      ENDDO
-      END SUBROUTINE MXDRMI
+      do j = 1 , m
+         do i = 1 , n
+            a(i+k) = zero
+            if ( i==j ) a(i+k) = one
+         enddo
+         k = k + n
+      enddo
+      end subroutine mxdrmi
 
-! SUBROUTINE MXDRMM               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdrmm               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! MULTIPLICATION OF A ROWWISE STORED DENSE RECTANGULAR MATRIX A BY
-! A VECTOR X.
+! purpose :
+! multiplication of a rowwise stored dense rectangular matrix a by
+! a vector x.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX A.
-!  II  M  NUMBER OF ROWS OF THE MATRIX A.
-!  RI  A(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE
-!         ONE-DIMENSIONAL ARRAY.
-!  RI  X(N)  INPUT VECTOR.
-!  RO  Y(M)  OUTPUT VECTOR EQUAL TO A*X.
+! parameters :
+!  ii  n  number of columns of the matrix a.
+!  ii  m  number of rows of the matrix a.
+!  ri  a(m*n)  rectangular matrix stored rowwise in the
+!         one-dimensional array.
+!  ri  x(n)  input vector.
+!  ro  y(m)  output vector equal to a*x.
 !
-      SUBROUTINE MXDRMM(N,M,A,X,Y)
-      IMPLICIT NONE
-      INTEGER N , M
-      DOUBLE PRECISION A(*) , X(*) , Y(*)
-      DOUBLE PRECISION temp
-      INTEGER i , j , k
+      subroutine mxdrmm(n,m,a,x,y)
+      implicit none
+      integer n , m
+      double precision a(*) , x(*) , y(*)
+      double precision temp
+      integer i , j , k
       k = 0
-      DO j = 1 , M
-         temp = 0.0D0
-         DO i = 1 , N
-            temp = temp + A(k+i)*X(i)
-         ENDDO
-         Y(j) = temp
-         k = k + N
-      ENDDO
-      END SUBROUTINE MXDRMM
+      do j = 1 , m
+         temp = 0.0d0
+         do i = 1 , n
+            temp = temp + a(k+i)*x(i)
+         enddo
+         y(j) = temp
+         k = k + n
+      enddo
+      end subroutine mxdrmm
 
-! FUNCTION  MXDRMN               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! function  mxdrmn               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! EUCLIDEAN NORM OF A PART OF THE I-TH COLUMN OF A ROWWISE STORED DENSE
-! RECTANGULAR MATRIX A IS COMPUTED.
+! purpose :
+! euclidean norm of a part of the i-th column of a rowwise stored dense
+! rectangular matrix a is computed.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX A.
-!  II  M  NUMBER OF ROWS OF THE MATRIX A.
-!  RI  A(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE
-!         ONE-DIMENSIONAL ARRAY.
-!  II  I  INDEX OF THE COLUMN WHOSE NORM IS COMPUTED.
-!  II  J  INDEX OF THE FIRST ELEMENT FROM WHICH THE NORM IS COMPUTED.
+! parameters :
+!  ii  n  number of columns of the matrix a.
+!  ii  m  number of rows of the matrix a.
+!  ri  a(m*n)  rectangular matrix stored rowwise in the
+!         one-dimensional array.
+!  ii  i  index of the column whose norm is computed.
+!  ii  j  index of the first element from which the norm is computed.
 !
-      FUNCTION MXDRMN(N,M,A,I,J)
-      IMPLICIT NONE
-      INTEGER N , M , I , J
-      DOUBLE PRECISION A(M*N) , MXDRMN
-      DOUBLE PRECISION pom , den
-      INTEGER k , l
-      DOUBLE PRECISION ZERO
-      PARAMETER (ZERO=0.0D0)
-      den = ZERO
-      l = (J-1)*N
-      DO k = J , M
-         den = MAX(den,ABS(A(l+I)))
-         l = l + N
-      ENDDO
-      pom = ZERO
-      IF ( den>ZERO ) THEN
-         l = (J-1)*N
-         DO k = J , M
-            pom = pom + (A(l+I)/den)**2
-            l = l + N
-         ENDDO
-      ENDIF
-      MXDRMN = den*SQRT(pom)
-      END FUNCTION MXDRMN
+      function mxdrmn(n,m,a,i,j)
+      implicit none
+      integer n , m , i , j
+      double precision a(m*n) , mxdrmn
+      double precision pom , den
+      integer k , l
+      double precision zero
+      parameter (zero=0.0d0)
+      den = zero
+      l = (j-1)*n
+      do k = j , m
+         den = max(den,abs(a(l+i)))
+         l = l + n
+      enddo
+      pom = zero
+      if ( den>zero ) then
+         l = (j-1)*n
+         do k = j , m
+            pom = pom + (a(l+i)/den)**2
+            l = l + n
+         enddo
+      endif
+      mxdrmn = den*sqrt(pom)
+      end function mxdrmn
 
-! SUBROUTINE MXDRMV               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdrmv               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! K-TH COLUMN OF A ROWWISE STORED DENSE RECTANGULAR MATRIX A IS COPIED
-! TO THE VECTOR X.
+! purpose :
+! k-th column of a rowwise stored dense rectangular matrix a is copied
+! to the vector x.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX A.
-!  II  M  NUMBER OF ROWS OF THE MATRIX A.
-!  RI  A(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE
-!         ONE-DIMENSIONAL ARRAY.
-!  RO  X(M)  OUTPUT VECTOR SUCH THAT X(J)=A(J,K) FOR ALL J.
-!  II  K  INDEX OF THE ROW BEING COPIED TO THE OUTPUT VECTOR.
+! parameters :
+!  ii  n  number of columns of the matrix a.
+!  ii  m  number of rows of the matrix a.
+!  ri  a(m*n)  rectangular matrix stored rowwise in the
+!         one-dimensional array.
+!  ro  x(m)  output vector such that x(j)=a(j,k) for all j.
+!  ii  k  index of the row being copied to the output vector.
 !
-      SUBROUTINE MXDRMV(N,M,A,X,K)
-      IMPLICIT NONE
-      INTEGER N , M , K
-      DOUBLE PRECISION A(*) , X(*)
-      INTEGER i , j
-      IF ( K<1 .OR. K>N ) RETURN
-      i = K
-      DO j = 1 , M
-         X(j) = A(i)
-         i = i + N
-      ENDDO
-      END SUBROUTINE MXDRMV
+      subroutine mxdrmv(n,m,a,x,k)
+      implicit none
+      integer n , m , k
+      double precision a(*) , x(*)
+      integer i , j
+      if ( k<1 .or. k>n ) return
+      i = k
+      do j = 1 , m
+         x(j) = a(i)
+         i = i + n
+      enddo
+      end subroutine mxdrmv
 
-! SUBROUTINE MXDRQF               ALL SYSTEMS                92/12/01
-! PORTABILITY : ALL SYSTEMS
-! 92/12/01 LU : ORIGINAL VERSION
+! subroutine mxdrqf               all systems                92/12/01
+! portability : all systems
+! 92/12/01 lu : original version
 !
-! PURPOSE :
-! QR DECOMPOSITION OF ROWWISE STORED DENSE RECTANGULAR MATRIX Q USING
-! HOUSEHOLDER TRANSFORMATIONS WITHOUT PIVOTING.
+! purpose :
+! qr decomposition of rowwise stored dense rectangular matrix q using
+! householder transformations without pivoting.
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX Q.
-!  II  M  NUMBER OF ROWS OF THE MATRIX Q.
-!  RU  Q(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE
-!         ONE-DIMENSIONAL ARRAY.
-!  RO  R(N*(N+1)/2)  UPPER TRIANGULAR MATRIX STORED IN THE PACKED FORM.
+! parameters :
+!  ii  n  number of columns of the matrix q.
+!  ii  m  number of rows of the matrix q.
+!  ru  q(m*n)  rectangular matrix stored rowwise in the
+!         one-dimensional array.
+!  ro  r(n*(n+1)/2)  upper triangular matrix stored in the packed form.
 !
-! SUBPROGRAMS USED :
-!  S   MXDRMN  EUCLIDEAN NORM OF A PART OF THE ROWWISE STORED
-!         RECTANGULAR MATRIX COLUMN.
+! subprograms used :
+!  s   mxdrmn  euclidean norm of a part of the rowwise stored
+!         rectangular matrix column.
 !
-! METHOD :
-! P.A.BUSSINGER, G.H.GOLUB : LINEAR LEAST SQUARES SOLUTION BY
-! HOUSEHOLDER TRANSFORMATION. NUMER. MATH. 7 (1965) 269-276.
+! method :
+! p.a.bussinger, g.h.golub : linear least squares solution by
+! householder transformation. numer. math. 7 (1965) 269-276.
 !
-      SUBROUTINE MXDRQF(N,M,Q,R)
-      IMPLICIT NONE
-      INTEGER N , M
-      DOUBLE PRECISION Q(M*N) , R(N*(N+1)/2)
-      DOUBLE PRECISION alf , pom
-      INTEGER i , j , k , l , jp , kp , nm
-      DOUBLE PRECISION ZERO , ONE
-      PARAMETER (ZERO=0.0D0,ONE=1.0D0)
-      nm = MIN(N,M)
+      subroutine mxdrqf(n,m,q,r)
+      implicit none
+      integer n , m
+      double precision q(m*n) , r(n*(n+1)/2)
+      double precision alf , pom
+      integer i , j , k , l , jp , kp , nm
+      double precision zero , one
+      parameter (zero=0.0d0,one=1.0d0)
+      nm = min(n,m)
 !
-!     QR DECOMPOSITION
+!     qr decomposition
 !
       l = 0
       kp = 0
-      DO k = 1 , nm
-         pom = MXDRMN(N,M,Q,k,k)
-         IF ( Q(kp+k)/=ZERO ) pom = SIGN(pom,Q(kp+k))
-         R(l+k) = -pom
+      do k = 1 , nm
+         pom = mxdrmn(n,m,q,k,k)
+         if ( q(kp+k)/=zero ) pom = sign(pom,q(kp+k))
+         r(l+k) = -pom
          jp = 0
-         DO j = 1 , k - 1
-            R(l+j) = Q(jp+k)
-            Q(jp+k) = ZERO
-            jp = jp + N
-         ENDDO
-         IF ( pom/=ZERO ) THEN
+         do j = 1 , k - 1
+            r(l+j) = q(jp+k)
+            q(jp+k) = zero
+            jp = jp + n
+         enddo
+         if ( pom/=zero ) then
 !
-!     HOUSEHOLDER TRANSFORMATION
+!     householder transformation
 !
-            DO j = k , M
-               Q(jp+k) = Q(jp+k)/pom
-               jp = jp + N
-            ENDDO
-            Q(kp+k) = Q(kp+k) + ONE
-            DO i = k + 1 , N
-               alf = ZERO
+            do j = k , m
+               q(jp+k) = q(jp+k)/pom
+               jp = jp + n
+            enddo
+            q(kp+k) = q(kp+k) + one
+            do i = k + 1 , n
+               alf = zero
                jp = kp
-               DO j = k , M
-                  alf = alf + Q(jp+k)*Q(jp+i)
-                  jp = jp + N
-               ENDDO
-               alf = alf/Q(kp+k)
+               do j = k , m
+                  alf = alf + q(jp+k)*q(jp+i)
+                  jp = jp + n
+               enddo
+               alf = alf/q(kp+k)
                jp = kp
-               DO j = k , M
-                  Q(jp+i) = Q(jp+i) - alf*Q(jp+k)
-                  jp = jp + N
-               ENDDO
-            ENDDO
-         ENDIF
+               do j = k , m
+                  q(jp+i) = q(jp+i) - alf*q(jp+k)
+                  jp = jp + n
+               enddo
+            enddo
+         endif
          l = l + k
-         kp = kp + N
-      ENDDO
+         kp = kp + n
+      enddo
 !
-!     EXPLICIT FORMULATION OF THE ORTHOGONAL MATRIX
+!     explicit formulation of the orthogonal matrix
 !
-      kp = N*N
-      DO k = N , 1 , -1
-         kp = kp - N
-         IF ( Q(kp+k)/=ZERO ) THEN
-            DO i = k + 1 , N
-               alf = ZERO
+      kp = n*n
+      do k = n , 1 , -1
+         kp = kp - n
+         if ( q(kp+k)/=zero ) then
+            do i = k + 1 , n
+               alf = zero
                jp = kp
-               DO j = k , M
-                  alf = alf + Q(jp+k)*Q(jp+i)
-                  jp = jp + N
-               ENDDO
-               alf = alf/Q(kp+k)
+               do j = k , m
+                  alf = alf + q(jp+k)*q(jp+i)
+                  jp = jp + n
+               enddo
+               alf = alf/q(kp+k)
                jp = kp
-               DO j = k , M
-                  Q(jp+i) = Q(jp+i) - alf*Q(jp+k)
-                  jp = jp + N
-               ENDDO
-            ENDDO
+               do j = k , m
+                  q(jp+i) = q(jp+i) - alf*q(jp+k)
+                  jp = jp + n
+               enddo
+            enddo
             jp = kp
-            DO j = k , M
-               Q(jp+k) = -Q(jp+k)
-               jp = jp + N
-            ENDDO
-         ENDIF
-         Q(kp+k) = Q(kp+k) + ONE
-      ENDDO
-      END SUBROUTINE MXDRQF
+            do j = k , m
+               q(jp+k) = -q(jp+k)
+               jp = jp + n
+            enddo
+         endif
+         q(kp+k) = q(kp+k) + one
+      enddo
+      end subroutine mxdrqf
 
-! SUBROUTINE MXDRQU               ALL SYSTEMS                92/12/01
-! PORTABILITY : ALL SYSTEMS
-! 92/12/01 LU : ORIGINAL VERSION
+! subroutine mxdrqu               all systems                92/12/01
+! portability : all systems
+! 92/12/01 lu : original version
 !
-! PURPOSE :
-! UPDATE OF A QR DECOMPOSITION. THIS QR DECOMPOSITION IS UPDATED
-! BY THE RULE Q*R:=Q*R+ALF*X*TRANS(Y).
+! purpose :
+! update of a qr decomposition. this qr decomposition is updated
+! by the rule q*r:=q*r+alf*x*trans(y).
 !
-! PARAMETERS :
-!  II  N  NUMBER OF COLUMNS OF THE MATRIX Q.
-!  II  M  NUMBER OF ROWS OF THE MATRIX Q.
-!  RU  Q(M*N)  RECTANGULAR MATRIX STORED ROWWISE IN THE
-!         ONE-DIMENSIONAL ARRAY (PART OF THE ORTHOGONAL MATRIX).
-!  RU  R(N*(N+1)/2)  UPPER TRIANGULAR MATRIX STORED IN A PACKED FORM.
-!  RI  ALF  SCALAR PARAMETER.
-!  RI  X(M)  INPUT VECTOR.
-!  RI  Y(N)  INPUT VECTOR.
-!  RA  Z(N)  AUXILIARY VECTOR.
-!  IO  INF  INFORMATION. IF INF=0 THEN X LIES IN THE COLUMN SPACE OF Q.
-!         IF INF=1 THEN X DOES NOT LIE IN THE COLUMN SPACE OF Q.
+! parameters :
+!  ii  n  number of columns of the matrix q.
+!  ii  m  number of rows of the matrix q.
+!  ru  q(m*n)  rectangular matrix stored rowwise in the
+!         one-dimensional array (part of the orthogonal matrix).
+!  ru  r(n*(n+1)/2)  upper triangular matrix stored in a packed form.
+!  ri  alf  scalar parameter.
+!  ri  x(m)  input vector.
+!  ri  y(n)  input vector.
+!  ra  z(n)  auxiliary vector.
+!  io  inf  information. if inf=0 then x lies in the column space of q.
+!         if inf=1 then x does not lie in the column space of q.
 !
-! SUBPROGRAMS USED :
-!  RF  MXVNOR  EUCLIDEAN NORM OF A VECTOR.
-!  S   MXVORT  COMPUTATION OF THE PLANE ROTATION MATRIX.
-!  S   MXVROT  PLANE ROTATION IS APPLIED TO TWO NUMBERS.
+! subprograms used :
+!  rf  mxvnor  euclidean norm of a vector.
+!  s   mxvort  computation of the plane rotation matrix.
+!  s   mxvrot  plane rotation is applied to two numbers.
 !
-! METHOD :
-! J.W.DANIEL, W.B.GRAGG, L.KAUFMAN, G.W.STEWARD : REORTHOGONALIZATION
-! AND STABLE ALGORITHMS FOR UPDATING THE GRAM-SCHMIDT QR FACTORIZATION.
-! MATHEMATICS OF COMPUTATION 30 (1976) 772-795.
-      SUBROUTINE MXDRQU(N,M,Q,R,Alf,X,Y,Z,Inf)
-      IMPLICIT NONE
-      INTEGER N , M , Inf
-      DOUBLE PRECISION Q(M*N) , R(N*(N+1)/2) , Alf , X(M) , Y(N) , Z(N)
-      DOUBLE PRECISION ck , cl , zk , zl !, MXVNOR
-      INTEGER j , k , l , kj , kk , ier
-      DOUBLE PRECISION ONE , CON
-      PARAMETER (ONE=1.0D0,CON=1.0D-10)
-      Inf = 0
-      kk = N*(N+1)/2
+! method :
+! j.w.daniel, w.b.gragg, l.kaufman, g.w.steward : reorthogonalization
+! and stable algorithms for updating the gram-schmidt qr factorization.
+! mathematics of computation 30 (1976) 772-795.
+      subroutine mxdrqu(n,m,q,r,alf,x,y,z,inf)
+      implicit none
+      integer n , m , inf
+      double precision q(m*n) , r(n*(n+1)/2) , alf , x(m) , y(n) , z(n)
+      double precision ck , cl , zk , zl !, mxvnor
+      integer j , k , l , kj , kk , ier
+      double precision one , con
+      parameter (one=1.0d0,con=1.0d-10)
+      inf = 0
+      kk = n*(n+1)/2
 !
-!     COMPUTATION OF THE VECTOR TRANS(Q)*X
+!     computation of the vector trans(q)*x
 !
-      CALL MXDCMM(N,M,Q,X,Z)
-      IF ( M>N ) THEN
+      call mxdcmm(n,m,q,x,z)
+      if ( m>n ) then
 !
-!     IF X DOES NOT LIE IN THE COLUMN SPACE OF Q WE HAVE TO USE
-!     A SUBPROBLEM WHOSE DIMENSION IS BY ONE GREATER (INF=1).
+!     if x does not lie in the column space of q we have to use
+!     a subproblem whose dimension is by one greater (inf=1).
 !
-         zk = MXVNOR(M,X)
-         CALL MXDRMD(N,M,Q,Z,-ONE,X,X)
-         zl = MXVNOR(M,X)
-         IF ( zl>CON*zk ) THEN
-            Inf = 1
-            CALL MXVSCL(M,-ONE/zl,X,X)
-            CALL MXVORT(Z(N),zl,ck,cl,ier)
-            IF ( ier==0 .OR. ier==1 ) THEN
-               CALL MXVROT(R(kk),zl,ck,cl,ier)
-               kj = N
-               DO j = 1 , M
-                  CALL MXVROT(Q(kj),X(j),ck,cl,ier)
-                  kj = kj + N
-               ENDDO
-            ENDIF
-         ENDIF
-      ENDIF
+         zk = mxvnor(m,x)
+         call mxdrmd(n,m,q,z,-one,x,x)
+         zl = mxvnor(m,x)
+         if ( zl>con*zk ) then
+            inf = 1
+            call mxvscl(m,-one/zl,x,x)
+            call mxvort(z(n),zl,ck,cl,ier)
+            if ( ier==0 .or. ier==1 ) then
+               call mxvrot(r(kk),zl,ck,cl,ier)
+               kj = n
+               do j = 1 , m
+                  call mxvrot(q(kj),x(j),ck,cl,ier)
+                  kj = kj + n
+               enddo
+            endif
+         endif
+      endif
 !
-!     APPLICATION OF PLANE ROTATIONS TO THE VECTOR Z SO THAT
-!     TRANS(Q1)*Z=E1 WHERE Q1 IS AN ORTHOGONAL MATRIX (ACCUMULATION OF
-!     THE PLANE ROTATIONS) AND E1 IS THE FIRST COLUMN OF THE UNIT
-!     MATRIX. AT THE SAME TIME BOTH THE UPPER HESSENBERG MATRIX
-!     TRANS(Q1)*R AND THE ORTHOGONAL MATRIX Q*Q1 ARE CONSTRUCTED SO THAT
-!     Q*Q1*R1=Q*Q1*(TRANS(Q1)*R+ALF*E1*TRANS(Y)) WHERE R1 IS AN UPPER
-!     HESSENBERG MATRIX.
+!     application of plane rotations to the vector z so that
+!     trans(q1)*z=e1 where q1 is an orthogonal matrix (accumulation of
+!     the plane rotations) and e1 is the first column of the unit
+!     matrix. at the same time both the upper hessenberg matrix
+!     trans(q1)*r and the orthogonal matrix q*q1 are constructed so that
+!     q*q1*r1=q*q1*(trans(q1)*r+alf*e1*trans(y)) where r1 is an upper
+!     hessenberg matrix.
 !
-      DO l = N , 2 , -1
+      do l = n , 2 , -1
          k = l - 1
          kk = kk - l
-         CALL MXVORT(Z(k),Z(l),ck,cl,ier)
-         IF ( ier==0 .OR. ier==1 ) THEN
-            CALL MXVROT(R(kk),Z(l),ck,cl,ier)
+         call mxvort(z(k),z(l),ck,cl,ier)
+         if ( ier==0 .or. ier==1 ) then
+            call mxvrot(r(kk),z(l),ck,cl,ier)
             kj = kk
-            DO j = l , N
+            do j = l , n
                kj = kj + j - 1
-               CALL MXVROT(R(kj),R(kj+1),ck,cl,ier)
-            ENDDO
+               call mxvrot(r(kj),r(kj+1),ck,cl,ier)
+            enddo
             kj = k
-            DO j = 1 , M
-               CALL MXVROT(Q(kj),Q(kj+1),ck,cl,ier)
-               kj = kj + N
-            ENDDO
-         ENDIF
-      ENDDO
-      Z(1) = Alf*Z(1)
+            do j = 1 , m
+               call mxvrot(q(kj),q(kj+1),ck,cl,ier)
+               kj = kj + n
+            enddo
+         endif
+      enddo
+      z(1) = alf*z(1)
       kj = 1
-      DO j = 1 , N
-         R(kj) = R(kj) + Z(1)*Y(j)
+      do j = 1 , n
+         r(kj) = r(kj) + z(1)*y(j)
          kj = kj + j
-      ENDDO
+      enddo
 !
-!     APPLICATION OF PLANE ROTATIONS TO THE UPPER HESSENBERG MATRIX R1
-!     GIVEN ABOVE SO THAT R2=TRANS(Q2)*R1 WHERE Q2 IS AN ORTHOGONAL
-!     MATRIX (ACCUMULATION OF THE PLANE ROTATIONS) AND R2 IS AN UPPER
-!     TRIANGULAR MATRIX. WE OBTAIN THE NEW QR DECOMPOSITION Q*Q1*Q2*R2.
+!     application of plane rotations to the upper hessenberg matrix r1
+!     given above so that r2=trans(q2)*r1 where q2 is an orthogonal
+!     matrix (accumulation of the plane rotations) and r2 is an upper
+!     triangular matrix. we obtain the new qr decomposition q*q1*q2*r2.
 !
       kk = 1
-      DO l = 2 , N
+      do l = 2 , n
          k = l - 1
-         CALL MXVORT(R(kk),Z(l),ck,cl,ier)
-         IF ( ier==0 .OR. ier==1 ) THEN
+         call mxvort(r(kk),z(l),ck,cl,ier)
+         if ( ier==0 .or. ier==1 ) then
             kj = kk
-            DO j = l , N
+            do j = l , n
                kj = kj + j - 1
-               CALL MXVROT(R(kj),R(kj+1),ck,cl,ier)
-            ENDDO
+               call mxvrot(r(kj),r(kj+1),ck,cl,ier)
+            enddo
             kj = k
-            DO j = 1 , M
-               CALL MXVROT(Q(kj),Q(kj+1),ck,cl,ier)
-               kj = kj + N
-            ENDDO
-         ENDIF
+            do j = 1 , m
+               call mxvrot(q(kj),q(kj+1),ck,cl,ier)
+               kj = kj + n
+            enddo
+         endif
          kk = kk + l
-      ENDDO
+      enddo
 !
-!     BACK TRANSFORMATION OF THE GREATER SUBPROBLEM IF INF=1.
+!     back transformation of the greater subproblem if inf=1.
 !
-      IF ( Inf==1 ) THEN
-         CALL MXVORT(R(kk),zl,ck,cl,ier)
-         IF ( ier==0 .OR. ier==1 ) THEN
-            kj = N
-            DO j = 1 , M
-               CALL MXVROT(Q(kj),X(j),ck,cl,ier)
-               kj = kj + N
-            ENDDO
-         ENDIF
-      ENDIF
-      END SUBROUTINE MXDRQU
+      if ( inf==1 ) then
+         call mxvort(r(kk),zl,ck,cl,ier)
+         if ( ier==0 .or. ier==1 ) then
+            kj = n
+            do j = 1 , m
+               call mxvrot(q(kj),x(j),ck,cl,ier)
+               kj = kj + n
+            enddo
+         endif
+      endif
+      end subroutine mxdrqu
 
-! SUBROUTINE MXDSDA                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsda                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! A DENSE SYMMETRIC MATRIX A IS AUGMENTED BY THE SCALED UNIT MATRIX
-! SUCH THAT A:=A+ALF*I (I IS THE UNIT MATRIX OF ORDER N).
+! purpose :
+! a dense symmetric matrix a is augmented by the scaled unit matrix
+! such that a:=a+alf*i (i is the unit matrix of order n).
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  RI  ALF  SCALING FACTOR.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  ri  alf  scaling factor.
 !
-      SUBROUTINE MXDSDA(N,A,Alf)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(*) , Alf
-      INTEGER i , j
+      subroutine mxdsda(n,a,alf)
+      implicit none
+      integer n
+      double precision a(*) , alf
+      integer i , j
       j = 0
-      DO i = 1 , N
+      do i = 1 , n
          j = j + i
-         A(j) = A(j) + Alf
-      ENDDO
-      END SUBROUTINE MXDSDA
+         a(j) = a(j) + alf
+      enddo
+      end subroutine mxdsda
 
-! FUNCTION MXDSDL                  ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! function mxdsdl                  all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! DETERMINATION OF THE MINIMUM DIAGONAL ELEMENT OF A DENSE SYMMETRIC
-! MATRIX.
+! purpose :
+! determination of the minimum diagonal element of a dense symmetric
+! matrix.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  IO  INF  INDEX OF THE MINIMUM DIAGONAL ELEMENT OF THE MATRIX A.
-!  RR  MXDSDL  MINIMUM DIAGONAL ELEMENT OF THE MATRIX A.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  io  inf  index of the minimum diagonal element of the matrix a.
+!  rr  mxdsdl  minimum diagonal element of the matrix a.
 !
-      FUNCTION MXDSDL(N,A,Inf)
-      IMPLICIT NONE
-      INTEGER N , Inf
-      DOUBLE PRECISION A(N*(N+1)/2) , MXDSDL
-      DOUBLE PRECISION temp
-      INTEGER i , j
+      function mxdsdl(n,a,inf)
+      implicit none
+      integer n , inf
+      double precision a(n*(n+1)/2) , mxdsdl
+      double precision temp
+      integer i , j
       j = 1
-      Inf = 1
-      temp = A(1)
-      DO i = 2 , N
+      inf = 1
+      temp = a(1)
+      do i = 2 , n
          j = j + i
-         IF ( temp>A(j) ) THEN
-            Inf = j
-            temp = A(j)
-         ENDIF
-      ENDDO
-      MXDSDL = temp
-      END FUNCTION MXDSDL
+         if ( temp>a(j) ) then
+            inf = j
+            temp = a(j)
+         endif
+      enddo
+      mxdsdl = temp
+      end function mxdsdl
 
-! SUBROUTINE MXDSMA             ALL SYSTEMS                 91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsma             all systems                 91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! DENSE SYMMETRIC MATRIX AUGMENTED BY THE SCALED DENSE SYMMETRIC MATRIX.
+! purpose :
+! dense symmetric matrix augmented by the scaled dense symmetric matrix.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRICES.
-!  RI  ALF  SCALING FACTOR.
-!  RI  A(N*(N+1)/2)  INPUT MATRIX.
-!  RI  B(N*(N+1)/2)  INPUT MATRIX.
-!  RO  C(N*(N+1)/2)  OUTPUT MATRIX WHERE C:=B+ALF*A.
+! parameters :
+!  ii  n  order of the matrices.
+!  ri  alf  scaling factor.
+!  ri  a(n*(n+1)/2)  input matrix.
+!  ri  b(n*(n+1)/2)  input matrix.
+!  ro  c(n*(n+1)/2)  output matrix where c:=b+alf*a.
 !
-      SUBROUTINE MXDSMA(N,Alf,A,B,C)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION Alf , A(N*(N+1)/2) , B(N*(N+1)/2) , C(N*(N+1)/2)
-      INTEGER i
-      DO i = 1 , N*(N+1)/2
-         C(i) = B(i) + Alf*A(i)
-      ENDDO
-      END SUBROUTINE MXDSMA
+      subroutine mxdsma(n,alf,a,b,c)
+      implicit none
+      integer n
+      double precision alf , a(n*(n+1)/2) , b(n*(n+1)/2) , c(n*(n+1)/2)
+      integer i
+      do i = 1 , n*(n+1)/2
+         c(i) = b(i) + alf*a(i)
+      enddo
+      end subroutine mxdsma
 
-! SUBROUTINE MXDSMC                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsmc                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! COPYING OF A DENSE SYMMETRIC MATRIX.
+! purpose :
+! copying of a dense symmetric matrix.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRICES A AND B.
-!  RI  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  RO  B(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM
-!         WHERE B:=A.
+! parameters :
+!  ii  n  order of the matrices a and b.
+!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  ro  b(n*(n+1)/2)  dense symmetric matrix stored in the packed form
+!         where b:=a.
 !
-      SUBROUTINE MXDSMC(N,A,B)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(N*(N+1)/2) , B(N*(N+1)/2)
-      INTEGER m , i
-      m = N*(N+1)/2
-      DO i = 1 , m
-         B(i) = A(i)
-      ENDDO
-      END SUBROUTINE MXDSMC
+      subroutine mxdsmc(n,a,b)
+      implicit none
+      integer n
+      double precision a(n*(n+1)/2) , b(n*(n+1)/2)
+      integer m , i
+      m = n*(n+1)/2
+      do i = 1 , m
+         b(i) = a(i)
+      enddo
+      end subroutine mxdsmc
 
-! SUBROUTINE MXDSMG                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsmg                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-!  GERSHGORIN BOUNDS FOR EIGENVALUES OF A DENSE SYMMETRIC MATRIX.
-!  AMIN .LE. ANY EIGENVALUE OF A .LE. AMAX.
+! purpose :
+!  gershgorin bounds for eigenvalues of a dense symmetric matrix.
+!  amin .le. any eigenvalue of a .le. amax.
 !
-! PARAMETERS :
-!  II  N  DIMENSION OF THE MATRIX A.
-!  RI  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  RO  AMIN  LOWER BOUND FOR EIGENVALUES OF A.
-!  RO  AMAX  UPPER BOUND FOR EIGENVALUES OF A.
+! parameters :
+!  ii  n  dimension of the matrix a.
+!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  ro  amin  lower bound for eigenvalues of a.
+!  ro  amax  upper bound for eigenvalues of a.
 !
-      SUBROUTINE MXDSMG(N,A,Amin,Amax)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(N*(N+1)/2) , Amin , Amax
-      DOUBLE PRECISION temp
-      INTEGER i , j , k , l
-      DOUBLE PRECISION ZERO
-      PARAMETER (ZERO=0.0D0)
-      Amax = A(1)
-      Amin = A(1)
+      subroutine mxdsmg(n,a,amin,amax)
+      implicit none
+      integer n
+      double precision a(n*(n+1)/2) , amin , amax
+      double precision temp
+      integer i , j , k , l
+      double precision zero
+      parameter (zero=0.0d0)
+      amax = a(1)
+      amin = a(1)
       k = 0
-      DO i = 1 , N
-         temp = ZERO
+      do i = 1 , n
+         temp = zero
          l = k
-         DO j = 1 , i - 1
+         do j = 1 , i - 1
             l = l + 1
-            temp = temp + ABS(A(l))
-         ENDDO
+            temp = temp + abs(a(l))
+         enddo
          l = l + 1
-         DO j = i + 1 , N
+         do j = i + 1 , n
             l = l + j - 1
-            temp = temp + ABS(A(l))
-         ENDDO
+            temp = temp + abs(a(l))
+         enddo
          k = k + i
-         Amax = MAX(Amax,A(k)+temp)
-         Amin = MIN(Amin,A(k)-temp)
-      ENDDO
-      END SUBROUTINE MXDSMG
+         amax = max(amax,a(k)+temp)
+         amin = min(amin,a(k)-temp)
+      enddo
+      end subroutine mxdsmg
 
-! SUBROUTINE MXDSMI                ALL SYSTEMS                88/12/01
-! PORTABILITY : ALL SYSTEMS
-! 88/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsmi                all systems                88/12/01
+! portability : all systems
+! 88/12/01 lu : original version
 !
-! PURPOSE :
-! DENSE SYMMETRIC MATRIX A IS SET TO THE UNIT MATRIX WITH THE SAME
-! ORDER.
+! purpose :
+! dense symmetric matrix a is set to the unit matrix with the same
+! order.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RO  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM
-!         WHICH IS SET TO THE UNIT MATRIX (I.E. A:=I).
+! parameters :
+!  ii  n  order of the matrix a.
+!  ro  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form
+!         which is set to the unit matrix (i.e. a:=i).
 !
-      SUBROUTINE MXDSMI(N,A)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(*)
-      INTEGER i , m
-      m = N*(N+1)/2
-      DO i = 1 , m
-         A(i) = 0.0D0
-      ENDDO
+      subroutine mxdsmi(n,a)
+      implicit none
+      integer n
+      double precision a(*)
+      integer i , m
+      m = n*(n+1)/2
+      do i = 1 , m
+         a(i) = 0.0d0
+      enddo
       m = 0
-      DO i = 1 , N
+      do i = 1 , n
          m = m + i
-         A(m) = 1.0D0
-      ENDDO
-      END SUBROUTINE MXDSMI
+         a(m) = 1.0d0
+      enddo
+      end subroutine mxdsmi
 
-! SUBROUTINE MXDSMM                ALL SYSTEMS                89/12/01
-! PORTABILITY : ALL SYSTEMS
-! 89/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsmm                all systems                89/12/01
+! portability : all systems
+! 89/12/01 lu : original version
 !
-! PURPOSE :
-! MULTIPLICATION OF A DENSE SYMMETRIC MATRIX A BY A VECTOR X.
+! purpose :
+! multiplication of a dense symmetric matrix a by a vector x.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  RI  X(N)  INPUT VECTOR.
-!  RO  Y(N)  OUTPUT VECTOR EQUAL TO  A*X.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  ri  x(n)  input vector.
+!  ro  y(n)  output vector equal to  a*x.
 !
-      SUBROUTINE MXDSMM(N,A,X,Y)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(*) , X(*) , Y(*)
-      DOUBLE PRECISION temp
-      INTEGER i , j , k , l
+      subroutine mxdsmm(n,a,x,y)
+      implicit none
+      integer n
+      double precision a(*) , x(*) , y(*)
+      double precision temp
+      integer i , j , k , l
       k = 0
-      DO i = 1 , N
-         temp = 0.0D0
+      do i = 1 , n
+         temp = 0.0d0
          l = k
-         DO j = 1 , i
+         do j = 1 , i
             l = l + 1
-            temp = temp + A(l)*X(j)
-         ENDDO
-         DO j = i + 1 , N
+            temp = temp + a(l)*x(j)
+         enddo
+         do j = i + 1 , n
             l = l + j - 1
-            temp = temp + A(l)*X(j)
-         ENDDO
-         Y(i) = temp
+            temp = temp + a(l)*x(j)
+         enddo
+         y(i) = temp
          k = k + i
-      ENDDO
-      END SUBROUTINE MXDSMM
+      enddo
+      end subroutine mxdsmm
 
-! FUNCTION MXDSMQ                  ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! function mxdsmq                  all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! VALUE OF A QUADRATIC FORM WITH A DENSE SYMMETRIC MATRIX A.
+! purpose :
+! value of a quadratic form with a dense symmetric matrix a.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  RI  X(N)  GIVEN VECTOR.
-!  RI  Y(N)  GIVEN VECTOR.
-!  RR  MXDSMQ  VALUE OF THE QUADRATIC FORM MXDSMQ=TRANS(X)*A*Y.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  ri  x(n)  given vector.
+!  ri  y(n)  given vector.
+!  rr  mxdsmq  value of the quadratic form mxdsmq=trans(x)*a*y.
 !
-      DOUBLE PRECISION FUNCTION MXDSMQ(N,A,X,Y)
-      IMPLICIT NONE
-      DOUBLE PRECISION ZERO
-      PARAMETER (ZERO=0.0D0)
-      INTEGER N
-      DOUBLE PRECISION A(*) , X(*) , Y(*)
-      DOUBLE PRECISION temp , temp1 , temp2
-      INTEGER i , j , k
-      temp = ZERO
+      double precision function mxdsmq(n,a,x,y)
+      implicit none
+      double precision zero
+      parameter (zero=0.0d0)
+      integer n
+      double precision a(*) , x(*) , y(*)
+      double precision temp , temp1 , temp2
+      integer i , j , k
+      temp = zero
       k = 0
-      DO i = 1 , N
-         temp1 = ZERO
-         temp2 = ZERO
-         DO j = 1 , i - 1
+      do i = 1 , n
+         temp1 = zero
+         temp2 = zero
+         do j = 1 , i - 1
             k = k + 1
-            temp1 = temp1 + A(k)*X(j)
-            temp2 = temp2 + A(k)*Y(j)
-         ENDDO
+            temp1 = temp1 + a(k)*x(j)
+            temp2 = temp2 + a(k)*y(j)
+         enddo
          k = k + 1
-         temp = temp + X(i)*(temp2+A(k)*Y(i)) + Y(i)*temp1
-      ENDDO
-      MXDSMQ = temp
-      END FUNCTION MXDSMQ
+         temp = temp + x(i)*(temp2+a(k)*y(i)) + y(i)*temp1
+      enddo
+      mxdsmq = temp
+      end function mxdsmq
 
-! SUBROUTINE MXDSMR               ALL SYSTEMS                92/12/01
-! PORTABILITY : ALL SYSTEMS
-! 92/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsmr               all systems                92/12/01
+! portability : all systems
+! 92/12/01 lu : original version
 !
-! PURPOSE :
-! PLANE ROTATION IS APPLIED TO A DENSE SYMMETRIC MATRIX A. THE CASE
-! K=L+1 IS REQUIRED.
+! purpose :
+! plane rotation is applied to a dense symmetric matrix a. the case
+! k=l+1 is required.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2) DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  II  K  FIRST INDEX OF PLANE ROTATION.
-!  II  L  SECOND INDEX OF PLANE ROTATION.
-!  RO  CK  DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  RO  CL  OFF-DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  IO  IER  INFORMATION ON THE TRANSFORMATION. IER<0-K OR L OUT OF
-!         RANGE. IER=0-PLANE ROTATION. IER=1-PERMUTATION.
-!         IER=2-TRANSFORMATION SUPPRESSED.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ru  a(n*(n+1)/2) dense symmetric matrix stored in the packed form.
+!  ii  k  first index of plane rotation.
+!  ii  l  second index of plane rotation.
+!  ro  ck  diagonal element of the elementary orthogonal matrix.
+!  ro  cl  off-diagonal element of the elementary orthogonal matrix.
+!  io  ier  information on the transformation. ier<0-k or l out of
+!         range. ier=0-plane rotation. ier=1-permutation.
+!         ier=2-transformation suppressed.
 !
-! SUBPROGRAMS USED :
-!  S   MXVROT  PLANE ROTATION IS APPLIED TO TWO NUMBERS.
+! subprograms used :
+!  s   mxvrot  plane rotation is applied to two numbers.
 !
-      SUBROUTINE MXDSMR(N,A,K,L,Ck,Cl,Ier)
-      IMPLICIT NONE
-      INTEGER N , K , L , Ier
-      DOUBLE PRECISION A(*) , Ck , Cl
-      DOUBLE PRECISION akk , akl , all , ckk , ckl , cll
-      INTEGER j , kj , lj , kk , kl , ll
-      IF ( Ier/=0 .AND. Ier/=1 ) RETURN
-      IF ( K/=L+1 ) THEN
-         Ier = -1
-         RETURN
-      ENDIF
-      lj = L*(L-1)/2
-      DO j = 1 , N
-         IF ( j<=L ) THEN
+      subroutine mxdsmr(n,a,k,l,ck,cl,ier)
+      implicit none
+      integer n , k , l , ier
+      double precision a(*) , ck , cl
+      double precision akk , akl , all , ckk , ckl , cll
+      integer j , kj , lj , kk , kl , ll
+      if ( ier/=0 .and. ier/=1 ) return
+      if ( k/=l+1 ) then
+         ier = -1
+         return
+      endif
+      lj = l*(l-1)/2
+      do j = 1 , n
+         if ( j<=l ) then
             lj = lj + 1
-            kj = lj + L
-         ELSE
+            kj = lj + l
+         else
             lj = lj + j - 1
             kj = lj + 1
-         ENDIF
-         IF ( j/=K .AND. j/=L ) CALL MXVROT(A(kj),A(lj),Ck,Cl,Ier)
-      ENDDO
-      IF ( Ier==0 ) THEN
-         ckk = Ck**2
-         ckl = Ck*Cl
-         cll = Cl**2
-         ll = L*(L+1)/2
-         kl = ll + L
-         kk = ll + K
-         akl = (ckl+ckl)*A(kl)
-         akk = ckk*A(kk) + cll*A(ll) + akl
-         all = cll*A(kk) + ckk*A(ll) - akl
-         A(kl) = (cll-ckk)*A(kl) + ckl*(A(kk)-A(ll))
-         A(kk) = akk
-         A(ll) = all
-      ELSE
-         ll = L*(L+1)/2
-         kk = ll + K
-         akk = A(kk)
-         A(kk) = A(ll)
-         A(ll) = akk
-      ENDIF
-      END SUBROUTINE MXDSMR
+         endif
+         if ( j/=k .and. j/=l ) call mxvrot(a(kj),a(lj),ck,cl,ier)
+      enddo
+      if ( ier==0 ) then
+         ckk = ck**2
+         ckl = ck*cl
+         cll = cl**2
+         ll = l*(l+1)/2
+         kl = ll + l
+         kk = ll + k
+         akl = (ckl+ckl)*a(kl)
+         akk = ckk*a(kk) + cll*a(ll) + akl
+         all = cll*a(kk) + ckk*a(ll) - akl
+         a(kl) = (cll-ckk)*a(kl) + ckl*(a(kk)-a(ll))
+         a(kk) = akk
+         a(ll) = all
+      else
+         ll = l*(l+1)/2
+         kk = ll + k
+         akk = a(kk)
+         a(kk) = a(ll)
+         a(ll) = akk
+      endif
+      end subroutine mxdsmr
 
-! SUBROUTINE MXDSMS                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsms                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! SCALING OF A DENSE SYMMETRIC MATRIX.
+! purpose :
+! scaling of a dense symmetric matrix.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM
-!         WHICH IS SCALED BY THE VALUE ALF (I.E. A:=ALF*A).
-!  RI  ALF  SCALING FACTOR.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form
+!         which is scaled by the value alf (i.e. a:=alf*a).
+!  ri  alf  scaling factor.
 !
-      SUBROUTINE MXDSMS(N,A,Alf)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(N*(N+1)/2) , Alf
-      INTEGER i , m
-      m = N*(N+1)/2
-      DO i = 1 , m
-         A(i) = A(i)*Alf
-      ENDDO
-      END SUBROUTINE MXDSMS
+      subroutine mxdsms(n,a,alf)
+      implicit none
+      integer n
+      double precision a(n*(n+1)/2) , alf
+      integer i , m
+      m = n*(n+1)/2
+      do i = 1 , m
+         a(i) = a(i)*alf
+      enddo
+      end subroutine mxdsms
 
-! SUBROUTINE MXDSMU                ALL SYSTEMS                89/12/01
-! PORTABILITY : ALL SYSTEMS
-! 89/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsmu                all systems                89/12/01
+! portability : all systems
+! 89/12/01 lu : original version
 !
-! PURPOSE :
-! UPDATE OF A DENSE SYMMETRIC MATRIX A. THIS UPDATE IS DEFINED AS
-! A:=A+ALF*X*TRANS(X) WHERE ALF IS A GIVEN SCALING FACTOR AND X IS
-! A GIVEN VECTOR.
+! purpose :
+! update of a dense symmetric matrix a. this update is defined as
+! a:=a+alf*x*trans(x) where alf is a given scaling factor and x is
+! a given vector.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RU  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  RI  ALF  SCALING FACTOR IN THE CORRECTION TERM.
-!  RI  X(N)  VECTOR IN THE CORRECTION TERM.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  ri  alf  scaling factor in the correction term.
+!  ri  x(n)  vector in the correction term.
 !
-      SUBROUTINE MXDSMU(N,A,Alf,X)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION A(N*(N+1)/2) , X(N) , Alf
-      DOUBLE PRECISION temp
-      INTEGER i , j , k
+      subroutine mxdsmu(n,a,alf,x)
+      implicit none
+      integer n
+      double precision a(n*(n+1)/2) , x(n) , alf
+      double precision temp
+      integer i , j , k
       k = 0
-      DO i = 1 , N
-         temp = Alf*X(i)
-         DO j = 1 , i
+      do i = 1 , n
+         temp = alf*x(i)
+         do j = 1 , i
             k = k + 1
-            A(k) = A(k) + temp*X(j)
-         ENDDO
-      ENDDO
-      END SUBROUTINE MXDSMU
+            a(k) = a(k) + temp*x(j)
+         enddo
+      enddo
+      end subroutine mxdsmu
 
-! SUBROUTINE MXDSMV                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxdsmv                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! K-TH ROW OF A DENSE SYMMETRIC MATRIX A IS COPIED TO THE VECTOR X.
+! purpose :
+! k-th row of a dense symmetric matrix a is copied to the vector x.
 !
-! PARAMETERS :
-!  II  N  ORDER OF THE MATRIX A.
-!  RI  A(N*(N+1)/2)  DENSE SYMMETRIC MATRIX STORED IN THE PACKED FORM.
-!  RO  X(N)  OUTPUT VECTOR.
-!  II  K  INDEX OF COPIED ROW.
+! parameters :
+!  ii  n  order of the matrix a.
+!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+!  ro  x(n)  output vector.
+!  ii  k  index of copied row.
 !
-      SUBROUTINE MXDSMV(N,A,X,K)
-      IMPLICIT NONE
-      INTEGER K , N
-      DOUBLE PRECISION A(*) , X(*)
-      INTEGER i , l
-      l = K*(K-1)/2
-      DO i = 1 , N
-         IF ( i<=K ) THEN
+      subroutine mxdsmv(n,a,x,k)
+      implicit none
+      integer k , n
+      double precision a(*) , x(*)
+      integer i , l
+      l = k*(k-1)/2
+      do i = 1 , n
+         if ( i<=k ) then
             l = l + 1
-         ELSE
+         else
             l = l + i - 1
-         ENDIF
-         X(i) = A(l)
-      ENDDO
-      END SUBROUTINE MXDSMV
+         endif
+         x(i) = a(l)
+      enddo
+      end subroutine mxdsmv
 
-! SUBROUTINE MXVCOP                ALL SYSTEMS                88/12/01
-! PORTABILITY : ALL SYSTEMS
-! 88/12/01 LU : ORIGINAL VERSION
+! subroutine mxvcop                all systems                88/12/01
+! portability : all systems
+! 88/12/01 lu : original version
 !
-! PURPOSE :
-! COPYING OF A VECTOR.
+! purpose :
+! copying of a vector.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RO  Y(N)  OUTPUT VECTOR WHERE Y:= X.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  ro  y(n)  output vector where y:= x.
 !
-      SUBROUTINE MXVCOP(N,X,Y)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*)
-      INTEGER i
-      DO i = 1 , N
-         Y(i) = X(i)
-      ENDDO
-      END SUBROUTINE MXVCOP
+      subroutine mxvcop(n,x,y)
+      implicit none
+      integer n
+      double precision x(*) , y(*)
+      integer i
+      do i = 1 , n
+         y(i) = x(i)
+      enddo
+      end subroutine mxvcop
 
-! SUBROUTINE MXVDIF                ALL SYSTEMS                88/12/01
-! PORTABILITY : ALL SYSTEMS
-! 88/12/01 LU : ORIGINAL VERSION
+! subroutine mxvdif                all systems                88/12/01
+! portability : all systems
+! 88/12/01 lu : original version
 !
-! PURPOSE :
-! VECTOR DIFFERENCE.
+! purpose :
+! vector difference.
 !
-! PARAMETERS :
-!  RI  X(N)  INPUT VECTOR.
-!  RI  Y(N)  INPUT VECTOR.
-!  RO  Z(N)  OUTPUT VECTOR WHERE Z:= X - Y.
+! parameters :
+!  ri  x(n)  input vector.
+!  ri  y(n)  input vector.
+!  ro  z(n)  output vector where z:= x - y.
 !
-      SUBROUTINE MXVDIF(N,X,Y,Z)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*) , Z(*)
-      INTEGER i
-      DO i = 1 , N
-         Z(i) = X(i) - Y(i)
-      ENDDO
-      END SUBROUTINE MXVDIF
+      subroutine mxvdif(n,x,y,z)
+      implicit none
+      integer n
+      double precision x(*) , y(*) , z(*)
+      integer i
+      do i = 1 , n
+         z(i) = x(i) - y(i)
+      enddo
+      end subroutine mxvdif
 
-! SUBROUTINE MXVDIR                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxvdir                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! VECTOR AUGMENTED BY THE SCALED VECTOR.
+! purpose :
+! vector augmented by the scaled vector.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  A  SCALING FACTOR.
-!  RI  X(N)  INPUT VECTOR.
-!  RI  Y(N)  INPUT VECTOR.
-!  RO  Z(N)  OUTPUT VECTOR WHERE Z:= Y + A*X.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  a  scaling factor.
+!  ri  x(n)  input vector.
+!  ri  y(n)  input vector.
+!  ro  z(n)  output vector where z:= y + a*x.
 !
-      SUBROUTINE MXVDIR(N,A,X,Y,Z)
-      IMPLICIT NONE
-      DOUBLE PRECISION A
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*) , Z(*)
-      INTEGER i
-      DO i = 1 , N
-         Z(i) = Y(i) + A*X(i)
-      ENDDO
-      END SUBROUTINE MXVDIR
+      subroutine mxvdir(n,a,x,y,z)
+      implicit none
+      double precision a
+      integer n
+      double precision x(*) , y(*) , z(*)
+      integer i
+      do i = 1 , n
+         z(i) = y(i) + a*x(i)
+      enddo
+      end subroutine mxvdir
 
-! FUNCTION MXVDOT                  ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! function mxvdot                  all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! DOT PRODUCT OF TWO VECTORS.
+! purpose :
+! dot product of two vectors.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RI  Y(N)  INPUT VECTOR.
-!  RR  MXVDOT  VALUE OF DOT PRODUCT MXVDOT=TRANS(X)*Y.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  ri  y(n)  input vector.
+!  rr  mxvdot  value of dot product mxvdot=trans(x)*y.
 !
-      FUNCTION MXVDOT(N,X,Y)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*) , MXVDOT
-      DOUBLE PRECISION temp
-      INTEGER i
-      temp = 0.0D0
-      DO i = 1 , N
-         temp = temp + X(i)*Y(i)
-      ENDDO
-      MXVDOT = temp
-      END FUNCTION MXVDOT
+      function mxvdot(n,x,y)
+      implicit none
+      integer n
+      double precision x(*) , y(*) , mxvdot
+      double precision temp
+      integer i
+      temp = 0.0d0
+      do i = 1 , n
+         temp = temp + x(i)*y(i)
+      enddo
+      mxvdot = temp
+      end function mxvdot
 
-! SUBROUTINE MXVINA             ALL SYSTEMS                   90/12/01
-! PORTABILITY : ALL SYSTEMS
-! 90/12/01 LU : ORIGINAL VERSION
+! subroutine mxvina             all systems                   90/12/01
+! portability : all systems
+! 90/12/01 lu : original version
 !
-! PURPOSE :
-! ELEMENTS OF THE INTEGER VECTOR ARE REPLACED BY THEIR ABSOLUTE VALUES.
+! purpose :
+! elements of the integer vector are replaced by their absolute values.
 !
-! PARAMETERS :
-!  II  N DIMENSION OF THE INTEGER VECTOR.
-!  IU  IX(N)  INTEGER VECTOR WHICH IS UPDATED SO THAT IX(I):=ABS(IX(I))
-!         FOR ALL I.
+! parameters :
+!  ii  n dimension of the integer vector.
+!  iu  ix(n)  integer vector which is updated so that ix(i):=abs(ix(i))
+!         for all i.
 !
-      SUBROUTINE MXVINA(N,Ix)
-      IMPLICIT NONE
-      INTEGER N
-      INTEGER Ix(*)
-      INTEGER i
-      DO i = 1 , N
-         Ix(i) = ABS(Ix(i))
-         IF ( Ix(i)>10 ) Ix(i) = Ix(i) - 10
-      ENDDO
-      END SUBROUTINE MXVINA
+      subroutine mxvina(n,ix)
+      implicit none
+      integer n
+      integer ix(*)
+      integer i
+      do i = 1 , n
+         ix(i) = abs(ix(i))
+         if ( ix(i)>10 ) ix(i) = ix(i) - 10
+      enddo
+      end subroutine mxvina
 
-! SUBROUTINE MXVIND               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxvind               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! CHANGE OF THE INTEGER VECTOR ELEMENT FOR THE CONSTRAINT ADDITION.
+! purpose :
+! change of the integer vector element for the constraint addition.
 !
-! PARAMETERS :
-!  IU  IX(N)  INTEGER VECTOR.
-!  II  I  INDEX OF THE CHANGED ELEMENT.
-!  II JOB  CHANGE SPECIFICATION. IS JOB.EQ.0 THEN IX(I)=10-IX(I).
+! parameters :
+!  iu  ix(n)  integer vector.
+!  ii  i  index of the changed element.
+!  ii job  change specification. is job.eq.0 then ix(i)=10-ix(i).
 !
-      SUBROUTINE MXVIND(Ix,I,Job)
-      IMPLICIT NONE
-      INTEGER Ix(*) , I , Job
-      IF ( Job==0 ) Ix(I) = 10 - Ix(I)
-      END SUBROUTINE MXVIND
+      subroutine mxvind(ix,i,job)
+      implicit none
+      integer ix(*) , i , job
+      if ( job==0 ) ix(i) = 10 - ix(i)
+      end subroutine mxvind
 
-! SUBROUTINE MXVINS             ALL SYSTEMS                   90/12/01
-! PORTABILITY : ALL SYSTEMS
-! 90/12/01 LU : ORIGINAL VERSION
+! subroutine mxvins             all systems                   90/12/01
+! portability : all systems
+! 90/12/01 lu : original version
 !
-! PURPOSE :
-! INITIATION OF THE INTEGER VECTOR.
+! purpose :
+! initiation of the integer vector.
 !
-! PARAMETERS :
-!  II  N DIMENSION OF THE INTEGER VECTOR.
-!  II  IP  INTEGER PARAMETER.
-!  IO  IX(N)  INTEGER VECTOR SUCH THAT IX(I)=IP FOR ALL I.
+! parameters :
+!  ii  n dimension of the integer vector.
+!  ii  ip  integer parameter.
+!  io  ix(n)  integer vector such that ix(i)=ip for all i.
 !
-      SUBROUTINE MXVINS(N,Ip,Ix)
-      IMPLICIT NONE
-      INTEGER N , Ip , Ix(N)
-      INTEGER i
-      DO i = 1 , N
-         Ix(i) = Ip
-      ENDDO
-      END SUBROUTINE MXVINS
+      subroutine mxvins(n,ip,ix)
+      implicit none
+      integer n , ip , ix(n)
+      integer i
+      do i = 1 , n
+         ix(i) = ip
+      enddo
+      end subroutine mxvins
 
-! SUBROUTINE MXVINV               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxvinv               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! CHANGE OF THE INTEGER VECTOR ELEMENT FOR THE CONSTRAINT ADDITION.
+! purpose :
+! change of the integer vector element for the constraint addition.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  IU  IX(N)  INTEGER VECTOR.
-!  II  I  INDEX OF THE CHANGED ELEMENT.
-!  II  JOB  CHANGE SPECIFICATION
+! parameters :
+!  ii  n  vector dimension.
+!  iu  ix(n)  integer vector.
+!  ii  i  index of the changed element.
+!  ii  job  change specification
 !
-      SUBROUTINE MXVINV(Ix,I,Job)
-      IMPLICIT NONE
-      INTEGER I , Job
-      INTEGER Ix(*)
-      IF ( (Ix(I)==3 .OR. Ix(I)==5) .AND. Job<0 ) Ix(I) = Ix(I) + 1
-      IF ( (Ix(I)==4 .OR. Ix(I)==6) .AND. Job>0 ) Ix(I) = Ix(I) - 1
-      Ix(I) = -Ix(I)
-      END SUBROUTINE MXVINV
+      subroutine mxvinv(ix,i,job)
+      implicit none
+      integer i , job
+      integer ix(*)
+      if ( (ix(i)==3 .or. ix(i)==5) .and. job<0 ) ix(i) = ix(i) + 1
+      if ( (ix(i)==4 .or. ix(i)==6) .and. job>0 ) ix(i) = ix(i) - 1
+      ix(i) = -ix(i)
+      end subroutine mxvinv
 
-! FUNCTION MXVMAX               ALL SYSTEMS                   91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! function mxvmax               all systems                   91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! L-INFINITY NORM OF A VECTOR.
+! purpose :
+! l-infinity norm of a vector.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RR  MXVMAX  L-INFINITY NORM OF THE VECTOR X.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  rr  mxvmax  l-infinity norm of the vector x.
 !
-      FUNCTION MXVMAX(N,X)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , MXVMAX
-      INTEGER i
-      MXVMAX = 0.0D0
-      DO i = 1 , N
-         MXVMAX = MAX(MXVMAX,ABS(X(i)))
-      ENDDO
-      END FUNCTION MXVMAX
+      function mxvmax(n,x)
+      implicit none
+      integer n
+      double precision x(*) , mxvmax
+      integer i
+      mxvmax = 0.0d0
+      do i = 1 , n
+         mxvmax = max(mxvmax,abs(x(i)))
+      enddo
+      end function mxvmax
 
-! SUBROUTINE MXVNEG                ALL SYSTEMS                88/12/01
-! PORTABILITY : ALL SYSTEMS
-! 88/12/01 LU : ORIGINAL VERSION
+! subroutine mxvneg                all systems                88/12/01
+! portability : all systems
+! 88/12/01 lu : original version
 !
-! PURPOSE :
-! CHANGE THE SIGNS OF VECTOR ELEMENTS.
+! purpose :
+! change the signs of vector elements.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RO  Y(N)  OUTPUT VECTOR WHERE Y:= - X.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  ro  y(n)  output vector where y:= - x.
 !
-      SUBROUTINE MXVNEG(N,X,Y)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*)
-      INTEGER i
-      DO i = 1 , N
-         Y(i) = -X(i)
-      ENDDO
-      END SUBROUTINE MXVNEG
+      subroutine mxvneg(n,x,y)
+      implicit none
+      integer n
+      double precision x(*) , y(*)
+      integer i
+      do i = 1 , n
+         y(i) = -x(i)
+      enddo
+      end subroutine mxvneg
 
-! FUNCTION  MXVNOR               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! function  mxvnor               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! EUCLIDEAN NORM OF A VECTOR.
+! purpose :
+! euclidean norm of a vector.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RR  MXVNOR  EUCLIDEAN NORM OF X.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  rr  mxvnor  euclidean norm of x.
 !
-      FUNCTION MXVNOR(N,X)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , MXVNOR
-      DOUBLE PRECISION pom , den
-      INTEGER i
-      DOUBLE PRECISION ZERO
-      PARAMETER (ZERO=0.0D0)
-      den = ZERO
-      DO i = 1 , N
-         den = MAX(den,ABS(X(i)))
-      ENDDO
-      pom = ZERO
-      IF ( den>ZERO ) THEN
-         DO i = 1 , N
-            pom = pom + (X(i)/den)**2
-         ENDDO
-      ENDIF
-      MXVNOR = den*SQRT(pom)
-      END FUNCTION MXVNOR
+      function mxvnor(n,x)
+      implicit none
+      integer n
+      double precision x(*) , mxvnor
+      double precision pom , den
+      integer i
+      double precision zero
+      parameter (zero=0.0d0)
+      den = zero
+      do i = 1 , n
+         den = max(den,abs(x(i)))
+      enddo
+      pom = zero
+      if ( den>zero ) then
+         do i = 1 , n
+            pom = pom + (x(i)/den)**2
+         enddo
+      endif
+      mxvnor = den*sqrt(pom)
+      end function mxvnor
 
-! SUBROUTINE MXVORT               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxvort               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! DETERMINATION OF AN ELEMENTARY ORTHOGONAL MATRIX FOR PLANE ROTATION.
+! purpose :
+! determination of an elementary orthogonal matrix for plane rotation.
 !
-! PARAMETERS :
-!  RU  XK  FIRST VALUE FOR PLANE ROTATION (XK IS TRANSFORMED TO
-!         SQRT(XK**2+XL**2))
-!  RU  XL  SECOND VALUE FOR PLANE ROTATION (XL IS TRANSFORMED TO
-!         ZERO)
-!  RO  CK  DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  RO  CL  OFF-DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  IO  IER  INFORMATION ON THE TRANSFORMATION. IER=0-GENERAL PLANE
-!         ROTATION. IER=1-PERMUTATION. IER=2-TRANSFORMATION SUPPRESSED.
+! parameters :
+!  ru  xk  first value for plane rotation (xk is transformed to
+!         sqrt(xk**2+xl**2))
+!  ru  xl  second value for plane rotation (xl is transformed to
+!         zero)
+!  ro  ck  diagonal element of the elementary orthogonal matrix.
+!  ro  cl  off-diagonal element of the elementary orthogonal matrix.
+!  io  ier  information on the transformation. ier=0-general plane
+!         rotation. ier=1-permutation. ier=2-transformation suppressed.
 !
-      SUBROUTINE MXVORT(Xk,Xl,Ck,Cl,Ier)
-      IMPLICIT NONE
-      DOUBLE PRECISION Ck , Cl , Xk , Xl
-      INTEGER Ier
-      DOUBLE PRECISION den , pom
-      IF ( Xl==0.0D0 ) THEN
-         Ier = 2
-      ELSEIF ( Xk==0.0D0 ) THEN
-         Xk = Xl
-         Xl = 0.0D0
-         Ier = 1
-      ELSE
-         IF ( ABS(Xk)>=ABS(Xl) ) THEN
-            pom = Xl/Xk
-            den = SQRT(1.0D0+pom*pom)
-            Ck = 1.0D0/den
-            Cl = pom/den
-            Xk = Xk*den
-         ELSE
-            pom = Xk/Xl
-            den = SQRT(1.0D0+pom*pom)
-            Cl = 1.0D0/den
-            Ck = pom/den
-            Xk = Xl*den
-         ENDIF
-         Xl = 0.0D0
-         Ier = 0
-      ENDIF
-      END SUBROUTINE MXVORT
+      subroutine mxvort(xk,xl,ck,cl,ier)
+      implicit none
+      double precision ck , cl , xk , xl
+      integer ier
+      double precision den , pom
+      if ( xl==0.0d0 ) then
+         ier = 2
+      elseif ( xk==0.0d0 ) then
+         xk = xl
+         xl = 0.0d0
+         ier = 1
+      else
+         if ( abs(xk)>=abs(xl) ) then
+            pom = xl/xk
+            den = sqrt(1.0d0+pom*pom)
+            ck = 1.0d0/den
+            cl = pom/den
+            xk = xk*den
+         else
+            pom = xk/xl
+            den = sqrt(1.0d0+pom*pom)
+            cl = 1.0d0/den
+            ck = pom/den
+            xk = xl*den
+         endif
+         xl = 0.0d0
+         ier = 0
+      endif
+      end subroutine mxvort
 
-! SUBROUTINE MXVROT               ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxvrot               all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! PLANE ROTATION IS APPLIED TO TWO VALUES.
+! purpose :
+! plane rotation is applied to two values.
 !
-! PARAMETERS :
-!  RU  XK  FIRST VALUE FOR PLANE ROTATION.
-!  RU  XL  SECOND VALUE FOR PLANE ROTATION.
-!  RI  CK  DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  RI  CL  OFF-DIAGONAL ELEMENT OF THE ELEMENTARY ORTHOGONAL MATRIX.
-!  II  IER  INFORMATION ON THE TRANSFORMATION. IER=0-GENERAL PLANE
-!         ROTATION. IER=1-PERMUTATION. IER=2-TRANSFORMATION SUPPRESSED.
+! parameters :
+!  ru  xk  first value for plane rotation.
+!  ru  xl  second value for plane rotation.
+!  ri  ck  diagonal element of the elementary orthogonal matrix.
+!  ri  cl  off-diagonal element of the elementary orthogonal matrix.
+!  ii  ier  information on the transformation. ier=0-general plane
+!         rotation. ier=1-permutation. ier=2-transformation suppressed.
 !
-      SUBROUTINE MXVROT(Xk,Xl,Ck,Cl,Ier)
-      IMPLICIT NONE
-      DOUBLE PRECISION Ck , Cl , Xk , Xl
-      INTEGER Ier
-      DOUBLE PRECISION yk , yl
-      IF ( Ier==0 ) THEN
-         yk = Xk
-         yl = Xl
-         Xk = Ck*yk + Cl*yl
-         Xl = Cl*yk - Ck*yl
-      ELSEIF ( Ier==1 ) THEN
-         yk = Xk
-         Xk = Xl
-         Xl = yk
-      ENDIF
-      END SUBROUTINE MXVROT
+      subroutine mxvrot(xk,xl,ck,cl,ier)
+      implicit none
+      double precision ck , cl , xk , xl
+      integer ier
+      double precision yk , yl
+      if ( ier==0 ) then
+         yk = xk
+         yl = xl
+         xk = ck*yk + cl*yl
+         xl = cl*yk - ck*yl
+      elseif ( ier==1 ) then
+         yk = xk
+         xk = xl
+         xl = yk
+      endif
+      end subroutine mxvrot
 
-! SUBROUTINE MXVSAV                ALL SYSTEMS                91/12/01
-! PORTABILITY : ALL SYSTEMS
-! 91/12/01 LU : ORIGINAL VERSION
+! subroutine mxvsav                all systems                91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
 !
-! PURPOSE :
-! DIFFERENCE OF TWO VECTORS RETURNED IN THE SUBSTRACTED ONE.
+! purpose :
+! difference of two vectors returned in the substracted one.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RU  Y(N)  UPDATE VECTOR WHERE Y:= X - Y.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  ru  y(n)  update vector where y:= x - y.
 !
-      SUBROUTINE MXVSAV(N,X,Y)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*)
-      DOUBLE PRECISION temp
-      INTEGER i
-      DO i = 1 , N
-         temp = Y(i)
-         Y(i) = X(i) - Y(i)
-         X(i) = temp
-      ENDDO
-      END SUBROUTINE MXVSAV
+      subroutine mxvsav(n,x,y)
+      implicit none
+      integer n
+      double precision x(*) , y(*)
+      double precision temp
+      integer i
+      do i = 1 , n
+         temp = y(i)
+         y(i) = x(i) - y(i)
+         x(i) = temp
+      enddo
+      end subroutine mxvsav
 
-! SUBROUTINE MXVSCL                ALL SYSTEMS                88/12/01
-! PORTABILITY : ALL SYSTEMS
-! 88/12/01 LU : ORIGINAL VERSION
+! subroutine mxvscl                all systems                88/12/01
+! portability : all systems
+! 88/12/01 lu : original version
 !
-! PURPOSE :
-! SCALING OF A VECTOR.
+! purpose :
+! scaling of a vector.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RI  A  SCALING FACTOR.
-!  RO  Y(N)  OUTPUT VECTOR WHERE Y:= A*X.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  ri  a  scaling factor.
+!  ro  y(n)  output vector where y:= a*x.
 !
-      SUBROUTINE MXVSCL(N,A,X,Y)
-      IMPLICIT NONE
-      DOUBLE PRECISION A
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*)
-      INTEGER i
-      DO i = 1 , N
-         Y(i) = A*X(i)
-      ENDDO
-      END SUBROUTINE MXVSCL
+      subroutine mxvscl(n,a,x,y)
+      implicit none
+      double precision a
+      integer n
+      double precision x(*) , y(*)
+      integer i
+      do i = 1 , n
+         y(i) = a*x(i)
+      enddo
+      end subroutine mxvscl
 
-! SUBROUTINE MXVSET                ALL SYSTEMS                88/12/01
-! PORTABILITY : ALL SYSTEMS
-! 88/12/01 LU : ORIGINAL VERSION
+! subroutine mxvset                all systems                88/12/01
+! portability : all systems
+! 88/12/01 lu : original version
 !
-! PURPOSE :
-! A SCALAR IS SET TO ALL THE ELEMENTS OF A VECTOR.
+! purpose :
+! a scalar is set to all the elements of a vector.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  A  INITIAL VALUE.
-!  RO  X(N)  OUTPUT VECTOR SUCH THAT X(I)=A FOR ALL I.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  a  initial value.
+!  ro  x(n)  output vector such that x(i)=a for all i.
 !
-      SUBROUTINE MXVSET(N,A,X)
-      IMPLICIT NONE
-      DOUBLE PRECISION A
-      INTEGER N
-      DOUBLE PRECISION X(*)
-      INTEGER i
-      DO i = 1 , N
-         X(i) = A
-      ENDDO
-      END SUBROUTINE MXVSET
+      subroutine mxvset(n,a,x)
+      implicit none
+      double precision a
+      integer n
+      double precision x(*)
+      integer i
+      do i = 1 , n
+         x(i) = a
+      enddo
+      end subroutine mxvset
 
-! SUBROUTINE MXVSUM                ALL SYSTEMS                88/12/01
-! PORTABILITY : ALL SYSTEMS
-! 88/12/01 LU : ORIGINAL VERSION
+! subroutine mxvsum                all systems                88/12/01
+! portability : all systems
+! 88/12/01 lu : original version
 !
-! PURPOSE :
-! SUM OF TWO VECTORS.
+! purpose :
+! sum of two vectors.
 !
-! PARAMETERS :
-!  II  N  VECTOR DIMENSION.
-!  RI  X(N)  INPUT VECTOR.
-!  RI  Y(N)  INPUT VECTOR.
-!  RO  Z(N)  OUTPUT VECTOR WHERE Z:= X + Y.
+! parameters :
+!  ii  n  vector dimension.
+!  ri  x(n)  input vector.
+!  ri  y(n)  input vector.
+!  ro  z(n)  output vector where z:= x + y.
 !
-      SUBROUTINE MXVSUM(N,X,Y,Z)
-      IMPLICIT NONE
-      INTEGER N
-      DOUBLE PRECISION X(*) , Y(*) , Z(*)
-      INTEGER i
-      DO i = 1 , N
-         Z(i) = X(i) + Y(i)
-      ENDDO
-      END SUBROUTINE MXVSUM
+      subroutine mxvsum(n,x,y,z)
+      implicit none
+      integer n
+      double precision x(*) , y(*) , z(*)
+      integer i
+      do i = 1 , n
+         z(i) = x(i) + y(i)
+      enddo
+      end subroutine mxvsum
 
     end module matrix_routines
