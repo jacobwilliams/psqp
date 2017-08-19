@@ -24,10 +24,22 @@
         integer,public :: nfg  = 0 !! number of gradient evaluations.
         integer,public :: nfh  = 0 !! number of hessian evaluations.
 
-        procedure(obj_func) ,pointer :: obj  => null()
-        procedure(dobj_func),pointer :: dobj => null()
-        procedure(con_func) ,pointer :: con  => null()
-        procedure(dcon_func),pointer :: dcon => null()
+        ! formerly saved variables in ps0l02:
+        integer :: mtyp = 0
+        integer :: mode = 0
+        integer :: mes1 = 0
+        integer :: mes2 = 0
+        double precision :: rl = 0.0d0
+        double precision :: fl = 0.0d0
+        double precision :: ru = 0.0d0
+        double precision :: fu = 0.0d0
+        double precision :: ri = 0.0d0
+        double precision :: fi = 0.0d0
+
+        procedure(obj_func) ,pointer :: obj  => null() !! objective function
+        procedure(dobj_func),pointer :: dobj => null() !! gradient of the objective function
+        procedure(con_func) ,pointer :: con  => null() !! constraint function
+        procedure(dcon_func),pointer :: dcon => null() !! gradient of the constraint function
 
     contains
 
@@ -40,13 +52,14 @@
         procedure :: plqdb1
         procedure :: plrmf0
         procedure :: pc1f01
+        procedure :: ps0l02
 
     end type psqp_class
 
     abstract interface
 
         subroutine obj_func(me,nf,x,ff)
-            !! computation of the value of the objective function
+            !! objective function interface
             import
             implicit none
             class(psqp_class),intent(inout) :: me
@@ -56,7 +69,7 @@
         end subroutine obj_func
 
         subroutine dobj_func(me,nf,x,gf)
-            !! computation of the gradient of the objective function
+            !! gradient of the objective function interface
             import
             implicit none
             class(psqp_class),intent(inout) :: me
@@ -66,7 +79,7 @@
         end subroutine dobj_func
 
         subroutine con_func(me,nf,kc,x,fc)
-            !! computation of the value of the constraint function
+            !! constraint function interface
             import
             implicit none
             class(psqp_class),intent(inout) :: me
@@ -77,7 +90,7 @@
         end subroutine con_func
 
         subroutine dcon_func(me,nf,kc,x,gc)
-            !! computation of the gradient of the constraint function
+            !! gradient of the constraint function interface
             import
             implicit none
             class(psqp_class),intent(inout) :: me
@@ -535,7 +548,7 @@
 !
 !     line search without directional derivatives
 !
- 450     call ps0l02(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,rmax,tols,kd, &
+ 450     call me%ps0l02(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,rmax,tols,kd, &
                      ld,me%nit,kit,nred,mred,maxst,iest,inits,iters,kters, &
                      mes,isys)
          if ( isys==0 ) then
@@ -604,7 +617,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! computation of the value and the gradient of the constraint function.
 !
 ! parameters :
@@ -670,7 +682,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! computation of the value and the gradient of the objective function.
 !
 ! parameters:
@@ -716,7 +727,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! new linear constraint or a new simple bound is added to the
 ! active set.
 !
@@ -766,7 +776,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! new linear constraint or a new simple bound is added to the active
 ! set. transformed hessian matrix approximation or its inversion
 ! is updated.
@@ -843,7 +852,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! triangular decomposition of kernel of the orthogonal projection
 ! is updated after constraint addition.
 !
@@ -920,7 +928,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! dual range space quadratic programming method.
 !
 ! parameters :
@@ -1182,7 +1189,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! triangular decomposition of kernel of the general projection
 ! is updated after constraint addition.
 !
@@ -1219,8 +1225,8 @@
       integer nf , n , ica(*) , idecf , inew , nadd , ier , job
       double precision cg(*) , cr(*) , h(*) , s(*) , g(*) , eps7 ,      &
                        gmax , umax
-      !double precision mxvdot
       integer nca , ncr , jcg , j , k , l
+
       ier = 0
       if ( job==0 .and. n<=0 ) ier = 2
       if ( inew==0 ) ier = 3
@@ -1287,325 +1293,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
-! determination of the new values of the constraint functions.
-!
-! parameters :
-!  ii  nc  number of constraints.
-!  ru  cf(nf)  vector containing values of the constraint functions.
-!  ri  cfd(nf)  vector containing increments of the constraint
-!         functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  step  current stepsize.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!
-      subroutine pldirl(nc,cf,cfd,ic,step,kbc)
-      implicit none
-      integer nc , ic(*) , kbc
-      double precision cf(*) , cfd(*) , step
-      integer kc
-      if ( kbc>0 ) then
-         do kc = 1 , nc
-            if ( ic(kc)>=0 .and. ic(kc)<=10 ) then
-               cf(kc) = cf(kc) + step*cfd(kc)
-            elseif ( ic(kc)<-10 ) then
-               cf(kc) = cf(kc) + step*cfd(kc)
-            endif
-         enddo
-      endif
-      end subroutine pldirl
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! determination of the new vector of variables.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ru  x(nf)  vector of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ri  s(nf)  direction vector.
-!  ri  step  current stepsize.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!
-      subroutine pldirs(nf,x,ix,s,step,kbf)
-      implicit none
-      integer nf , ix(*) , kbf
-      double precision x(*) , s(*) , step
-      integer i
-      do i = 1 , nf
-         if ( kbf<=0 ) then
-            x(i) = x(i) + step*s(i)
-         elseif ( ix(i)>=0 .and. ix(i)<=10 ) then
-            x(i) = x(i) + step*s(i)
-         elseif ( ix(i)<-10 ) then
-            x(i) = x(i) + step*s(i)
-         endif
-      enddo
-      end subroutine pldirs
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! determination of the initial point which satisfies simple bounds.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ru  x(nf)  vector of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  eps9  tolerance for active constraints.
-!  io  inew  index of the new active constraint.
-!  io  ind  indicator. if ind.ne.0 then trust region bounds cannot
-!         be satisfied.
-
-      subroutine plinit(nf,x,ix,xl,xu,eps9,kbf,inew,ind)
-      implicit none
-      integer nf , ix(*) , kbf , inew , ind
-      double precision x(*) , xl(*) , xu(*) , eps9
-      integer i
-      ind = 0
-      if ( kbf>0 ) then
-         do i = 1 , nf
-            call plnews(x,ix,xl,xu,eps9,i,inew)
-            if ( ix(i)<5 ) then
-            elseif ( ix(i)==5 ) then
-               ix(i) = -5
-            elseif ( ix(i)==11 .or. ix(i)==13 ) then
-               x(i) = xl(i)
-               ix(i) = 10 - ix(i)
-            elseif ( ix(i)==12 .or. ix(i)==14 ) then
-               x(i) = xu(i)
-               ix(i) = 10 - ix(i)
-            endif
-         enddo
-      endif
-      end subroutine plinit
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! determination of the maximum stepsize using linear constraints.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  nc  number of current linear constraints.
-!  ri  cf(nf)  vector containing values of the constraint funcyions.
-!  ro  cfd(nf)  vector containing increments of the constraint
-!         functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  s(nf)  direction vector.
-!  ro  step  maximum stepsize.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  ii  krem  indication of linearly dependent gradients.
-!  io  inew  index of the new active function.
-
-      subroutine plmaxl(nf,nc,cf,cfd,ic,cl,cu,cg,s,step,kbc,krem,inew)
-      implicit none
-      integer nf , nc , ic(*) , kbc , krem , inew
-      double precision cf(*) , cfd(*) , cl(*) , cu(*) , cg(*) , s(*) ,  &
-                       step
-      double precision temp !, mxvdot
-      integer jcg , kc
-      if ( kbc>0 ) then
-         jcg = 1
-         do kc = 1 , nc
-            if ( krem>0 .and. ic(kc)>10 ) ic(kc) = ic(kc) - 10
-            if ( ic(kc)>0 .and. ic(kc)<=10 ) then
-               temp = mxvdot(nf,cg(jcg),s)
-               cfd(kc) = temp
-               if ( temp<0.0d0 ) then
-                  if ( ic(kc)==1 .or. ic(kc)>=3 ) then
-                     temp = (cl(kc)-cf(kc))/temp
-                     if ( temp<=step ) then
-                        inew = kc
-                        step = temp
-                     endif
-                  endif
-               elseif ( temp>0.0d0 ) then
-                  if ( ic(kc)==2 .or. ic(kc)>=3 ) then
-                     temp = (cu(kc)-cf(kc))/temp
-                     if ( temp<=step ) then
-                        inew = kc
-                        step = temp
-                     endif
-                  endif
-               endif
-            elseif ( ic(kc)<-10 ) then
-               temp = mxvdot(nf,cg(jcg),s)
-               cfd(kc) = temp
-               if ( temp>0.0d0 ) then
-                  if ( ic(kc)==-11 .or. ic(kc)==-13 .or. ic(kc)==-15 )  &
-                       then
-                     temp = (cl(kc)-cf(kc))/temp
-                     if ( temp<=step ) then
-                        inew = kc
-                        step = temp
-                     endif
-                  endif
-               elseif ( temp<0.0d0 ) then
-                  if ( ic(kc)==-12 .or. ic(kc)==-14 .or. ic(kc)==-16 )  &
-                       then
-                     temp = (cu(kc)-cf(kc))/temp
-                     if ( temp<=step ) then
-                        inew = kc
-                        step = temp
-                     endif
-                  endif
-               endif
-            endif
-            jcg = jcg + nf
-         enddo
-      endif
-      end subroutine plmaxl
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! determination of the maximum stepsize using the simple bounds
-! for variables.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ri  x(nf)  vector of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  s(nf)  direction vector.
-!  ro  step  maximum stepsize.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  io  krem  indication of linearly dependent gradients.
-!  io  inew  index of the new active constraint.
-!
-      subroutine plmaxs(nf,x,ix,xl,xu,s,step,kbf,krem,inew)
-      implicit none
-      integer nf , ix(*) , kbf , krem , inew
-      double precision x(*) , xl(*) , xu(*) , s(*) , step
-      double precision temp
-      integer i
-      if ( kbf>0 ) then
-         do i = 1 , nf
-            if ( krem>0 .and. ix(i)>10 ) ix(i) = ix(i) - 10
-            if ( ix(i)>0 .and. ix(i)<=10 ) then
-               if ( s(i)<0.0d0 ) then
-                  if ( ix(i)==1 .or. ix(i)>=3 ) then
-                     temp = (xl(i)-x(i))/s(i)
-                     if ( temp<=step ) then
-                        inew = -i
-                        step = temp
-                     endif
-                  endif
-               elseif ( s(i)>0.0d0 ) then
-                  if ( ix(i)==2 .or. ix(i)>=3 ) then
-                     temp = (xu(i)-x(i))/s(i)
-                     if ( temp<=step ) then
-                        inew = -i
-                        step = temp
-                     endif
-                  endif
-               endif
-            endif
-         enddo
-      endif
-      krem = 0
-      end subroutine plmaxs
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! test on activity of a given linear constraint.
-!
-! parameters :
-!  ii  kc  index of a given constraint.
-!  ri  cf(nc)  vector containing values of the constraint functions.
-!  iu  ic(nc)  vector containing types of constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  eps9  tolerance for active constraints.
-!  io  inew  index of the new active constraint.
-!
-      subroutine plnewl(kc,cf,ic,cl,cu,eps9,inew)
-      implicit none
-      integer kc , ic(*) , inew
-      double precision cf(*) , cl(*) , cu(*) , eps9
-      double precision temp
-      if ( ic(kc)<-10 ) ic(kc) = -ic(kc) - 10
-      if ( ic(kc)<=0 ) then
-      elseif ( ic(kc)==1 ) then
-         temp = eps9*max(abs(cl(kc)),1.0d0)
-         if ( cf(kc)>cl(kc)+temp ) then
-         elseif ( cf(kc)>=cl(kc)-temp ) then
-            ic(kc) = 11
-            inew = kc
-         else
-            ic(kc) = -11
-         endif
-      elseif ( ic(kc)==2 ) then
-         temp = eps9*max(abs(cu(kc)),1.0d0)
-         if ( cf(kc)<cu(kc)-temp ) then
-         elseif ( cf(kc)<=cu(kc)+temp ) then
-            ic(kc) = 12
-            inew = kc
-         else
-            ic(kc) = -12
-         endif
-      elseif ( ic(kc)==3 .or. ic(kc)==4 ) then
-         temp = eps9*max(abs(cl(kc)),1.0d0)
-         if ( cf(kc)>cl(kc)+temp ) then
-            temp = eps9*max(abs(cu(kc)),1.0d0)
-            if ( cf(kc)<cu(kc)-temp ) then
-            elseif ( cf(kc)<=cu(kc)+temp ) then
-               ic(kc) = 14
-               inew = kc
-            else
-               ic(kc) = -14
-            endif
-         elseif ( cf(kc)>=cl(kc)-temp ) then
-            ic(kc) = 13
-            inew = kc
-         else
-            ic(kc) = -13
-         endif
-      elseif ( ic(kc)==5 .or. ic(kc)==6 ) then
-         temp = eps9*max(abs(cl(kc)),1.0d0)
-         if ( cf(kc)>cl(kc)+temp ) then
-            temp = eps9*max(abs(cu(kc)),1.0d0)
-            if ( cf(kc)<cu(kc)-temp ) then
-            elseif ( cf(kc)<=cu(kc)+temp ) then
-               ic(kc) = 16
-               inew = kc
-            else
-               ic(kc) = -16
-            endif
-         elseif ( cf(kc)>=cl(kc)-temp ) then
-            ic(kc) = 15
-            inew = kc
-         else
-            ic(kc) = -15
-         endif
-      endif
-      end subroutine plnewl
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
 ! determination of the new active linear constraint.
 !
 ! parameters :
@@ -1668,7 +1355,6 @@
 !***********************************************************************
 !> date: 91/12/01
 !
-! purpose :
 ! determination of the new active simple bound.
 !
 ! parameters :
@@ -1721,7 +1407,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! test on activity of a given simple bound.
 !
 ! parameters :
@@ -1765,7 +1450,6 @@
 !***********************************************************************
 !> date: 98/12/01
 !
-! purpose :
 ! transformation of the incompatible quadratic programming subproblem.
 !
 ! parameters :
@@ -1806,7 +1490,6 @@
 !***********************************************************************
 !> date: 91/12/01
 !
-! purpose :
 ! operations after constraint deletion.
 !
 ! parameters :
@@ -1852,7 +1535,6 @@
 !***********************************************************************
 !> date: 91/12/01
 !
-! purpose :
 ! triangular decomposition of kernel of the orthogonal projection is
 ! updated after constraint deletion.
 !
@@ -1907,7 +1589,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! determination of initial values of the constraint functions.
 !
 ! parameters :
@@ -1925,8 +1606,8 @@
       implicit none
       integer nf , nc , ic(*)
       double precision x(*) , xo(*) , cf(*) , cg(*) , s(*)
-      !double precision mxvdot
       integer jcg , kc
+
       call mxvdif(nf,x,xo,s)
       jcg = 0
       do kc = 1 , nc
@@ -1938,7 +1619,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! gradient determination in the first phase of lp subroutine.
 !
 ! parameters :
@@ -1972,7 +1652,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! maximum absolute value of the negative lagrange multiplier is
 ! computed.
 !
@@ -2024,7 +1703,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! gradient of the objective function is scaled and reduced. lagrange
 ! multipliers are determined. test values gmax and umax are computed.
 !
@@ -2056,8 +1734,8 @@
       integer nf , n , nc , ix(*) , ic(*) , ica(*) , iold
       double precision cg(*) , cr(*) , cz(*) , g(*) , gn(*) , eps7 ,    &
                        gmax , umax
-      !double precision mxvmax
       integer nca , ncz
+
       gmax = 0.0d0
       if ( n>0 ) then
          call mxdrmm(nf,n,cz,g,gn)
@@ -2081,7 +1759,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! gradient of the objective function is premultiplied by transpose
 ! of the matrix whose columns are normals of current active constraints
 ! and gradients of current active functions.
@@ -2101,8 +1778,8 @@
       implicit none
       integer nf , n , nc , iaa(*)
       double precision ag(*) , cg(*) , g(*) , gn(*)
-      !double precision mxvdot
       integer naa , j , l
+
       naa = nf - n
       do j = 1 , naa
          l = iaa(j)
@@ -2121,7 +1798,6 @@
 !***********************************************************************
 !> date: 91/12/01
 !
-! purpose :
 ! extrapolation or interpolation for line search with directional
 ! derivatives.
 !
@@ -2234,7 +1910,6 @@
 !***********************************************************************
 !> date: 91/12/01
 !
-! purpose :
 ! extrapolation or interpolation for line search without directional
 ! derivatives.
 !
@@ -2353,40 +2028,8 @@
       end subroutine pnint3
 
 !***********************************************************************
-!> date: 89/12/01
-!
-! purpose :
-! determination of a scaling factor for the boundary step.
-!
-! parameters :
-!  ri  del  maximum stepsize.
-!  ri  a  input parameter.
-!  ri  b  input parameter.
-!  ri  c  input parameter.
-!  ro  alf  scaling factor for the boundary step such that
-!         a**2+2*b*alf+c*alf**2=del**2.
-!
-      subroutine pnstep(del,a,b,c,alf)
-      implicit none
-      double precision del , a , b , c , alf
-      double precision den , dis
-      double precision zero
-      parameter (zero=0.0d0)
-      alf = zero
-      den = (del+a)*(del-a)
-      if ( den<=zero ) return
-      dis = b*b + c*den
-      if ( b>=zero ) then
-         alf = den/(sqrt(dis)+b)
-      else
-         alf = (sqrt(dis)-b)/c
-      endif
-      end subroutine pnstep
-
-!***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! computation of value of the augmented lagrangian function.
 !
 ! parameters :
@@ -2437,7 +2080,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
 ! computation of the new penalty parameters.
 !
 ! parameters :
@@ -2469,160 +2111,6 @@
 !***********************************************************************
 !> date: 97/12/01
 !
-! purpose :
-! simple search with trust region update.
-!
-! parameters :
-!  ro  r  value of the stepsize parameter.
-!  ro  f  value of the objective function.
-!  ri  fo  initial value of the objective function.
-!  ri  po  initial value of the directional derivative.
-!  ri  pp  quadratic part of the predicted function value.
-!  ru  xdel  trust region bound.
-!  ro  xdelo  previous trust region bound.
-!  ri  xmax maximum stepsize.
-!  ri  rmax  maximum value of the stepsize parameter.
-!  ri  snorm  euclidean norm of the direction vector.
-!  ri  bet1  lower bound for stepsize reduction.
-!  ri  bet2  upper bound for stepsize reduction.
-!  ri  gam1  lower bound for stepsize expansion.
-!  ri  gam2  upper bound for stepsize expansion.
-!  ri  eps4  first tolerance for ratio df/dfpred. step bound is
-!         decreased if df/dfpred<eps4.
-!  ri  eps5  second tolerance for ratio df/dfpred. step bound is
-!         increased if it is active and df/dfpred>eps5.
-!  ii  kd  degree of required dervatives.
-!  io  ld  degree of previously computed derivatives.
-!  iu  idir indicator for direction determination.
-!         idir=0-basic determination. idir=1-determination
-!         after stepsize reduction. idir=2-determination after
-!         stepsize expansion.
-!  io  iters  termination indicator. iters=0-zero step. iters=1-step
-!         bound was decreased. iters=2-step bound was unchanged.
-!         iters=3-step bound was increased. iters=6-first stepsize.
-!  ii  iterd termination indicator. iterd<0-bad decomposition.
-!         iterd=0-descent direction. iterd=1-newton like step.
-!         iterd=2-inexact newton like step. iterd=3-boundary step.
-!         iterd=4-direction with the negative curvature.
-!         iterd=5-marquardt step.
-!  io  maxst  maximum stepsize indicator. maxst=0 or maxst=1 if maximum
-!         stepsize was not or was reached.
-!  io  nred  actual number of extrapolations or interpolations.
-!  ii  mred  maximum number of extrapolations or interpolations.
-!  ii  kters  termination selection. kters=1-normal termination.
-!         kters=6-first stepsize.
-!  ii  mes1  switch for extrapolation. mes1=1-constant increasing of
-!         the interval. mes1=2-extrapolation specified by the parameter
-!         mes. mes1=3 suppressed extrapolation.
-!  ii  mes2  switch for termination. mes2=1-normal termination.
-!         mes2=2-termination after at least two steps (asymptotically
-!         perfect line search).
-!  ii  mes3  safeguard against rounding errors. mes3=0-safeguard
-!         suppressed. mes3=1-first level of safeguard. mes3=2-second
-!         level of safeguard.
-!  iu  isys  control parameter.
-!
-! common data :
-!
-!### Method
-! g.a.schultz, r.b.schnabel, r.h.byrd: a family of trust-region-based
-! algorithms for unconstrained minimization with strong global
-! convergence properties, siam j. numer.anal. 22 (1985) pp. 47-67.
-!
-      subroutine ps0g01(r,f,fo,po,pp,xdel,xdelo,xmax,rmax,snorm,bet1,   &
-                        bet2,gam1,gam2,eps4,eps5,kd,ld,idir,iters,iterd,&
-                        maxst,nred,mred,kters,mes1,mes2,mes3,isys)
-      implicit none
-      integer kd , ld , idir , iters , iterd , maxst , nred , mred ,    &
-              kters , mes1 , mes2 , mes3 , isys
-      double precision r , f , fo , po , pp , xdel , xdelo , xmax ,     &
-                       rmax , snorm , bet1 , bet2 , gam1 , gam2 , eps4 ,&
-                       eps5
-      double precision df , dfpred
-      integer nred1 , nred2
-      save nred1 , nred2
-      if ( isys==1 ) then
-         if ( kters<0 .or. kters>5 ) then
-            iters = 6
-         else
-            df = fo - f
-            dfpred = -r*(po+r*pp)
-            if ( df<eps4*dfpred ) then
-!
-!     step is too large, it has to be reduced
-!
-               if ( mes1==1 ) then
-                  xdel = bet2*snorm
-               elseif ( mes1==2 ) then
-                  xdel = bet2*min(0.5d0*xdel,snorm)
-               else
-                  xdel = 0.5d0*po*snorm/(po+df)
-                  xdel = max(xdel,bet1*snorm)
-                  xdel = min(xdel,bet2*snorm)
-               endif
-               iters = 1
-               if ( mes3<=1 ) then
-                  nred2 = nred2 + 1
-               else
-                  if ( iterd>2 ) nred2 = nred2 + 1
-               endif
-            elseif ( df<=eps5*dfpred ) then
-!
-!     step is suitable
-!
-               iters = 2
-            else
-!
-!     step is too small, it has to be enlarged
-!
-               if ( mes2==2 ) then
-                  xdel = max(xdel,gam1*snorm)
-               elseif ( iterd>2 ) then
-                  xdel = gam1*xdel
-               endif
-               iters = 3
-            endif
-            xdel = min(xdel,xmax,gam2*snorm)
-            if ( fo<=f ) then
-               if ( nred1>=mred ) then
-                  iters = -1
-               else
-                  idir = 1
-                  iters = 0
-                  nred1 = nred1 + 1
-               endif
-            endif
-         endif
-         maxst = 0
-         if ( xdel>=xmax ) maxst = 1
-         if ( mes3==0 ) then
-            nred = nred1
-         else
-            nred = nred2
-         endif
-         isys = 0
-         return
-      endif
-!      go to (1,2) isys+1
-      if ( idir==0 ) then
-         nred1 = 0
-         nred2 = 0
-      endif
-      idir = 0
-      xdelo = xdel
-!
-!     computation of the new function value
-!
-      r = min(1.0d0,rmax)
-      kd = 0
-      ld = -1
-      isys = 1
-      end subroutine ps0g01
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
 !  extended line search without directional derivatives.
 !
 ! parameters :
@@ -2673,32 +2161,31 @@
 !         interpolation.
 !  iu  isys  control parameter.
 !
-! subprogram used :
-!  s   pnint3  extrapolation or interpolation without directional
-!         derivatives.
-!
 !### Method
 ! safeguarded extrapolation and interpolation with extended termination
 ! criteria.
-!
-      subroutine ps0l02(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,rmax,tols, &
+
+      subroutine ps0l02(me,r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,rmax,tols, &
                         kd,ld,nit,kit,nred,mred,maxst,iest,inits,iters, &
                         kters,mes,isys)
       implicit none
+
+      class(psqp_class),intent(inout) :: me
+
       integer kd , ld , nit , kit , nred , mred , maxst , iest , inits ,&
               iters , kters , mes , isys
-      double precision r , ro , rp , f , fo , fp , po , pp , fmin ,     &
+      double precision r , ro , rp , f , fo , fp , po , pp , fmin , &
                        fmax , rmin , rmax , tols
-      double precision rl , fl , ru , fu , ri , fi , rtemp , tol
-      integer mtyp , merr , mode , init1 , mes1 , mes2
+      double precision rtemp
+      integer merr , init1
       logical l1 , l2 , l3 , l4 , l6 , l7
-      parameter (tol=1.0d-4)
-      save mtyp , mode , mes1 , mes2
-      save rl , fl , ru , fu , ri , fi
+
+      double precision,parameter :: tol = 1.0d-4
+
       if ( isys/=1 ) then
 !      go to (1,3) isys+1
-         mes1 = 2
-         mes2 = 2
+         me%mes1 = 2
+         me%mes2 = 2
          iters = 0
          if ( po>=0.0d0 ) then
             r = 0.0d0
@@ -2738,13 +2225,13 @@
          rtemp = r
          r = max(r,rmin)
          r = min(r,rmax)
-         mode = 0
-         rl = 0.0d0
-         fl = fo
-         ru = 0.0d0
-         fu = fo
-         ri = 0.0d0
-         fi = fo
+         me%mode = 0
+         me%rl = 0.0d0
+         me%fl = fo
+         me%ru = 0.0d0
+         me%fu = fo
+         me%ri = 0.0d0
+         me%fi = fo
       elseif ( iters/=0 ) then
          isys = 0
          return
@@ -2757,9 +2244,9 @@
             l1 = r<=rmin .and. nit/=kit
             l2 = r>=rmax
             l3 = f - fo<=tols*r*po .or. f - fmin<=(fo-fmin)/1.0d1
-            l4 = f - fo>=(1.0d0-tols)*r*po .or. mes2==2 .and. mode==2
-            l6 = ru - rl<=tol*ru .and. mode==2
-            l7 = mes2<=2 .or. mode/=0
+            l4 = f - fo>=(1.0d0-tols)*r*po .or. me%mes2==2 .and. me%mode==2
+            l6 = me%ru - me%rl<=tol*me%ru .and. me%mode==2
+            l7 = me%mes2<=2 .or. me%mode/=0
             maxst = 0
             if ( l2 ) maxst = 1
          endif
@@ -2770,7 +2257,7 @@
             iters = 0
             isys = 0
             return
-         elseif ( l2 .and. .not.f>=fu ) then
+         elseif ( l2 .and. .not.f>=me%fu ) then
             iters = 7
             isys = 0
             return
@@ -2798,61 +2285,61 @@
          else
             rp = r
             fp = f
-            mode = max(mode,1)
-            mtyp = abs(mes)
-            if ( f>=fmax ) mtyp = 1
+            me%mode = max(me%mode,1)
+            me%mtyp = abs(mes)
+            if ( f>=fmax ) me%mtyp = 1
          endif
-         if ( mode==1 ) then
+         if ( me%mode==1 ) then
 !
 !     interval change after extrapolation
 !
-            rl = ri
-            fl = fi
-            ri = ru
-            fi = fu
-            ru = r
-            fu = f
-            if ( f>=fi ) then
+            me%rl = me%ri
+            me%fl = me%fi
+            me%ri = me%ru
+            me%fi = me%fu
+            me%ru = r
+            me%fu = f
+            if ( f>=me%fi ) then
                nred = 0
-               mode = 2
-            elseif ( mes1==1 ) then
-               mtyp = 1
+               me%mode = 2
+            elseif ( me%mes1==1 ) then
+               me%mtyp = 1
             endif
 !
 !     interval change after interpolation
 !
-         elseif ( r<=ri ) then
-            if ( f<=fi ) then
-               ru = ri
-               fu = fi
-               ri = r
-               fi = f
+         elseif ( r<=me%ri ) then
+            if ( f<=me%fi ) then
+               me%ru = me%ri
+               me%fu = me%fi
+               me%ri = r
+               me%fi = f
             else
-               rl = r
-               fl = f
+               me%rl = r
+               me%fl = f
             endif
-         elseif ( f<=fi ) then
-            rl = ri
-            fl = fi
-            ri = r
-            fi = f
+         elseif ( f<=me%fi ) then
+            me%rl = me%ri
+            me%fl = me%fi
+            me%ri = r
+            me%fi = f
          else
-            ru = r
-            fu = f
+            me%ru = r
+            me%fu = f
          endif
       endif
 !
 !     new stepsize selection (extrapolation or interpolation)
 !
-      call pnint3(ro,rl,ru,ri,fo,fl,fu,fi,po,r,mode,mtyp,merr)
+      call pnint3(ro,me%rl,me%ru,me%ri,fo,me%fl,me%fu,me%fi,po,r,me%mode,me%mtyp,merr)
       if ( merr>0 ) then
          iters = -merr
          isys = 0
          return
-      elseif ( mode==1 ) then
+      elseif ( me%mode==1 ) then
          nred = nred - 1
          r = min(r,rmax)
-      elseif ( mode==2 ) then
+      elseif ( me%mode==2 ) then
          nred = nred + 1
       endif
 !
@@ -2864,262 +2351,8 @@
       end subroutine ps0l02
 
 !***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-!  standard line search with directional derivatives.
-!
-! parameters :
-!  ro  r  value of the stepsize parameter.
-!  ro  rp  previous value of the stepsize parameter.
-!  ro  f  value of the objective function.
-!  ri  fo  initial value of the objective function.
-!  ro  fp  previous value of the objective function.
-!  ro  p  value of the directional derivative.
-!  ri  po  initial value of the directional derivative.
-!  ro  pp  previous value of the directional derivative.
-!  ri  fmin  lower bound for value of the objective function.
-!  ri  fmax  upper bound for value of the objective function.
-!  ri  rmin  minimum value of the stepsize parameter
-!  ri  rmax  maximum value of the stepsize parameter
-!  ri  tols  termination tolerance for line search (in test on the
-!         change of the function value).
-!  ri  tolp  termination tolerance for line search (in test on the
-!         change of the directional derivative).
-!  ro  par1  parameter for controlled scaling of variable metric
-!         updates.
-!  ro  par2  parameter for controlled scaling of variable metric
-!         updates.
-!  ii  kd  degree of required dervatives.
-!  io  ld  degree of previously computed derivatives.
-!  ii  nit  actual number of iterations.
-!  ii  kit  number of the iteration after last restart.
-!  io  nred  actual number of extrapolations or interpolations.
-!  ii  mred  maximum number of extrapolations or interpolations.
-!  io  maxst  maximum stepsize indicator. maxst=0 or maxst=1 if maximum
-!         stepsize was not or was reached.
-!  ii  iest  lower bound specification. iest=0 or iest=1 if lower bound
-!         is not or is given.
-!  ii  inits  choice of the initial stepsize. inits=0-initial stepsize
-!         is specified in the calling program. inits=1-unit initial
-!         stepsize. inits=2-combined unit and quadratically estimated
-!         initial stepsize. inits=3-quadratically estimated initial
-!         stepsize.
-!  io  iters  termination indicator. iters=0-zero step. iters=1-perfect
-!         line search. iters=2 goldstein stepsize. iters=3-curry
-!         stepsize. iters=4-extended curry stepsize.
-!         iters=5-armijo stepsize. iters=6-first stepsize.
-!         iters=7-maximum stepsize. iters=8-unbounded function.
-!         iters=-1-mred reached. iters=-2-positive directional
-!         derivative. iters=-3-error in interpolation.
-!  ii  kters  termination selection. kters=1-perfect line search.
-!         kters=2-goldstein stepsize. kters=3-curry stepsize.
-!         kters=4-extended curry stepsize. kters=5-armijo stepsize.
-!         kters=6-first stepsize.
-!  ii  mes  method selection. mes=1-bisection. mes=2-quadratic
-!         interpolation (with one directional derivative).
-!         mes=3-quadratic interpolation (with two directional
-!         derivatives). mes=4-cubic interpolation. mes=5-conic
-!         interpolation.
-!  iu  isys  control parameter.
-!
-! subprogram used :
-!  s   pnint1  extrapolation or interpolation with directional
-!         derivatives.
-!
-!### Method
-! safeguarded extrapolation and interpolation with standard termination
-! criteria.
-!
-      subroutine ps1l01(r,rp,f,fo,fp,p,po,pp,fmin,fmax,rmin,rmax,tols,  &
-                        tolp,par1,par2,kd,ld,nit,kit,nred,mred,maxst,   &
-                        iest,inits,iters,kters,mes,isys)
-      implicit none
-      integer kd , ld , nit , kit , nred , mred , maxst , iest , inits ,&
-              iters , kters , mes , isys
-      double precision r , rp , f , fo , fp , p , po , pp , fmin ,      &
-                       fmax , rmin , rmax , tols , tolp , par1 , par2
-      double precision rl , fl , pl , ru , fu , pu , rtemp
-      integer mtyp , merr , mode , init1 , mes1 , mes2 , mes3
-      logical l1 , l2 , l3 , l5 , l7 , m1 , m2 , m3
-      double precision con , con1
-      parameter (con=1.0d-2,con1=1.0d-13)
-      save mtyp , mode , mes1 , mes2 , mes3
-      save rl , fl , pl , ru , fu , pu
-      if ( isys==1 ) then
-         if ( mode==0 ) then
-            par1 = p/po
-            par2 = f - fo
-         endif
-         if ( iters/=0 ) then
-            isys = 0
-            return
-         else
-            if ( f<=fmin ) then
-               iters = 7
-               isys = 0
-               return
-            else
-               l1 = r<=rmin .and. nit/=kit
-               l2 = r>=rmax
-               l3 = f - fo<=tols*r*po
-               l5 = p>=tolp*po .or. mes2==2 .and. mode==2
-               l7 = mes2<=2 .or. mode/=0
-               m1 = .false.
-               m2 = .false.
-               m3 = l3
-               if ( mes3>=1 ) then
-                  m1 = abs(p)<=con*abs(po) .and. fo - f>=(con1/con)     &
-                       *abs(fo)
-                  l3 = l3 .or. m1
-               endif
-               if ( mes3>=2 ) then
-                  m2 = abs(p)<=0.5d0*abs(po) .and. abs(fo-f)            &
-                       <=2.0d0*con1*abs(fo)
-                  l3 = l3 .or. m2
-               endif
-               maxst = 0
-               if ( l2 ) maxst = 1
-            endif
-!
-!     test on termination
-!
-            if ( l1 .and. .not.l3 ) then
-               iters = 0
-               isys = 0
-               return
-            elseif ( l2 .and. l3 .and. .not.l5 ) then
-               iters = 7
-               isys = 0
-               return
-            elseif ( m3 .and. mes1==3 ) then
-               iters = 5
-               isys = 0
-               return
-            elseif ( l3 .and. l5 .and. l7 ) then
-               iters = 4
-               isys = 0
-               return
-            elseif ( kters<0 .or. kters==6 .and. l7 ) then
-               iters = 6
-               isys = 0
-               return
-            elseif ( abs(nred)>=mred ) then
-               iters = -1
-               isys = 0
-               return
-            else
-               rp = r
-               fp = f
-               pp = p
-               mode = max(mode,1)
-               mtyp = abs(mes)
-               if ( f>=fmax ) mtyp = 1
-            endif
-            if ( mode==1 ) then
-!
-!     interval change after extrapolation
-!
-               rl = ru
-               fl = fu
-               pl = pu
-               ru = r
-               fu = f
-               pu = p
-               if ( .not.l3 ) then
-                  nred = 0
-                  mode = 2
-               elseif ( mes1==1 ) then
-                  mtyp = 1
-               endif
-!
-!     interval change after interpolation
-!
-            elseif ( .not.l3 ) then
-               ru = r
-               fu = f
-               pu = p
-            else
-               rl = r
-               fl = f
-               pl = p
-            endif
-         endif
-      else
-!      go to (1,3) isys+1
-         mes1 = 2
-         mes2 = 2
-         mes3 = 2
-         iters = 0
-         if ( po>=0.0d0 ) then
-            r = 0.0d0
-            iters = -2
-            isys = 0
-            return
-         endif
-         if ( rmax<=0.0d0 ) then
-            iters = 0
-            isys = 0
-            return
-         endif
-!
-!     initial stepsize selection
-!
-         if ( inits>0 ) then
-            rtemp = fmin - f
-         elseif ( iest==0 ) then
-            rtemp = f - fp
-         else
-            rtemp = max(f-fp,1.0d1*(fmin-f))
-         endif
-         init1 = abs(inits)
-         rp = 0.0d0
-         fp = fo
-         pp = po
-         if ( init1==0 ) then
-         elseif ( init1==1 .or. inits>=1 .and. iest==0 ) then
-            r = 1.0d0
-         elseif ( init1==2 ) then
-            r = min(1.0d0,4.0d0*rtemp/po)
-         elseif ( init1==3 ) then
-            r = min(1.0d0,2.0d0*rtemp/po)
-         elseif ( init1==4 ) then
-            r = 2.0d0*rtemp/po
-         endif
-         r = max(r,rmin)
-         r = min(r,rmax)
-         mode = 0
-         ru = 0.0d0
-         fu = fo
-         pu = po
-      endif
-!
-!     new stepsize selection (extrapolation or interpolation)
-!
-      call pnint1(rl,ru,fl,fu,pl,pu,r,mode,mtyp,merr)
-      if ( merr>0 ) then
-         iters = -merr
-         isys = 0
-         return
-      elseif ( mode==1 ) then
-         nred = nred - 1
-         r = min(r,rmax)
-      elseif ( mode==2 ) then
-         nred = nred + 1
-      endif
-!
-!     computation of the new function value and the new directional
-!     derivative
-!
-      kd = 1
-      ld = -1
-      isys = 1
-      end subroutine ps1l01
-
-!***********************************************************************
 !> date: 92/12/01
 !
-! purpose :
 ! variable metric update of a dense symmetric positive definite matrix
 ! using the factorization b=l*d*trans(l).
 !
@@ -3152,7 +2385,7 @@
       double precision g(*) , go(*) , h(*) , s(*) , xo(*)
       double precision a , b , c , gam , par , den , dis
       logical l1 , l3
-      !double precision mxvdot , mxdpgp
+
       l1 = met1>=3 .or. met1==2 .and. nit==kit
       l3 = .not.l1
 !
@@ -3233,1130 +2466,8 @@
       end subroutine pudbg1
 
 !***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! variable metric updates.
-!
-! parameters :
-!  ii  n  number of variables.
-!  ru  h(n*(n+1)/2)  updated approximation of the inverse hessian
-!         matrix.
-!  ra  s(n)  auxiliary vector.
-!  ri  xo(n)  vector of variables difference.
-!  ri  go(n)  gradient difference.
-!  ro  r  value of the stepsize parameter.
-!  ri  po  initial value of the directional derivative.
-!  ro  par1  parameter for control scaling.
-!  ro  par2  parameter for control scaling.
-!  ro  f  value of the objective function.
-!  ri  fo  initial value of the objective function.
-!  ri  p  current value of the directional derivative.
-!  ii  nit  number of iterations.
-!  ii  kit  index of the iteration with the last restart.
-!  ii  met  variable metric update.
-!  ii  met1  scaling strategy.
-!  ii  met2  correction rule.
-!  iu  idecf  decomposition indicator.
-!  ii  iterd  termination indicator. iterd<0-bad decomposition.
-!         iterd=0-descent direction. iterd=1-newton like step.
-!         iterd=2-inexact newton like step. iterd=3-boundary step.
-!         iterd=4-direction with the negative curvature.
-!         iterd=5-marquardt step.
-!  io  iterh  update indicator. iterh=0-successful update.
-!         iterh>0-unsuccessful update.
-!
-!### Method
-! various variable metric updates including bfgs update.
-!
-      subroutine pudbi1(n,h,s,xo,go,r,po,par1,par2,f,fo,p,nit,kit,met,  &
-                        met1,met2,idecf,iterd,iterh)
-      implicit none
-      integer n , nit , kit , met , met1 , met2 , idecf , iterd , iterh
-      double precision h(*) , s(*) , xo(*) , go(*) , r , po
-      double precision par1 , par2
-      double precision f , fo , p
-      double precision aa , cc
-      double precision dis , pom , pom3 , pom4 , a , b , c , gam , rho ,&
-                       par
-      double precision den
-      logical l1 , l2 , l3
-      if ( met>0 ) then
-         if ( idecf/=9 ) then
-            iterh = -1
-            goto 100
-         endif
-         l1 = abs(met1)>=3 .or. abs(met1)==2 .and. nit==kit
-         l3 = .not.l1
-!
-!     determination of the parameters a, b, c
-!
-         b = mxvdot(n,xo,go)
-         if ( b<=0.0d0 ) then
-            iterh = 2
-            goto 100
-         endif
-         call mxdsmm(n,h,go,s)
-         a = mxvdot(n,go,s)
-         if ( a<=0.0d0 ) then
-            iterh = 1
-            goto 100
-         endif
-         if ( .not.(met/=1 .or. l1) ) then
-            c = 0.0d0
-         elseif ( iterd/=1 ) then
-            c = 0.0d0
-         else
-            c = -r*po
-            if ( c<=0.0d0 ) then
-               iterh = 3
-               goto 100
-            endif
-         endif
-!
-!     determination of the parameter rho (nonquadratic properties)
-!
-         if ( met2==1 ) then
-            rho = 1.0d0
-         elseif ( fo-f+p==0 ) then
-            rho = 1.0d0
-         else
-            rho = 0.5d0*b/(fo-f+p)
-         endif
-         if ( rho<=1.0d-2 ) rho = 1.0d0
-         if ( rho>=1.0d2 ) rho = 1.0d0
-         aa = a/b
-         cc = c/b
-         if ( l1 ) then
-!
-!     determination of the parameter gam (self scaling)
-!
-            par = a/b
-            pom3 = 0.7d0
-            pom4 = 6.0d0
-            gam = rho/par
-            if ( nit/=kit ) then
-               if ( met1==3 ) then
-                  l2 = par2<=0.0d0
-                  l3 = l2 .and. abs(par1)<=0.2d0
-                  l3 = l3 .or. (.not.l2 .and. gam>1.0d0)
-                  l3 = l3 .or. (l2 .and. par1<0.0d0 .and. gam>1.0d0)
-                  l3 = l3 .or. (l2 .and. par1>0.0d0 .and. gam<1.0d0)
-                  l3 = l3 .or. gam<pom3
-                  l3 = l3 .or. gam>pom4
-               elseif ( met1==4 ) then
-                  l3 = gam<pom3 .or. gam>pom4
-               endif
-            endif
-         endif
-         if ( l3 ) then
-            gam = 1.0d0
-            par = rho/gam
-         endif
-         if ( met/=1 ) then
-!
-!     new update
-!
-            pom = 1.0d0/(aa*cc)
-            if ( pom<1.0d0 ) then
-               pom = max(1.0d-15,(sqrt(c/a)-pom)/(1.0d0-pom))
-!
-!     general update
-!
-               den = par + pom*aa
-               dis = pom/den
-               call mxdsmu(n,h,(par*dis-1.0d0)/a,s)
-               call mxvdir(n,-dis,s,xo,s)
-               call mxdsmu(n,h,den/b,s)
-               goto 50
-            endif
-         endif
-!
-!     bfgs update
-!
-         pom = 1.0d0
-         dis = par + aa
-         call mxvdir(n,-dis,xo,s,xo)
-         dis = 1.0d0/(b*dis)
-         call mxdsmu(n,h,dis,xo)
-         call mxdsmu(n,h,-dis,s)
-!
-!     scaling
-!
- 50      if ( gam/=1.0d0 ) call mxdsms(n,h,gam)
-      endif
- 100  iterh = 0
-      end subroutine pudbi1
-
-!***********************************************************************
-!> date: 92/12/01
-!
-! purpose :
-! variable metric update of a dense symmetric positive definite matrix.
-!
-! parameters :
-!  ru  h(m)  positive definite approximation of the hessian
-!         matrix.
-!  ri  g(nf)  gradient of the objective function.
-!  ra  s(nf)  auxiliary vector.
-!  ru  xo(nf)  vectors of variables difference.
-!  ri  go(nf)  gradients difference.
-!
-! common data :
-!  ii  nf declared number of variables.
-!  ii  n  actual number of variables.
-!  ii  m  number of nonzero elements of the matrix.
-!  ii  met  method selection. met=1-bfgs update. met=2-dfp update.
-!         met=3-hoshino update.
-!  ii  met1  selection of self scaling.  met1=1-self scaling suppressed.
-!         met1=2-initial self scaling.
-!  ii  met2  selection of the line search model. met2=1-quadratic model.
-!         met2=2 use of taylor expansion.
-!  ii  met3  method correction. met3=1-no correction.
-!         met3=2-powell's correction.
-!  ii  iterd  termination indicator. iterd<0-bad decomposition.
-!         iterd=0-descent direction. iterd=1-newton like step.
-!         iterd=2-inexact newton like step. iterd=3-boundary step.
-!         iterd=4-direction with the negative curvature.
-!         iterd=5-marquardt step.
-!  io  iterh  termination indicator. iterh<0-bad decomposition.
-!         iterh=0-successful update. iterh>0-nonpositive parameters.
-!  ii  idecf  decomposition indicator. idecf=0-no decomposition.
-!         idecf=1-gill-murray decomposition. idecf=2-bunch-parlett
-!         decomposition. idecf=3-inversion.
-!  ii  itran  transformation indicator. itran=0 or itran=1 if
-!         transformation is not or is used.
-!  ii  nit  actual number of iterations.
-!  ii  kit  number of the iteration after last restart.
-!  ri  r  value of the stepsize parameter.
-!  ri  f  new value of the objective function.
-!  ri  fo  old value of the objective function.
-!  ri  p  new value of the directional derivative.
-!  ri  po  old value of the directional derivative.
-!  to  tuxx  text information on the correction used.
-!
-!### Method
-! basic variable metric methods.
-!
-      subroutine pudbm2(nf,n,h,hh,s,xo,go,so,fo,par,met1,met3,idecf,    &
-                        iterh)
-      implicit none
-      integer nf , n , met1 , met3 , idecf , iterh
-      double precision h(nf*(nf+1)/2) , hh(nf*(nf+1)/2) , s(nf) , xo(nf)&
-                       , go(nf) , so(nf) , fo , par
-      double precision den , a , b , c , gam , pom !, mxvdot
-      logical l1
-      double precision con
-      parameter (con=1.0d-8)
-      if ( idecf/=0 ) then
-         iterh = -1
-         return
-      endif
-      l1 = met1>=2
-!
-!     determination of the parameters b, c
-!
-      call mxdsmm(n,h,xo,s)
-      call mxvdif(n,go,s,so)
-      if ( met3==2 ) call mxvscl(n,1.0d0/sqrt(fo),so,so)
-      b = mxvdot(n,xo,so)
-      if ( b<=0.0d0 ) l1 = .false.
-      a = 0.0d0
-      call mxdsmm(n,hh,xo,s)
-      c = mxvdot(n,xo,s)
-      if ( c<=0.0d0 ) l1 = .false.
-      if ( l1 ) then
-!
-!     determination of the parameter gam (self scaling)
-!
-         gam = c/b
-      else
-         gam = 1.0d0
-      endif
-      par = gam
-!
-!     rank one update
-!
-      den = par*b - c
-      if ( abs(den)<=con*max(con,abs(par*b),abs(c)) ) then
-         if ( b>0.0d0 .and. c>0.0d0 ) then
-!
-!     bfgs update
-!
-            pom = 0.0d0
-            call mxdsmu(n,hh,par/b,so)
-            if ( c>0.0d0 ) call mxdsmu(n,hh,-1.0d0/c,s)
-            goto 100
-         else
-            iterh = 4
-            return
-         endif
-      endif
-      pom = par*b/den
-      call mxvdir(n,-par,so,s,s)
-      call mxdsmu(n,hh,1.0d0/den,s)
- 100  iterh = 0
-      if ( gam/=1.0d0 ) call mxdsms(n,hh,1.0d0/gam)
-      end subroutine pudbm2
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! broyden good update of a rectangular matrix after the qr
-! decomposition.
-!
-! parameters :
-!  ii  n  number of variables.
-!  ii  na  number of equations.
-!  ru  h(n*(n+1)/2)  updated upper triangular matrix.
-!  ri  eta2  parameter which controls a nonsingularity
-!  ru  ag(n*na)  updated rectangular matrix.
-!  ra  s(n)  auxiliary vector.
-!  ri  xo(n)  vector of variables difference.
-!  ri  afo(na)  right hand sides difference.
-!  ii  met  variable metric update.
-!  io  iterh  update indicator. iterh=0-successful update.
-!         iterh>0-unsuccessful update.
-!  iu  ideca  decomposition indicator.
-!  ii  ndeca  number of decompositions.
-!
-!### Method
-! various variable metric updates including bfgs update.
-!
-      subroutine pudbq1(n,na,h,eta2,ag,s,xo,afo,met,iterh,ideca,ndeca)
-      implicit none
-      integer n , na , met , inf , iterh , ideca , ndeca
-      double precision h(*) , eta2 , ag(*) , s(*) , xo(*) , afo(*)
-      double precision den !, mxvdot
-      if ( met<=0 ) return
-      if ( ideca==0 ) then
-!
-!     qr decomposition
-!
-         den = eta2
-         call mxdrqf(n,na,ag,h)
-         call mxdprc(n,h,inf,den)
-         ndeca = ndeca + 1
-         ideca = 1
-      elseif ( ideca/=1 ) then
-         iterh = -1
-         return
-      endif
-!
-!     the good broyden update
-!
-      den = mxvdot(n,xo,xo)
-      if ( den<=0.0d0 ) then
-         iterh = 2
-         return
-      endif
-      call mxvcop(n,xo,s)
-      call mxvneg(n,xo,xo)
-      call mxdprm(n,h,xo,1)
-      call mxdrmd(n,na,ag,xo,1.0d0,afo,afo)
-      call mxdrqu(n,na,ag,h,1.0d0/den,afo,s,xo,inf)
-      iterh = 0
-      end subroutine pudbq1
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! variable metric update of a dense symmetric positive definite matrix.
-!
-! parameters :
-!  ii  n  actual number of variables.
-!  ru  b(m)  positive definite approximation of the hessian matrix.
-!  ri  g(nf)  gradient of the objective function.
-!  ra  s(nf)  auxiliary vector.
-!  ru  xo(nf)  vectors of variables difference.
-!  ri  go(nf)  gradients difference.
-!  ri  f  current value of the objective function.
-!  ri  fo  previous value of the objective function.
-!  ri  eta5  tolerance for a hybrid method.
-!  ri  eta9  maximum for real numbers.
-!  ii  ipom1  method indicator.
-!  io  ipom2  indicator for scaling.
-!  ii  met  method selection. met=0-no update. met=1-bfgs update.
-!  ii  met1  selection of self scaling.  met1=1-self scaling suppressed.
-!         met1=2 self scaling in the first iteration after restart.
-!         met1=3-self scaling in each iteration.
-!
-! common data :
-!  io  iterh  termination indicator. iterh<0-bad decomposition.
-!         iterh=0-successful update. iterh>0-nonpositive parameters.
-!  ii  idecf  decomposition indicator. idecf=0-no decomposition.
-!  to  tuxx  text information on the correction used.
-!
-!### Method
-!  fletcher's combination of the gauss-newton and the bfgs methods.
-!
-      subroutine pudfm1(n,b,s,xo,go,f,fo,eta5,ipom1,ipom2,met1,idecf,   &
-                        iterh)
-      implicit none
-      integer n , ipom1 , ipom2 , met1 , idecf , iterh
-      double precision b(n*(n+1)/2) , s(n) , xo(n) , go(n) , f , fo ,   &
-                       eta5
-      !double precision mxvdot
-      double precision ab , bb , cb , gam , par
-      logical l1
-      if ( idecf/=0 ) then
-         iterh = -1
-         return
-      endif
-      par = 0.0d0
-!
-!     determination of the parameters a,b,c
-!
-      bb = mxvdot(n,xo,go)
-      if ( bb<=0.0d0 ) then
-         iterh = 2
-         ipom1 = 0
-         return
-      endif
-      ab = 0.0d0
-      call mxdsmm(n,b,xo,s)
-      cb = mxvdot(n,xo,s)
-      if ( cb<=0.0d0 ) then
-         iterh = 3
-         return
-      endif
-      l1 = met1==4 .or. met1==3 .and. ipom2>=1 .or. met1==2 .and.       &
-           ipom2==1
-      if ( fo-f>=eta5*fo ) then
-         ipom1 = 0
-      else
-         ipom1 = 1
-      endif
-      if ( l1 ) then
-!
-!     determination of the parameter gam (self scaling)
-!
-         gam = cb/bb
-      else
-         gam = 1.0d0
-      endif
-!
-!     bfgs update
-!
-      call mxdsmu(n,b,gam/bb,go)
-      call mxdsmu(n,b,-1.0d0/cb,s)
-      iterh = 0
-      ipom2 = 0
-      if ( l1 ) call mxdsms(n,b,1.0d0/gam)
-      end subroutine pudfm1
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! driver for hybrid quasi-newton updates.
-!
-! parameters:
-!  ri  r  value of the stepsize parameter.
-!  ri  fo  previous value of the objective function.
-!  ri  f  current value of the objective function.
-!  ri  po  previous value of the directional derivative.
-!  ii  ipom1  update selection.
-!  ii  ipom2  method selection.
-!  io  nred  actual number of extrapolations or interpolations.
-!  ii  irest  restart specification. if irest=0 does not hold then a
-!         restart is performed.
-!
-      subroutine pudrv1(r,fo,f,po,ipom1,ipom2,nred,irest)
-      implicit none
-      integer ipom1 , ipom2 , nred , irest
-      double precision r , fo , f , po
-      double precision pom
-      double precision con2
-      parameter (con2=1.0d-2)
-      pom = (fo-f)/fo
-      select case (ipom2)
-      case (2)
-         irest = 1
-         if ( pom>=con2 ) then
-            ipom1 = 0
-         elseif ( f-fo<=r*po ) then
-            ipom1 = 0
-         else
-            ipom1 = 1
-            irest = 0
-         endif
-      case (3)
-         irest = 1
-         if ( nred<=0 ) then
-            if ( ipom1/=1 ) then
-               ipom1 = 2
-               irest = 0
-            else
-               ipom1 = 0
-            endif
-         elseif ( pom>=con2 ) then
-            ipom1 = 0
-         elseif ( ipom1/=2 ) then
-            ipom1 = 1
-            irest = 0
-         else
-            ipom1 = 0
-         endif
-      case (4)
-         irest = 1
-         ipom1 = 0
-      case default
-         irest = 1
-         if ( nred<=0 ) then
-            ipom1 = 2
-            irest = 0
-         else
-            ipom1 = 0
-         endif
-      end select
-      end subroutine pudrv1
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! initiation of a dense symmetric positive definite matrix
-!
-! parameters :
-!  ii  n  actual number of variables.
-!  ru  h(n*(n+1)/2)  positive definite approximation of the hessian
-!         matrix
-!  ru  b(n*(n+1)/2)  positive definite approximation of the hessian
-!         matrix
-!  ri  f  current value of the objective function.
-!  ri  fo  previous value of the objective function.
-!  ri  eta5  tolerance for a hybrid method.
-!  ii  met3  type of structured update. met3=1-standard structured
-!         update. met3=2-totally structured update.
-!
-! common data :
-!  ru  ran  random number.
-!  ii  idecf  decomposition indicator. idecf=0-no decomposition.
-!  ii  irest  restart specification. if irest=0 does not hold then a
-!         restart is performed.
-!  ii  idir indicator of direction determination. idir=0-basic
-!         determination. idir=1-determination after stepsize
-!         reduction. idir=2-determination after stepsize expansion.
-!  iu  ld  degree of previously computed derivatives.
-!  to  tuxx   text information on the restart used.
-
-      subroutine pudsd2(n,h,b,f,fo,eta5,met3,ld,idir,idecf,irest,ind)
-      implicit none
-      integer n , met3 , ld , idir , idecf , irest , ind
-      double precision h(n*(n+1)/2) , b(n*(n+1)/2) , f , fo , eta5
-      integer iudsd
-      save iudsd
-      ind = 0
-      if ( irest<0 ) then
-         call mxdsmi(n,b)
-         if ( f<1.0d0 ) call mxdsms(n,b,sqrt(f))
-         iudsd = 1
-      elseif ( irest==0 ) then
-         if ( idir<=0 ) then
-            if ( fo-f<=eta5*fo ) then
-               if ( met3==2 ) then
-                  call mxdsma(n,sqrt(f),b,h,h)
-               else
-                  call mxdsma(n,1.0d0,b,h,h)
-               endif
-               ld = min(ld,1)
-               iudsd = 0
-            endif
-         endif
-      elseif ( iudsd==0 ) then
-         if ( met3==2 ) then
-            call mxdsma(n,-sqrt(f),b,h,h)
-         else
-            call mxdsma(n,-1.0d0,b,h,h)
-         endif
-         call mxdsmi(n,b)
-         if ( f<1.0d0 ) call mxdsms(n,b,sqrt(f))
-         iudsd = 1
-      else
-         call mxdsmi(n,h)
-         ld = min(ld,1)
-         iudsd = 1
-         ind = 1
-      endif
-      idecf = 0
-      end subroutine pudsd2
-
-!***********************************************************************
-!> date: 97/12/01
-!
-! purpose :
-! initiation of a dense symmetric positive definite matrix
-!
-! parameters :
-!  ii  n  actual number of variables.
-!  ru  h(n*(n+1)/2)  factorization h=l*d*trans(l) of a positive
-!         semidefinite hessian matrix.
-!  ru  b(n*(n+1)/2)  factorization b=l*d*trans(l) of a positive
-!         definite approximation of the hessian matrix.
-!  iu  ipom1  method indicator.
-!  iu  ipom2  indicator for scaling.
-!
-! common data :
-!  ru  ran  random number.
-!  ii  idecf  decomposition indicator. idecf=0-no decomposition.
-!  ii  irest  restart specification. if irest=0 does not hold then a
-!         restart is performed.
-!  ii  iters  termination indicator. iters=0-zero step.
-!  iu  ld  degree of previously computed derivatives.
-
-      subroutine pudsd3(n,h,b,ipom1,ipom2,ld,idecf,iters,irest,ind)
-      implicit none
-      integer n , ipom1 , ipom2 , ld , idecf , iters , irest , ind
-      double precision h(n*(n+1)/2) , b(n*(n+1)/2)
-      integer kdecf
-      save kdecf
-      ind = 0
-      if ( .not.(irest==0 .or. irest>0 .and. ipom1==0) ) then
-         call mxdsmi(n,b)
-         ipom2 = 1
-         kdecf = -1
-      endif
-      if ( ipom1==1 ) then
-         if ( iters>0 .or. irest>0 ) then
-            call mxdsmc(n,b,h)
-            ld = min(ld,1)
-            if ( ipom2==1 ) idecf = kdecf
-            if ( irest>0 ) ind = 1
-         endif
-      elseif ( irest>0 ) then
-         ipom1 = 1
-         call mxdsmc(n,b,h)
-         ld = min(ld,1)
-         if ( ipom2==1 ) idecf = kdecf
-      endif
-      end subroutine pudsd3
-
-!***********************************************************************
-!> date: 98/12/01
-!
-! purpose :
-! termination criteria and test on restart.
-!
-! parameters :
-!  ii  n  actual number of variables.
-!  ri  f  new value of the objective function.
-!  ri  fo  old value of the objective function.
-!  ri  umax  maximum absolute value of the negative lagrange multiplier.
-!  ro  gmax  norm of the transformed gradient.
-!  ri  dmax  maximum relative difference of variables.
-!  ri  tolx  lower bound for steplength.
-!  ri  tolf  lower bound for function decrease.
-!  ri  tolb  lower bound for function value.
-!  ri  tolg  lower bound for gradient.
-!  ii  kd  degree of required derivatives.
-!  iu  nit  actual number of iterations.
-!  ii  kit  number of the iteration after restart.
-!  ii  mit  maximum number of iterations.
-!  iu  nfv  actual number of computed function values.
-!  ii  mfv  maximum number of computed function values.
-!  iu  nfg  actual number of computed gradient values.
-!  ii  mfg  maximum number of computed gradient values.
-!  iu  ntesx  actual number of tests on steplength.
-!  ii  mtesx  maximum number of tests on steplength.
-!  iu  ntesf  actual number of tests on function decrease.
-!  ii  mtesf  maximum number of tests on function decrease.
-!  ii  ites  system varible which specifies termination. if ites=0
-!         then termination is suppressed.
-!  ii  ires1  restart specification. restart is performed after
-!         ires1*n+ires2 iterations.
-!  ii  ires2  restart specification. restart is performed after
-!         ires1*n+ires2 iterations.
-!  iu  irest  restart indicator. restart is performed if irest>0.
-!  ii  iters  termination indicator for steplength determination.
-!         iters=0 for zero step.
-!  io  iterm  termination indicator. iterm=1-termination after mtesx
-!         unsufficient steplengths. iterm=2-termination after mtesf
-!         unsufficient function decreases. iterm=3-termination on lower
-!         bound for function value. iterm=4-termination on lower bound
-!         for gradient. iterm=11-termination after maximum number of
-!         iterations. iterm=12-termination after maximum number of
-!         computed function values.
-!
-      subroutine pyfut1(n,f,fo,umax,gmax,dmax,tolx,tolf,tolb,tolg,kd,   &
-                        nit,kit,mit,nfv,mfv,nfg,mfg,ntesx,mtesx,ntesf,  &
-                        mtesf,ites,ires1,ires2,irest,iters,iterm)
-      implicit none
-      integer n , kd , nit , kit , mit , nfv , mfv , nfg , mfg , ntesx ,&
-              mtesx , ntesf , mtesf , ites , ires1 , ires2 , irest ,    &
-              iters , iterm
-      double precision f , fo , umax , gmax , dmax , tolx , tolf ,      &
-                       tolg , tolb
-      double precision temp
-      if ( iterm<0 ) return
-      if ( ites>0 ) then
-         if ( iters/=0 ) then
-            if ( nit<=0 ) fo = f + min(sqrt(abs(f)),abs(f)/1.0d1)
-            if ( f<=tolb ) then
-               iterm = 3
-               return
-            endif
-            if ( kd>0 ) then
-               if ( gmax<=tolg .and. umax<=tolg ) then
-                  iterm = 4
-                  return
-               endif
-            endif
-            if ( nit<=0 ) then
-               ntesx = 0
-               ntesf = 0
-            endif
-            if ( dmax<=tolx ) then
-               iterm = 1
-               ntesx = ntesx + 1
-               if ( ntesx>=mtesx ) return
-            else
-               ntesx = 0
-            endif
-            temp = abs(fo-f)/max(abs(f),1.0d0)
-            if ( temp<=tolf ) then
-               iterm = 2
-               ntesf = ntesf + 1
-               if ( ntesf>=mtesf ) return
-            else
-               ntesf = 0
-            endif
-         endif
-         if ( nit>=mit ) then
-            iterm = 11
-            return
-         endif
-         if ( nfv>=mfv ) then
-            iterm = 12
-            return
-         endif
-         if ( nfg>=mfg ) then
-            iterm = 13
-            return
-         endif
-      endif
-      iterm = 0
-      if ( n>0 .and. nit-kit>=ires1*n+ires2 ) irest = max(irest,1)
-      nit = nit + 1
-      end subroutine pyfut1
-
-!***********************************************************************
-!> date: 98/12/01
-!
-! purpose :
-! vectors of variables difference and gradients difference are computed
-! and transformed. test value dmax is determined.
-!
-! parameters :
-!  ii  nf declared number of variables.
-!  ii  n  actual number of variables.
-!  ri  x(nf)  vector of variables.
-!  ru  xo(nf)  vectors of variables difference.
-!  ri  g(nf)  gradient of the objective function.
-!  ru  go(nf)  gradients difference.
-!  ri  cz(nf*nf)  matrix whose columns are basic vectors from current
-!         reduced subspace.
-!  ru  sn(nf)  transformed direction vector.
-!  ri  r  value of the stepsize parameter.
-!  ru  f  new value of the objective function.
-!  ri  fo  old value of the objective function.
-!  ru  p  new value of the directional derivative.
-!  ru  po  old value of the directional derivative.
-!  ro  dmax  maximum relative difference of variables.
-!  ii  iters  termination indicator for steplength determination.
-!         iters=0 for zero step.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-
-      subroutine pytrbd(nf,n,x,ix,xo,g,go,cz,sn,r,f,fo,p,po,dmax,iters, &
-                        kbf,kbc)
-      implicit none
-      integer nf , n , ix(*) , iters , kbf , kbc
-      double precision x(*) , xo(*) , g(*) , go(*) , cz(*) , sn(*) , r ,&
-                       f , fo , p , po , dmax
-      integer i , k
-      if ( iters>0 ) then
-         call mxvdif(nf,x,xo,xo)
-         call mxvdif(nf,g,go,go)
-         po = r*po
-         p = r*p
-      else
-         f = fo
-         p = po
-         call mxvsav(nf,x,xo)
-         call mxvsav(nf,g,go)
-      endif
-      dmax = 0.0d0
-      if ( kbc>0 ) then
-         do i = 1 , nf
-            dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0d0))
-         enddo
-         if ( n>0 ) then
-            call mxvscl(n,r,sn,xo)
-            call mxvcop(nf,go,sn)
-            call mxdrmm(nf,n,cz,sn,go)
-         endif
-      elseif ( kbf>0 ) then
-         k = 0
-         do i = 1 , nf
-            if ( ix(i)>=0 ) then
-               k = k + 1
-               dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0d0))
-               xo(k) = xo(i)
-               go(k) = go(i)
-            endif
-         enddo
-      else
-         do i = 1 , nf
-            dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0d0))
-         enddo
-      endif
-      end subroutine pytrbd
-
-!***********************************************************************
-!> date: 98/12/01
-!
-! purpose :
-! gradient of the objective function is scaled and reduced.
-! test values gmax and umax are computed.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  n  actual number of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ii  ica(nf)  vector containing indices of active constraints.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ru  cz(nf*nf)  matrix whose columns are basic vectors from the
-!         current reduced subspace.
-!  ri  g(nf)  gradient of the objective function.
-!  ro  gn(nf)  transformed gradient of the objective function.
-!  ri  eps7  tolerance for linear independence of constraints.
-!  ro  umax  maximum absolute value of the negative lagrange multiplier.
-!  ro  gmax  norm of the transformed gradient.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  ii  iold  index of the removed constraint.
-!  ia  kold  auxiliary variable.
-
-      subroutine pytrbg(nf,n,ix,ic,ica,cg,cr,cz,g,gn,umax,gmax,kbf,kbc, &
-                        iold,kold)
-      implicit none
-      integer nf , n , ix(*) , ic(*) , ica(*) , kbf , kbc , iold , kold
-      double precision cg(*) , cr(*) , cz(*) , g(*) , gn(*) , umax ,    &
-                       gmax
-      double precision temp !, mxvmax , mxvdot
-      integer nca , ncz , i , j , k , kc
-      iold = 0
-      kold = 0
-      umax = 0.0d0
-      gmax = 0.0d0
-      if ( kbc>0 ) then
-         if ( nf>n ) then
-            nca = nf - n
-            ncz = n*nf
-            call mxvcop(nf,g,gn)
-            do j = 1 , nca
-               k = ica(j)
-               if ( k>0 ) then
-                  cz(ncz+j) = mxvdot(nf,cg((k-1)*nf+1),gn)
-               else
-                  i = -k
-                  cz(ncz+j) = gn(i)
-               endif
-            enddo
-            call mxdprb(nca,cr,cz(ncz+1),0)
-            do j = 1 , nca
-               temp = cz(ncz+j)
-               kc = ica(j)
-               if ( kc>0 ) then
-                  k = ic(kc)
-               else
-                  i = -kc
-                  k = ix(i)
-               endif
-               if ( k<=-5 ) then
-               elseif ( (k==-1 .or. k==-3) .and. umax+temp>=0.0d0 ) then
-               elseif ( .not.((k==-2 .or. k==-4) .and. umax-temp>=0.0d0)&
-                        ) then
-                  iold = j
-                  umax = abs(temp)
-               endif
-            enddo
-         endif
-         if ( n>0 ) then
-            call mxdrmm(nf,n,cz,g,gn)
-            gmax = mxvmax(n,gn)
-         endif
-      elseif ( kbf>0 ) then
-         j = 0
-         iold = 0
-         kold = 0
-         do i = 1 , nf
-            temp = g(i)
-            k = ix(i)
-            if ( k>=0 ) then
-               j = j + 1
-               gn(j) = temp
-               gmax = max(gmax,abs(temp))
-            elseif ( k<=-5 ) then
-            elseif ( (k==-1 .or. k==-3) .and. umax+temp>=0.0d0 ) then
-            elseif ( .not.((k==-2 .or. k==-4) .and. umax-temp>=0.0d0) ) &
-                     then
-               iold = i
-               kold = j + 1
-               umax = abs(temp)
-            endif
-         enddo
-         n = j
-      else
-         do i = 1 , nf
-            temp = g(i)
-            gmax = max(gmax,abs(temp))
-         enddo
-         n = nf
-      endif
-      end subroutine pytrbg
-
-!***********************************************************************
-!> date: 98/12/01
-!
-! purpose :
-! hessian matrix of the objective function or its approximation is
-! scaled and reduced.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  n  actual number of variables.
-!  ri  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ri  cz(nf*nf)  matrix whose columns are basic vectors from the
-!         current reduced subspace.
-!  ri  h(nf*(nf+1)/2)  hessian matrix or its approximation.
-!  ra  s(nf)  auxiliary vector.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  ii  ld  degree of previously computed derivatives.
-!  ii  iters  termination indicator for steplength determination.
-
-      subroutine pytrbh(nf,n,ix,cr,cz,h,s,kbf,kbc,ld,iters)
-      implicit none
-      integer nf , n , ix(*) , kbf , kbc , ld , iters
-      double precision cr(*) , cz(*) , h(*) , s(*)
-      !double precision mxvdot
-      integer nca , ncr , icz , jcz , i , j , k , l
-      if ( ld/=2 .or. iters==0 ) return
-      if ( kbc>0 ) then
-         if ( n<=0 ) return
-         nca = nf - n
-         ncr = nca*(nca+1)/2
-         k = ncr
-         jcz = 1
-         do j = 1 , n
-            call mxdsmm(nf,h,cz(jcz),s)
-            icz = 1
-            do i = 1 , j
-               k = k + 1
-               cr(k) = mxvdot(nf,cz(icz),s)
-               icz = icz + nf
-            enddo
-            jcz = jcz + nf
-         enddo
-         call mxvcop(n*(n+1)/2,cr(ncr+1),h)
-      elseif ( kbf>0 ) then
-         k = 0
-         l = 0
-         do i = 1 , nf
-            do j = 1 , i
-               k = k + 1
-               if ( ix(i)>=0 .and. ix(j)>=0 ) then
-                  l = l + 1
-                  h(l) = h(k)
-               endif
-            enddo
-         enddo
-      endif
-      end subroutine pytrbh
-
-!***********************************************************************
-!> date: 98/12/01
-!
-! purpose :
-! scaled and reduced direction vector is back transformed.
-! vectors x,g and values f,p are saved.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  iu  n  actual number of variables.
-!  ii  nc  number of linearized constraints.
-!  ri  x(nf)  vector of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ro  xo(nf)  saved vector of variables.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  g(nf)  gradient of the objective function.
-!  ro  go(nf)  saved gradient of the objective function.
-!  ri  cf(nf)  vector containing values of the constraint funcyions.
-!  ro  cfd(nf)  vector containing increments of the constraint
-!         functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  cz(nf*nf)  matrix whose columns are basic vectors from the
-!         current reduced subspace.
-!  ri  sn(nf)  transformed direction vector.
-!  ro  s(nf)  direction vector.
-!  ro  ro  saved value of the stepsize parameter.
-!  ro  fp  previous value of the objective function.
-!  ru  fo  saved value of the objective function.
-!  ri  f  value of the objective function.
-!  ro  po  saved value of the directional derivative.
-!  ri  p  value of the directional derivative.
-!  ru  rmax  maximum value of the stepsize parameter.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  io  krem  indication of linearly dependent gradients.
-!  io  inew  index of the new active function.
-
-      subroutine pytrbs(nf,n,nc,x,ix,xo,xl,xu,g,go,cf,cfd,ic,cl,cu,cg,  &
-                        cz,sn,s,ro,fp,fo,f,po,p,rmax,kbf,kbc,krem,inew)
-      implicit none
-      integer nf , n , nc , ix(*) , ic(*) , kbf , kbc , krem , inew
-      double precision x(*) , xo(*) , xl(*) , xu(*) , g(*) , go(*) ,    &
-                       cf(*) , cfd(*) , cl(*) , cu(*) , cg(*) , cz(*) , &
-                       sn(*) , s(*) , ro , fp , fo , f , po , p , rmax
-      integer i , k
-      fp = fo
-      ro = 0.0d0
-      fo = f
-      po = p
-      call mxvcop(nf,x,xo)
-      call mxvcop(nf,g,go)
-      if ( kbc>0 ) then
-         if ( n>0 ) then
-            call mxdcmm(nf,n,cz,sn,s)
-            inew = 0
-            call plmaxl(nf,nc,cf,cfd,ic,cl,cu,cg,s,rmax,kbc,krem,inew)
-            call plmaxs(nf,x,ix,xl,xu,s,rmax,kbf,krem,inew)
-         else
-            call mxvset(nf,0.0d0,s)
-         endif
-      elseif ( kbf>0 ) then
-         k = n + 1
-         do i = nf , 1 , -1
-            if ( ix(i)<0 ) then
-               s(i) = 0.0d0
-            else
-               k = k - 1
-               s(i) = sn(k)
-            endif
-         enddo
-         inew = 0
-         call plmaxs(nf,x,ix,xl,xu,s,rmax,kbf,krem,inew)
-      endif
-      end subroutine pytrbs
-
-!***********************************************************************
-!> date: 90/12/01
-!
-! purpose :
-! preparation of variable metric update.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  nc  number of constraints.
-!  ri  x(nf)  vector of variables.
-!  ru  xo(nf)  saved vector of variables.
-!  ii  iaa(nf+1)  vector containing indices of active functions.
-!  ri  ag(nf*na)  matrix whose columns are gradients of the linear
-!          approximated functions.
-!  ri  az(nf+1)  vector of lagrange multipliers.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  g(nf)  gradient of the lagrangian function.
-!  ru  go(nf)  saved gradient of the lagrangian function.
-!  ii  n  actual number of variables.
-!  ii  kd  degree of required dervatives.
-!  iu  ld  degree of previously computed derivatives.
-!  ru  r  value of the stepsize parameter.
-!  ru  f  value of the objective function.
-!  ri  fo  saved value of the objective function.
-!  ru  p  value of the directional derivative.
-!  ru  po  saved value of the directional derivative.
-!  ro  dmax  relative stepsize.
-!  io  iters  termination indicator. iters=0-zero step. iters=1-perfect
-!         line search. iters=2 goldstein stepsize. iters=3-curry
-!         stepsize. iters=4-extended curry stepsize.
-!         iters=5-armijo stepsize. iters=6-first stepsize.
-!         iters=7-maximum stepsize. iters=8-unbounded function.
-!         iters=-1-mred reached. iters=-2-positive directional
-!         derivative. iters=-3-error in interpolation.
-
-      subroutine pytrfd(nf,nc,x,xo,iaa,ag,az,cg,g,go,n,kd,ld,r,f,fo,p,  &
-                        po,dmax,iters)
-      implicit none
-      double precision dmax , f , fo , p , po , r
-      integer iters , kd , ld , n , nc , nf
-      double precision ag(*) , az(*) , cg(*) , g(*) , go(*) , x(*) ,    &
-                       xo(*)
-      integer iaa(*)
-      integer i , j , l
-      call mxvset(nf,0.0d0,g)
-      do j = 1 , nf - n
-         l = iaa(j)
-         if ( l>nc ) then
-            l = l - nc
-            call mxvdir(nf,-az(j),ag((l-1)*nf+1),g,g)
-         elseif ( l>0 ) then
-            call mxvdir(nf,-az(j),cg((l-1)*nf+1),g,g)
-         else
-            l = -l
-            g(l) = g(l) - az(j)
-         endif
-      enddo
-      if ( iters>0 ) then
-         call mxvdif(nf,x,xo,xo)
-         call mxvdif(nf,g,go,go)
-         po = r*po
-         p = r*p
-      else
-         r = 0.0d0
-         f = fo
-         p = po
-         call mxvsav(nf,x,xo)
-         call mxvsav(nf,g,go)
-         ld = kd
-      endif
-      dmax = 0.0d0
-      do i = 1 , nf
-         dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0d0))
-      enddo
-      n = nf
-      end subroutine pytrfd
-
-!***********************************************************************
 !> date: 91/12/01
 !
-! purpose :
 ! dual range space quadratic programming method for minimax
 ! approximation.
 !
@@ -4426,108 +2537,6 @@
       enddo
       n = nf
       end subroutine pytrnd
-
-!***********************************************************************
-!> date: 98/12/01
-!
-! purpose :
-! vectors of variables difference and gradients difference are computed
-! and scaled. test value dmax is determined.
-!
-! parameters :
-!  ii  nf declared number of variables.
-!  ri  x(nf)  vector of variables.
-!  ru  xo(nf)  vectors of variables difference.
-!  ri  g(nf)  gradient of the objective function.
-!  ru  go(nf)  gradients difference.
-!  ro  r  value of the stepsize parameter.
-!  ro  f  new value of the objective function.
-!  ri  fo  old value of the objective function.
-!  ro  p  new value of the directional derivative.
-!  ri  po  old value of the directional derivative.
-!  ro  dmax  maximum relative difference of variables.
-!  ii  kd  degree of required dervatives.
-!  io  ld  degree of previously computed derivatives.
-!  ii  iters  termination indicator for steplength determination.
-!         iters=0 for zero step.
-
-      subroutine pytrud(nf,x,xo,g,go,r,f,fo,p,po,dmax,kd,ld,iters)
-      implicit none
-      integer nf , kd , ld , iters
-      double precision x(*) , xo(*) , g(*) , go(*) , r , f , fo , p ,   &
-                       po , dmax
-      integer i
-      if ( iters>0 ) then
-         call mxvdif(nf,x,xo,xo)
-         call mxvdif(nf,g,go,go)
-         po = r*po
-         p = r*p
-      else
-         f = fo
-         p = po
-         call mxvsav(nf,x,xo)
-         call mxvsav(nf,g,go)
-         ld = kd
-      endif
-      dmax = 0.0d0
-      do i = 1 , nf
-         dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0d0))
-      enddo
-      end subroutine pytrud
-
-!***********************************************************************
-!> date: 98/12/01
-!
-! purpose :
-! vectors of variables difference and right hand sides difference are
-! computed and scaled. test value dmax is determined.
-!
-! parameters :
-!  ii  nf declared number of variables.
-!  ii  na number of approximated functions.
-!  ri  x(nf)  vector of variables.
-!  ru  xo(nf)  vectors of variables difference.
-!  ri  af(na)  vector of right hand sides.
-!  ri  afo(na)  vector of right hand sides difference.
-!  ro  r  value of the stepsize parameter.
-!  ro  f  new value of the objective function.
-!  ri  fo  old value of the objective function.
-!  ro  p  new value of the directional derivative.
-!  ri  po  old value of the directional derivative.
-!  ro  dmax  maximum relative difference of variables.
-!  ii  kd  degree of required dervatives.
-!  io  ld  degree of previously computed derivatives.
-!  ii  iters  termination indicator for steplength determination.
-!         iters=0 for zero step.
-
-      subroutine pytruf(nf,na,x,xo,af,afo,r,f,fo,p,po,dmax,kd,ld,iters)
-      implicit none
-      integer nf , na , kd , ld , iters
-      double precision x(*) , xo(*) , af(*) , afo(*) , r , f , fo , p , &
-                       po , dmax
-      integer i
-      if ( iters>0 ) then
-         call mxvdif(nf,x,xo,xo)
-         call mxvdif(na,af,afo,afo)
-         po = r*po
-         p = r*p
-      else
-         r = 0.0d0
-         f = fo
-         p = po
-         call mxvsav(nf,x,xo)
-         call mxvsav(na,af,afo)
-         ld = kd
-      endif
-      dmax = 0.0d0
-      do i = 1 , nf
-         dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0d0))
-      enddo
-      end subroutine pytruf
-
-
-
-
 
 !***********************************************************************
     end module psqp_module
