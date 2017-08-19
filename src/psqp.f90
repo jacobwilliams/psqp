@@ -2,134 +2,174 @@
 !>
 !  module for psqp
 
-  module psqp_module
+    module psqp_module
 
-  use matrix_routines
+    use matrix_routines
 
-  implicit none
+    implicit none
 
-  private
+    private
 
-  public :: psqpn
+    type,public :: psqp_class
 
-  contains
+        private
+
+        ! these were formerly in the `stat` common block:
+        integer :: nres = 0 !! number of restarts.
+        integer :: ndec = 0 !! number of matrix decomposition.
+        integer :: nrem = 0 !! number of constraint deletions.
+        integer :: nadd = 0 !! number of constraint additions.
+        integer :: nit  = 0 !! number of iterations.
+        integer :: nfv  = 0 !! number of function evaluations.
+        integer :: nfg  = 0 !! number of gradient evaluations.
+        integer :: nfh  = 0 !! number of hessian evaluations.
+
+        procedure(obj_func) ,pointer :: obj  => null()
+        procedure(dobj_func),pointer :: dobj => null()
+        procedure(con_func) ,pointer :: con  => null()
+        procedure(dcon_func),pointer :: dcon => null()
+
+    contains
+
+        private
+
+        procedure,public :: psqpn
+        procedure,public :: psqp
+
+        procedure :: pf1f01
+        procedure :: pllpb1  ! not used?
+        procedure :: plqdb1
+        procedure :: plrmf0
+        procedure :: pyadb4  ! not used?
+        procedure :: pyrmb1  ! not used?
+
+    end type psqp_class
+
+    abstract interface
+        subroutine obj_func(me,nf,x,ff)
+        !! computation of the value of the objective function
+        import
+        implicit none
+        class(psqp_class),intent(inout) :: me
+        integer          :: nf    !! the number of variables
+        double precision :: x(nf) !! a vector of variables
+        double precision :: ff    !! the value of the objective function
+        end subroutine obj_func
+        subroutine dobj_func(me,nf,x,gf)
+        !! computation of the gradient of the objective function
+        import
+        implicit none
+        class(psqp_class),intent(inout) :: me
+        integer          :: nf     !! the number of variables
+        double precision :: x(nf)  !! a vector of variables
+        double precision :: gf(nf) !! the gradient of the objective function
+        end subroutine dobj_func
+        subroutine con_func(me,nf,kc,x,fc)
+        !! computation of the value of the constraint function
+        import
+        implicit none
+        class(psqp_class),intent(inout) :: me
+        integer          :: nf      !! the number of variables
+        double precision :: kc      !! the index of the constraint function
+        double precision :: x(nf)   !! a vector of variables
+        double precision :: fc      !! the value of the constraint function
+        end subroutine con_func
+        subroutine dcon_func(me,nf,kc,x,gc)
+        !! computation of the gradient of the constraint function
+        import
+        implicit none
+        class(psqp_class),intent(inout) :: me
+        integer          :: nf     !! the number of variables
+        double precision :: kc     !! the index of the constraint function
+        double precision :: x(nf)  !! a vector of variables and
+        double precision :: gc(nf) !! the gradient of the constraint function
+        end subroutine dcon_func
+    end interface
+
+    contains
 !***********************************************************************
 
 !***********************************************************************
-! subroutine psqpn              all systems                   97/01/22
-! purpose :
+!> date: 97/01/22
+!
 ! easy to use subroutine for general nonlinear programming problems.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ii  nb  choice of simple bounds. nb=0-simple bounds suppressed.
-!         nb>0-simple bounds accepted.
-!  ii  nc  number of linear constraints.
-!  ri  x(nf)  vector of variables.
-!  ii  ix(nf)  vector containing types of bounds. ix(i)=0-variable
-!         x(i) is unbounded. ix(i)=1-lover bound xl(i).le.x(i).
-!         ix(i)=2-upper bound x(i).le.xu(i). ix(i)=3-two side bound
-!         xl(i).le.x(i).le.xu(i). ix(i)=5-variable x(i) is fixed.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  cf(nc+1)  vector containing values of the constraint functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!         ic(kc)=0-constraint cf(kc) is not used. ic(kc)=1-lover
-!         constraint cl(kc).le.cf(kc). ic(kc)=2-upper constraint
-!         cf(kc).le.cu(kc). ic(kc)=3-two side constraint
-!         cl(kc).le.cf(kc).le.cu(kc). ic(kc)=5-equality constraint
-!         cf(kc).eq.cl(kc).
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ii  ipar(6)  integer paremeters:
-!      ipar(1)  maximum number of iterations.
-!      ipar(2)  maximum number of function evaluations.
-!      ipar(3)  this parameter is not used in the subroutine psqp.
-!      ipar(4)  this parameter is not used in the subroutine psqp.
-!      ipar(5)  variable metric update used. ipar(5)=1-the bfgs update.
-!         ipar(5)-the hoshino update.
-!      ipar(6)  correction of the variable metric update if a negative
-!         curvature occurs. ipar(6)=1-no correction. ipar(6)=2-powell's
-!         correction.
-!  ri  rpar(5)  real parameters:
-!      rpar(1)  maximum stepsize.
-!      rpar(2)  tolerance for change of variables.
-!      rpar(3)  tolerance for constraint violations.
-!      rpar(4)  tolerance for the gradient of the lagrangian function.
-!      rpar(5)  penalty coefficient.
-!  ro  f  value of the objective function.
-!  ro  gmax  maximum partial derivative of the lagrangian function.
-!  ro  cmax  maximum constraint violation.
-!  ii  iprnt  print specification. iprnt=0-no print.
-!         abs(iprnt)=1-print of final results.
-!         abs(iprnt)=2-print of final results and iterations.
-!         iprnt>0-basic final results. iprnt<0-extended final
-!         results.
-!  io  iterm  variable that indicates the cause of termination.
-!         iterm=1-if abs(x-xo) was less than or equal to tolx in
-!                   mtesx (usually two) subsequebt iterations.
-!         iterm=2-if abs(f-fo) was less than or equal to tolf in
-!                   mtesf (usually two) subsequebt iterations.
-!         iterm=3-if f is less than or equal to tolb.
-!         iterm=4-if gmax is less than or equal to tolg.
-!         iterm=11-if nit exceeded mit. iterm=12-if nfv exceeded mfv.
-!         iterm=13-if nfg exceeded mfg. iterm<0-if the method failed.
-!         if iterm=-6, then the termination criterion has not been
-!         satisfied, but the point obtained if usually acceptable.
-!
-! variables in common /stat/ (statistics) :
-!  io  nres  number of restarts.
-!  io  ndec  number of matrix decomposition.
-!  io  nrem  number of constraint deletions.
-!  io  nadd  number of constraint additions.
-!  io  nit  number of iterations.
-!  io  nfv  number of function evaluations.
-!  io  nfg  number of gradient evaluations.
-!  io  nfh  number of hessian evaluations.
-!
-! subprograms used :
-!  s   psqp  recursive quadratic programming method with the bfgs
-!         variable metric update.
-!
-! external subroutines :
-!  se  obj  computation of the value of the objective function.
-!         calling sequence: call obj(nf,x,ff) where nf is the number
-!         of variables, x(nf) is a vector of variables and ff is the
-!         value of the objective function.
-!  se  dobj  computation of the gradient of the objective function.
-!         calling sequence: call dobj(nf,x,gf) where nf is the number
-!         of variables, x(nf) is a vector of variables and gc(nf) is
-!         the gradient of the objective function.
-!  se  con  computation of the value of the constraint function.
-!         calling sequence: call con(nf,kc,x,fc) where nf is the
-!         number of variables, kc is the index of the constraint
-!         function, x(nf) is a vector of variables and fc is the
-!         value of the constraint function.
-!  se  dcon  computation of the gradient of the constraint function.
-!         calling sequence: call dcon(nf,kc,x,gc) where nf is the
-!         number of variables, kc is the index of the constraint
-!         function, x(nf) is a vector of variables and gc(nf) is the
-!         gradient of the constraint function.
-!
-      subroutine psqpn(nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,ipar,rpar,f,gmax,&
+
+      subroutine psqpn(me,nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,ipar,rpar,f,gmax,&
                        cmax,iprnt,iterm)
       implicit none
-!
-!     pointers for auxiliary arrays
-!
-      double precision f , cmax , gmax
-      integer iprnt , iterm , nb , nc , nf
-      double precision cf(*) , cl(*) , cu(*) , rpar(5) , x(*) , xl(*) , &
-                       xu(*)
-      integer ic(*) , ipar(6) , ix(*)
-      integer nadd , ndec , nfg , nfh , nfv , nit , nrem , nres
-      integer lcfd , lcfo , lcg , lcp , lcr , lcz , lg , lgc , lgf ,    &
-              lgo , lh , lia , ls , lxo
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
-      integer ia(:)
-      double precision ra(:)
-      allocatable ia , ra
+
+      class(psqp_class),intent(inout) :: me
+
+      double precision :: f     !! value of the objective function.
+      double precision :: cmax  !! maximum constraint violation.
+      double precision :: gmax  !! maximum partial derivative of the lagrangian function.
+      integer :: iprnt  !! print specification:
+                        !!
+                        !! * iprnt=0      - no print.
+                        !! * abs(iprnt)=1 - print of final results.
+                        !! * abs(iprnt)=2 - print of final results and iterations.
+                        !! * iprnt>0      - basic final results.
+                        !! * iprnt<0      - extended final results.
+      integer,intent(out) :: iterm  !! variable that indicates the cause of termination.
+                                    !!
+                                    !! * iterm=1  - if abs(x-xo) was less than or equal to tolx in mtesx (usually two) subsequent iterations.
+                                    !! * iterm=2  - if abs(f-fo) was less than or equal to tolf in mtesf (usually two) subsequent iterations.
+                                    !! * iterm=3  - if f is less than or equal to tolb.
+                                    !! * iterm=4  - if gmax is less than or equal to tolg.
+                                    !! * iterm=11 - if nit exceeded mit. iterm=12-if nfv exceeded mfv.
+                                    !! * iterm=13 - if nfg exceeded mfg. iterm<0-if the method failed.
+                                    !! * iterm=-6, then the termination criterion has not been satisfied, but the point obtained if usually acceptable.
+      integer,intent(in) :: nb     !! choice of simple bounds. nb=0-simple bounds suppressed.
+                                   !! nb>0-simple bounds accepted.
+      integer,intent(in) :: nc     !! number of linear constraints.
+      integer,intent(in) :: nf     !! number of variables
+      double precision :: cf(*)    !! vector containing values of the constraint functions.
+      double precision :: cl(*)    !! vector containing lower bounds for constraint functions.
+      double precision :: cu(*)    !! vector containing upper bounds for constraint functions.
+      double precision :: rpar(5)  !! real parameters:
+                                   !!
+                                   !! * rpar(1)  maximum stepsize.
+                                   !! * rpar(2)  tolerance for change of variables.
+                                   !! * rpar(3)  tolerance for constraint violations.
+                                   !! * rpar(4)  tolerance for the gradient of the lagrangian function.
+                                   !! * rpar(5)  penalty coefficient.
+      double precision :: x(*)    !! vector of variables.
+      double precision :: xl(*)   !! vector containing lower bounds for variables.
+      double precision :: xu(*)   !! vector containing upper bounds for variables.
+      integer :: ic(*)  !! vector containing types of constraints.
+                        !!
+                        !! ic(kc) = 0 -- constraint cf(kc) is not used.
+                        !! ic(kc) = 1 -- lower constraint cl(kc) <= cf(kc).
+                        !! ic(kc) = 2 -- upper constraint cf(kc) <= cu(kc).
+                        !! ic(kc) = 3 -- two side constraint cl(kc) <= cf(kc) <= cu(kc).
+                        !! ic(kc) = 5 -- equality constraint cf(kc) == cl(kc).
+      integer :: ipar(6)    !! integer paremeters:
+                            !!
+                            !! * ipar(1)  maximum number of iterations.
+                            !! * ipar(2)  maximum number of function evaluations.
+                            !! * ipar(3)  this parameter is not used in the subroutine psqp.
+                            !! * ipar(4)  this parameter is not used in the subroutine psqp.
+                            !! * ipar(5)  variable metric update used.
+                            !!   ipar(5)=1 - the bfgs update.
+                            !!   ipar(5)=2 - the hoshino update.
+                            !! * ipar(6)  correction of the variable metric update if a negative
+                            !!   curvature occurs.
+                            !!   ipar(6)=1 - no correction.
+                            !!   ipar(6)=2 - powell's correction.
+      integer,intent(in) :: ix(*)  !! vector containing types of bounds.
+                                   !!
+                                   !! * ix(i) = 0 -- variable x(i) is unbounded.
+                                   !! * ix(i) = 1 -- lower bound xl(i) <= x(i).
+                                   !! * ix(i) = 2 -- upper bound x(i) <= xu(i).
+                                   !! * ix(i) = 3 -- two side bound xl(i) <= x(i) <= xu(i).
+                                   !! * ix(i) = 5 -- variable x(i) is fixed.
+
+      integer :: lcfd,lcfo,lcg,lcp,lcr,lcz,lg,lgc,lgf,lgo,lh,lia,ls,lxo
+      integer,dimension(:),allocatable :: ia
+      double precision,dimension(:),allocatable :: ra
+
       allocate (ia(nf),ra((nf+nc+8)*nf+3*nc+1))
+
       lcg = 1
       lcfo = lcg + nf*nc
       lcfd = lcfo + nc + 1
@@ -144,13 +184,15 @@
       lxo = ls + nf
       lgo = lxo + nf
       lia = 1
-      call psqp(nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,ra,ra(lcfo),ra(lcfd),   &
+      call me%psqp(nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,ra,ra(lcfo),ra(lcfd),&
                 ra(lgc),ia,ra(lcr),ra(lcz),ra(lcp),ra(lgf),ra(lg),ra(lh)&
                 ,ra(ls),ra(lxo),ra(lgo),rpar(1),rpar(2),rpar(3),rpar(4),&
                 rpar(5),cmax,gmax,f,ipar(1),ipar(2),ipar(5),ipar(6),    &
                 iprnt,iterm)
       deallocate (ia,ra)
-      end subroutine psqpn
+
+    end subroutine psqpn
+!***********************************************************************
 
 !***********************************************************************
 ! subroutine psqp               all systems                   97/01/22
@@ -165,17 +207,17 @@
 !  ii  nc  number of linear constraints.
 !  ri  x(nf)  vector of variables.
 !  ii  ix(nf)  vector containing types of bounds. ix(i)=0-variable
-!         x(i) is unbounded. ix(i)=1-lover bound xl(i).le.x(i).
-!         ix(i)=2-upper bound x(i).le.xu(i). ix(i)=3-two side bound
-!         xl(i).le.x(i).le.xu(i). ix(i)=5-variable x(i) is fixed.
+!         x(i) is unbounded. ix(i)=1-lover bound xl(i)<=x(i).
+!         ix(i)=2-upper bound x(i)<=xu(i). ix(i)=3-two side bound
+!         xl(i)<=x(i)<=xu(i). ix(i)=5-variable x(i) is fixed.
 !  ri  xl(nf)  vector containing lower bounds for variables.
 !  ri  xu(nf)  vector containing upper bounds for variables.
 !  ro  cf(nc+1)  vector containing values of the constraint functions.
 !  ii  ic(nc)  vector containing types of constraints.
 !         ic(kc)=0-constraint cf(kc) is not used. ic(kc)=1-lover
-!         constraint cl(kc).le.cf(kc). ic(kc)=2-upper constraint
-!         cf(kc).le.cu(kc). ic(kc)=3-two side constraint
-!         cl(kc).le.cf(kc).le.cu(kc). ic(kc)=5-equality constraint
+!         constraint cl(kc)<=cf(kc). ic(kc)=2-upper constraint
+!         cf(kc)<=cu(kc). ic(kc)=3-two side constraint
+!         cl(kc)<=cf(kc)<=cu(kc). ic(kc)=5-equality constraint
 !         cf(kc).eq.cl(kc).
 !  ri  cl(nc)  vector containing lower bounds for constraint functions.
 !  ri  cu(nc)  vector containing upper bounds for constraint functions.
@@ -229,16 +271,6 @@
 !         if iterm=-6, then the termination criterion has not been
 !         satisfied, but the point obtained if usually acceptable.
 !
-! variables in common /stat/ (statistics) :
-!  io  nres  number of restarts.
-!  io  ndec  number of matrix decomposition.
-!  io  nrem  number of constraint deletions.
-!  io  nadd  number of constraint additions.
-!  io  nit  number of iterations.
-!  io  nfv  number of function evaluations.
-!  io  nfg  number of gradient evaluations.
-!  io  nfh  number of hessian evaluations.
-!
 ! subprograms used :
 !  s   pc1f01  computation of the value and the gradient of the
 !         constraint function.
@@ -288,10 +320,13 @@
 ! recursive quadratic programming method with the bfgs variable metric
 ! update.
 !
-      subroutine psqp(nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,cg,cfo,cfd,gc,ica,&
+      subroutine psqp(me,nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,cg,cfo,cfd,gc,ica,&
                       cr,cz,cp,gf,g,h,s,xo,go,xmax,tolx,tolc,tolg,rpf,  &
                       cmax,gmax,f,mit,mfv,met,mec,iprnt,iterm)
       implicit none
+
+      class(psqp_class),intent(inout) :: me
+
       double precision f , cmax , gmax , rpf , tolc , told , tolg ,     &
                        tols , tolx , xmax
       integer iprnt , iterm , met , met1 , mec , mes , mfv , mit , nb , &
@@ -301,7 +336,6 @@
                        go(*) , h(*) , s(*) , x(*) , xl(*) , xo(*) ,     &
                        xu(*)
       integer ic(*) , ica(*) , ix(*)
-      integer nadd , ndec , nfg , nfh , nfv , nit , nrem , nres
       double precision alf1 , alf2 , cmaxo , dmax , eps7 , eps9 , eta0 ,&
                        eta2 , eta9 , fmax , fmin , fo , gnorm , p , po ,&
                        r , rmax , rmin , ro , snorm , tolb , tolf ,     &
@@ -310,8 +344,7 @@
               iters , kbc , kbf , kc , kd , kit , ld , mred , mtesf ,   &
               mtesx , n , k , ntesx , iest , inits , kters , maxst ,    &
               isys , mfp , nred , ipom , lds
-      !double precision mxvdot , mxvmax
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
+
       if ( abs(iprnt)>1 ) write (6,'(1x,''entry to psqp :'')')
 !
 !     initiation
@@ -320,14 +353,14 @@
       kbc = 0
       if ( nb>0 ) kbf = 2
       if ( nc>0 ) kbc = 2
-      nres = 0
-      ndec = 0
-      nrem = 0
-      nadd = 0
-      nit = 0
-      nfv = 0
-      nfg = 0
-      nfh = 0
+      me%nres = 0
+      me%ndec = 0
+      me%nrem = 0
+      me%nadd = 0
+      me%nit = 0
+      me%nfv = 0
+      me%nfg = 0
+      me%nfh = 0
       isys = 0
       iest = 0
       iext = 0
@@ -421,14 +454,14 @@
       gmax = eta9
       dmax = eta9
  100  lds = ld
-      call pf1f01(nf,x,gf,gf,ff,f,kd,ld,iext)
+      call me%pf1f01(nf,x,gf,gf,ff,f,kd,ld,iext)
       ld = lds
       call pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
       cf(nc+1) = f
-      if ( abs(iprnt)>1 ) write (6,                                     &
-      '(1x,''nit='',i4,2x,''nfv='',i4,2x,''nfg='',i4,2x,       ''f='',g1&
-      2.6,2x,''c='',e7.1,2x,''g='',e7.1)') nit , nfv , nfg , f , cmax , &
-      gmax
+      if ( abs(iprnt)>1 ) &
+        write (6,'(1x,''nit='',i9,2x,''nfv='',i9,2x,''nfg='',i9,2x,&
+                ''f='',g13.6,2x,''c='',e8.1,2x,''g='',e8.1)') &
+                me%nit , me%nfv , me%nfg , f , cmax , gmax
 !
 !     start of the iteration with tests for termination.
 !
@@ -446,16 +479,16 @@
             ntesx = 0
          endif
       endif
-      if ( nit>=mit ) then
+      if ( me%nit>=mit ) then
          iterm = 11
          goto 500
       endif
-      if ( nfv>=mfv ) then
+      if ( me%nfv>=mfv ) then
          iterm = 12
          goto 500
       endif
       iterm = 0
-      nit = nit + 1
+      me%nit = me%nit + 1
 !
 !     restart
 !
@@ -464,9 +497,9 @@
          call mxdsmi(n,h)
          ld = min(ld,1)
          idecf = 1
-         if ( kit<nit ) then
-            nres = nres + 1
-            kit = nit
+         if ( kit<me%nit ) then
+            me%nres = me%nres + 1
+            kit = me%nit
          else
             iterm = -10
             if ( iters<0 ) iterm = iters - 5
@@ -479,7 +512,7 @@
       call mxvcop(nc+1,cf,cfo)
       mfp = 2
       ipom = 0
- 300  call plqdb1(nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,g,gf,h, &
+ 300  call me%plqdb1(nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,g,gf,h, &
                   s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,eps9,umax,gmax,n,  &
                   iterq)
       if ( iterq<0 ) then
@@ -534,7 +567,7 @@
 !     line search without directional derivatives
 !
  450     call ps0l02(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,rmax,tols,kd, &
-                     ld,nit,kit,nred,mred,maxst,iest,inits,iters,kters, &
+                     ld,me%nit,kit,nred,mred,maxst,iest,inits,iters,kters, &
                      mes,isys)
          if ( isys==0 ) then
             kd = 1
@@ -559,7 +592,7 @@
 !
             if ( kd>ld ) then
                lds = ld
-               call pf1f01(nf,x,gf,gf,ff,f,kd,ld,iext)
+               call me%pf1f01(nf,x,gf,gf,ff,f,kd,ld,iext)
                ld = lds
                call pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
             endif
@@ -572,7 +605,7 @@
 !
 !     variable metric update
 !
-            call pudbg1(n,h,g,s,xo,go,r,po,nit,kit,iterh,met,met1,mec)
+            call pudbg1(n,h,g,s,xo,go,r,po,me%nit,kit,iterh,met,met1,mec)
 !      if (mer.gt.0.and.iterh.gt.0) irest=1
 !
 !     end of the iteration
@@ -582,7 +615,7 @@
 !      go to (11174,11172) isys+1
             call mxvdir(nf,r,s,xo,x)
             lds = ld
-            call pf1f01(nf,x,gf,g,ff,f,kd,ld,iext)
+            call me%pf1f01(nf,x,gf,g,ff,f,kd,ld,iext)
             ld = lds
             call pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
             cf(nc+1) = f
@@ -594,8 +627,8 @@
  500  if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,''exit from psqp :'')')
       if ( iprnt/=0 ) &
          write (6,'(1x,''nit='',i4,2x,''nfv='',i4,2x,''nfg='',i4,2x,''f='',&
-                  g12.6,2x,''c='',e7.1,2x,''g='',e7.1,2x,''iterm='',i3)') &
-                  nit , nfv , nfg , f , cmax , gmax , iterm
+                  g13.6,2x,''c='',e8.1,2x,''g='',e8.1,2x,''iterm='',i3)') &
+                  me%nit , me%nfv , me%nfg , f , cmax , gmax , iterm
       if ( iprnt<0 ) write (6,'(1x,''x='',5(g14.7,1x):/(3x,5(g14.7,1x)))') (x(i),i=1,nf)
       end subroutine psqp
 
@@ -885,16 +918,18 @@
 !  s   mxvcop  copying of a vector.
 !  s   mxvneg  copying of a vector with change of the sign.
 !
-      subroutine pf1f01(nf,x,gf,g,ff,f,kd,ld,iext)
+      subroutine pf1f01(me,nf,x,gf,g,ff,f,kd,ld,iext)
+
       implicit none
+
+      class(psqp_class),intent(inout) :: me
       double precision f , ff
       integer iext , kd , ld , nf
       double precision gf(*) , g(*) , x(*)
-      integer nadd , ndec , nfg , nfh , nfv , nit , nrem , nres
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
+
       if ( kd<=ld ) return
       if ( ld<0 ) then
-         nfv = nfv + 1
+         me%nfv = me%nfv + 1
          call obj(nf,x,ff)
          if ( iext<=0 ) then
             f = ff
@@ -904,7 +939,7 @@
       endif
       if ( kd>=1 ) then
          if ( ld<1 ) then
-            nfg = nfg + 1
+            me%nfg = me%nfg + 1
             call dobj(nf,x,gf)
             if ( iext>0 ) call mxvneg(nf,gf,g)
          endif
@@ -948,8 +983,7 @@
 !  s   mxvort  determination of an elementary orthogonal matrix for
 !         plane rotation.
 !
-      subroutine pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,nadd,   &
-                        ier)
+      subroutine pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,nadd,ier)
       implicit none
       integer nf , n , ica(*) , inew , nadd , ier
       double precision cg(*) , cr(*) , cz(*) , s(*) , eps7 , gmax , umax
@@ -1226,10 +1260,13 @@
 !  s   mxvneg  copying of a vector with change of the sign.
 !  s   mxvset  initiation of a vector.
 !
-      subroutine pllpb1(nf,nc,x,ix,xo,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,  &
+      subroutine pllpb1(me,nf,nc,x,ix,xo,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,  &
                         cz,g,go,s,mfp,kbf,kbc,eta9,eps7,eps9,umax,gmax, &
                         n,iterl)
       implicit none
+
+      class(psqp_class),intent(inout) :: me
+
       integer nf , nc , ix(*) , ic(*) , ica(*) , mfp , kbf , kbc , n ,  &
               iterl
       double precision x(*) , xo(*) , xl(*) , xu(*) , cf(*) , cfd(*) ,  &
@@ -1238,8 +1275,7 @@
       double precision pom , con , dmax
       integer nca , ncr , ncz , ipom , i , k , iold , inew , ier ,      &
               krem , kc , nred
-      integer nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
+
       con = eta9
 !
 !     initiation
@@ -1283,8 +1319,7 @@
             if ( ic(kc)/=0 ) then
                inew = 0
                call plnewl(kc,cf,ic,cl,cu,eps9,inew)
-               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,nadd,&
-                           ier)
+               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
                call mxvind(ic,kc,ier)
                if ( ic(kc)<-10 ) ipom = 1
             endif
@@ -1338,15 +1373,13 @@
                kc = inew
                inew = 0
                call plnewl(kc,cf,ic,cl,cu,eps9,inew)
-               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,nadd,&
-                           ier)
+               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
                call mxvind(ic,kc,ier)
             elseif ( inew+nf>=0 ) then
                i = -inew
                inew = 0
                call plnews(x,ix,xl,xu,eps9,i,inew)
-               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,nadd,&
-                           ier)
+               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
                call mxvind(ix,i,ier)
             endif
             dmax = pom
@@ -1370,7 +1403,7 @@
 !
 !     constraint deletion
 !
-         call plrmb0(nf,n,ica,cg,cr,cz,go,s,iold,krem,nrem,ier)
+         call plrmb0(nf,n,ica,cg,cr,cz,go,s,iold,krem,me%nrem,ier)
          kc = ica(nf-n+1)
          if ( kc>0 ) then
             ic(kc) = -ic(kc)
@@ -1448,7 +1481,6 @@
       implicit none
       integer nf , n , ica(*) , iold , krem , nrem , ier
       double precision cg(*) , cr(*) , cz(*) , g(*) , gn(*)
-      !double precision mxvdot
       integer nca , ncr , ncz , i , j , kc
       ier = 0
       if ( n==nf ) ier = 2
@@ -1467,8 +1499,7 @@
       do j = 1 , nca
          kc = ica(j)
          if ( kc>0 ) then
-            call mxvdir(nf,cr(ncr+j),cg((kc-1)*nf+1),cz(ncz+1),cz(ncz+1)&
-                        )
+            call mxvdir(nf,cr(ncr+j),cg((kc-1)*nf+1),cz(ncz+1),cz(ncz+1))
          else
             i = -kc
             cz(ncz+i) = cz(ncz+i) + cr(ncr+j)
@@ -1557,10 +1588,13 @@
 !  s   mxvinv  change of an integer vector after constraint addition.
 !  s   mxvneg  copying of a vector with change of the sign.
 !
-      subroutine plqdb1(nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,g,&
+      subroutine plqdb1(me,nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,g,&
                         go,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,eps9,   &
                         umax,gmax,n,iterq)
       implicit none
+
+      class(psqp_class),intent(inout) :: me
+
       integer nf , nc , ix(*) , ic(*) , ica(*) , mfp , kbf , kbc ,      &
               idecf , n , iterq
       double precision x(*) , xl(*) , xu(*) , cf(*) , cfd(*) , cl(*) ,  &
@@ -1571,8 +1605,7 @@
                        snorm
       integer nca , ncr , i , j , k , iold , jold , inew , jnew , knew ,&
               inf , ier , krem , kc , nred
-      integer nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
+
       con = eta9
       if ( idecf<0 ) idecf = 1
       if ( idecf==0 ) then
@@ -1581,7 +1614,7 @@
 !
          temp = eta2
          call mxdpgf(nf,h,inf,temp,step)
-         ndec = ndec + 1
+         me%ndec = me%ndec + 1
          idecf = 1
       endif
       if ( idecf>=2 .and. idecf<=8 ) then
@@ -1644,8 +1677,7 @@
 !
 !     stepsize determination
 !
-         call pladr1(nf,n,ica,cg,cr,h,s,g,eps7,gmax,umax,idecf,inew,    &
-                     nadd,ier,1)
+         call pladr1(nf,n,ica,cg,cr,h,s,g,eps7,gmax,umax,idecf,inew,me%nadd,ier,1)
          call mxdprb(nca,cr,g,-1)
          if ( knew<0 ) call mxvneg(nca,g,g)
 !
@@ -1726,7 +1758,7 @@
                if ( knew<0 ) ix(i) = -4
             endif
             nred = nred + 1
-            nadd = nadd + 1
+            me%nadd = me%nadd + 1
             jnew = inew
             jold = 0
             goto 100
@@ -1737,7 +1769,7 @@
             do j = iold , nca - 1
                cz(j) = cz(j+1)
             enddo
-            call plrmf0(nf,nc,ix,ic,ica,cr,ic,g,n,iold,krem,ier)
+            call me%plrmf0(nf,nc,ix,ic,ica,cr,ic,g,n,iold,krem,ier)
             ncr = ncr - nca
             nca = nca - 1
             jold = iold
@@ -1790,7 +1822,7 @@
 !  iu  nadd  number of constraint additions.
 !  io  ier  error indicator.
 !  ii  job  specification of computation. output vector g is not or is
-!         computed in case when n.le.0 if job=0 or job=1 respectively.
+!         computed in case when n<=0 if job=0 or job=1 respectively.
 !
 ! subprograms used :
 !  s   mxdpgb  back substitution.
@@ -2424,17 +2456,19 @@
 !  s   plrmr0  correction of kernel of the orthogonal projection
 !         after constraint deletion.
 !
-      subroutine plrmf0(nf,nc,ix,ia,iaa,ar,ic,s,n,iold,krem,ier)
+      subroutine plrmf0(me,nf,nc,ix,ia,iaa,ar,ic,s,n,iold,krem,ier)
       implicit none
+
+      class(psqp_class),intent(inout) :: me
+
       integer ier , iold , krem , n , nc , nf
       double precision ar(*) , s(*)
       integer ia(*) , iaa(*) , ic(*) , ix(*)
-      integer nadd , ndec , nfg , nfh , nfv , nit , nrem , nres
       integer l
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
+
       call plrmr0(nf,iaa,ar,s,n,iold,krem,ier)
       n = n + 1
-      nrem = nrem + 1
+      me%nrem = me%nrem + 1
       l = iaa(nf-n+1)
       if ( l>nc ) then
          l = l - nc
@@ -3410,7 +3444,7 @@
             iters = 5
             isys = 0
             return
-         elseif ( l3 .and. l4 .and. l7 .and.                            &
+         elseif ( l3 .and. l4 .and. l7 .and. &
                   (kters==2 .or. kters==3 .or. kters==4) ) then
             iters = 2
             isys = 0
@@ -3914,7 +3948,6 @@
       double precision par1 , par2
       double precision f , fo , p
       double precision aa , cc
-      !double precision mxvdot
       double precision dis , pom , pom3 , pom4 , a , b , c , gam , rho ,&
                        par
       double precision den
@@ -4555,9 +4588,6 @@
 !  io  ier  error indicator.
 !  io  iterm  termination indicator.
 !
-! common data :
-!  iu  nadd  number of constraint additions.
-!
 ! subprograms used :
 !  s   pladb4  addition of a new active constraint.
 !  s   plnews  identification of active upper bounds.
@@ -4565,10 +4595,13 @@
 !  s   pldirl  new values of constraint functions.
 !  s   mxvind  change of the integer vector for constraint addition.
 !
-      subroutine pyadb4(nf,n,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,&
+      subroutine pyadb4(me,nf,n,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,&
                         h,s,r,eps7,eps9,gmax,umax,kbf,kbc,inew,ier,     &
                         iterm)
       implicit none
+
+      class(psqp_class),intent(inout) :: me
+
       integer nf , n , nc , ix(*) , ic(*) , ica(*) , kbf , kbc , inew , &
               ier , iterm
       double precision x(*) , xl(*) , xu(*) , cf(*) , cfd(*) , cl(*) ,  &
@@ -4576,8 +4609,7 @@
                        eps7 , eps9 , gmax , umax
       integer i , j , k , l , ij , ik , kc , kj , kk , ll
       double precision den , temp
-      integer nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
+
       if ( kbc>0 ) then
          if ( r/=0.0d0 ) call pldirl(nc,cf,cfd,ic,r,kbc)
          if ( inew/=0 ) then
@@ -4586,7 +4618,7 @@
                   inew = 0
                   call plnews(x,ix,xl,xu,eps9,i,inew)
                   call pladb4(nf,n,ica,cg,cr,cz,h,s,eps7,gmax,umax,9,   &
-                              inew,nadd,ier)
+                              inew,me%nadd,ier)
                   call mxvind(ix,i,ier)
                   if ( ier<0 ) then
                      iterm = -15
@@ -4598,7 +4630,7 @@
                inew = 0
                call plnewl(kc,cf,ic,cl,cu,eps9,inew)
                call pladb4(nf,n,ica,cg,cr,cz,h,s,eps7,gmax,umax,9,inew, &
-                           nadd,ier)
+                           me%nadd,ier)
                call mxvind(ic,kc,ier)
                if ( ier<0 ) then
                   iterm = -15
@@ -4800,26 +4832,25 @@
 !  io  ier  error indicator.
 !  io  iterm  termination indicator.
 !
-! common data :
-!  iu  nrem  number of constraint deletions.
-!
 ! subprograms used :
 !  s   plrmb0  constraint deletion.
 !  s   mxvset  initiation of a vector.
 !
-      subroutine pyrmb1(nf,n,ix,ic,ica,cg,cr,cz,g,gn,h,eps8,umax,gmax,  &
+      subroutine pyrmb1(me,nf,n,ix,ic,ica,cg,cr,cz,g,gn,h,eps8,umax,gmax,  &
                         kbf,kbc,iold,kold,krem,ier,iterm)
       implicit none
+
+      class(psqp_class),intent(inout) :: me
+
       integer nf , n , ix(*) , ic(*) , ica(*) , kbf , kbc , iold ,      &
               kold , krem , ier , iterm
       double precision cg(*) , cr(*) , cz(*) , g(*) , gn(*) , h(*) ,    &
                        eps8 , umax , gmax
       integer i , j , k , kc , l
-      integer nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
-      common /stat  / nres , ndec , nrem , nadd , nit , nfv , nfg , nfh
+
       if ( kbc>0 ) then
          if ( umax>eps8*gmax ) then
-            call plrmb0(nf,n,ica,cg,cr,cz,g,gn,iold,krem,nrem,ier)
+            call plrmb0(nf,n,ica,cg,cr,cz,g,gn,iold,krem,me%nrem,ier)
             if ( ier<0 ) then
                iterm = -16
             elseif ( ier>0 ) then
