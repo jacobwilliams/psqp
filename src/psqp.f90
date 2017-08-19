@@ -400,11 +400,11 @@
                xl(i) = x(i)
                xu(i) = x(i)
                ix(i) = 5
-            endif
+            end if
             if ( ix(i)==1 .or. ix(i)==3 ) x(i) = max(x(i),xl(i))
             if ( ix(i)==2 .or. ix(i)==3 ) x(i) = min(x(i),xu(i))
-         enddo
-      endif
+         end do
+      end if
 !     initial operations with general constraints
 !
       if ( kbc>0 ) then
@@ -416,10 +416,10 @@
             elseif ( ic(kc)==5 .or. ic(kc)==6 ) then
                cu(kc) = cl(kc)
                ic(kc) = 5
-            endif
+            end if
             k = k + nf
-         enddo
-      endif
+         end do
+      end if
       if ( kbf>0 ) then
          do i = 1 , nf
             if ( ix(i)>=5 ) ix(i) = -ix(i)
@@ -428,11 +428,11 @@
                x(i) = xl(i)
             elseif ( (ix(i)==2 .or. ix(i)==3) .and. x(i)>=xu(i) ) then
                x(i) = xu(i)
-            endif
+            end if
             call plnews(x,ix,xl,xu,eps9,i,iterl)
             if ( ix(i)>10 ) ix(i) = 10 - ix(i)
-         enddo
-      endif
+         end do
+      end if
       fo = fmin
       gmax = eta9
       dmax = eta9
@@ -453,23 +453,23 @@
          if ( f<=tolb ) then
             iterm = 3
             goto 500
-         endif
+         end if
          if ( dmax<=tolx ) then
             iterm = 1
             ntesx = ntesx + 1
             if ( ntesx>=mtesx ) goto 500
          else
             ntesx = 0
-         endif
-      endif
+         end if
+      end if
       if ( me%nit>=mit ) then
          iterm = 11
          goto 500
-      endif
+      end if
       if ( me%nfv>=mfv ) then
          iterm = 12
          goto 500
-      endif
+      end if
       iterm = 0
       me%nit = me%nit + 1
 !
@@ -487,8 +487,8 @@
             iterm = -10
             if ( iters<0 ) iterm = iters - 5
             goto 500
-         endif
-      endif
+         end if
+      end if
 !
 !     direction determination using a quadratic programming procedure
 !
@@ -503,10 +503,10 @@
             ipom = ipom + 1
             call plredl(nc,cf,ic,cl,cu,kbc)
             goto 300
-         endif
+         end if
          iterd = iterq - 10
          goto 400
-      endif
+      end if
       ipom = 0
       iterd = 1
       gmax = mxvmax(nf,g)
@@ -523,7 +523,7 @@
          if ( snorm<=0.0_wp ) then
          elseif ( p+told*gnorm*snorm<=0.0_wp ) then
             irest = 0
-         endif
+         end if
          if ( irest/=0 ) goto 200
          nred = 0
          rmin = alf1*gnorm/snorm
@@ -531,7 +531,7 @@
          if ( gmax<=tolg .and. cmax<=tolc ) then
             iterm = 4
             goto 500
-         endif
+         end if
          call ppset2(nf,n,nc,ica,cz,cp)
          call mxvina(nc,ic)
          call pp0af8(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
@@ -567,7 +567,7 @@
                irest = 1
                ld = kd
                goto 200
-            endif
+            end if
 !
 !     computation of the value and the gradient of the objective
 !     function together with the values and the gradients of the
@@ -578,7 +578,7 @@
                call me%pf1f01(nf,x,gf,gf,ff,f,kd,ld,iext)
                ld = lds
                call me%pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
-            endif
+            end if
 !
 !     preparation of variable metric update
 !
@@ -604,8 +604,8 @@
             cf(nc+1) = f
             call pp0af8(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
             goto 450
-         endif
-      endif
+         end if
+      end if
 
  500  if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,''exit from psqp :'')')
       if ( iprnt/=0 ) &
@@ -657,7 +657,7 @@
             else
                call me%con(nf,kc,x,fc)
                cf(kc) = fc
-            endif
+            end if
             if ( ic(kc)>0 ) then
                pom = 0.0_wp
                temp = cf(kc)
@@ -666,17 +666,17 @@
                if ( ic(kc)==2 .or. ic(kc)>=3 ) &
                     pom = min(pom,cu(kc)-temp)
                if ( pom<0.0_wp ) cmax = max(cmax,-pom)
-            endif
+            end if
  20         if ( kd>=1 ) then
                if ( ld>=1 ) then
                   call mxvcop(nf,cg((kc-1)*nf+1),gc)
                else
                   call me%dcon(nf,kc,x,gc)
                   call mxvcop(nf,gc,cg((kc-1)*nf+1))
-               endif
-            endif
-         endif
-      enddo
+               end if
+            end if
+         end if
+      end do
       ld = kd
       end subroutine pc1f01
 
@@ -713,15 +713,15 @@
             f = ff
          else
             f = -ff
-         endif
-      endif
+         end if
+      end if
       if ( kd>=1 ) then
          if ( ld<1 ) then
             me%nfg = me%nfg + 1
             call me%dobj(nf,x,gf)
             if ( iext>0 ) call mxvneg(nf,gf,g)
-         endif
-      endif
+         end if
+      end if
       ld = kd
       end subroutine pf1f01
 
@@ -763,14 +763,14 @@
             call mxdrmm(nf,n1,cz,cg((inew-1)*nf+1),s)
          else
             call mxdrmv(nf,n1,cz,s,-inew)
-         endif
+         end if
          do l = 1 , n
             k = l + 1
             call mxvort(s(k),s(l),ck,cl,ier)
             call mxdrgr(nf,cz,k,l,ck,cl,ier)
             if ( ier<0 ) return
-         enddo
-      endif
+         end do
+      end if
       ier = 0
       end subroutine pladb0
 
@@ -815,7 +815,7 @@
       if ( idecf/=0 .and. idecf/=9 ) then
          ier = -2
          return
-      endif
+      end if
       call pladr0(nf,n,ica,cg,cr,s,eps7,gmax,umax,inew,nadd,ier)
       if ( ier/=0 ) return
       if ( n>0 ) then
@@ -824,14 +824,14 @@
             call mxdrmm(nf,n1,cz,cg((inew-1)*nf+1),s)
          else
             call mxdrmv(nf,n1,cz,s,-inew)
-         endif
+         end if
          do l = 1 , n
             k = l + 1
             call mxvort(s(k),s(l),ck,cl,ier)
             call mxdrgr(nf,cz,k,l,ck,cl,ier)
             call mxdsmr(n1,h,k,l,ck,cl,ier)
             if ( ier<0 ) return
-         enddo
+         end do
          if ( idecf==9 ) then
             l = n*(n+1)/2
             if ( h(l+n1)/=0.0_wp ) then
@@ -842,11 +842,11 @@
                   do j = 1 , i
                      k = k + 1
                      h(k) = h(k) - ck*h(l+j)
-                  enddo
-               enddo
-            endif
-         endif
-      endif
+                  end do
+               end do
+            end if
+         end if
+      end if
       ier = 0
       end subroutine pladb4
 
@@ -893,8 +893,8 @@
             else
                i = -l
                cr(ncr+j) = s(i)
-            endif
-         enddo
+            end if
+         end do
       else
          k = -inew
          gmax = 1.0_wp
@@ -904,15 +904,15 @@
                cr(ncr+j) = cg((l-1)*nf+k)*gmax
             else
                cr(ncr+j) = 0.0_wp
-            endif
-         enddo
-      endif
+            end if
+         end do
+      end if
       if ( nca==0 ) then
          umax = gmax
       else
          call mxdprb(nca,cr,cr(ncr+1),1)
          umax = gmax - mxvdot(nca,cr(ncr+1),cr(ncr+1))
-      endif
+      end if
       if ( umax<=eps7*gmax ) then
          ier = 1
          return
@@ -923,83 +923,75 @@
          ica(nca) = inew
          cr(ncr) = sqrt(umax)
          nadd = nadd + 1
-      endif
+      end if
       end subroutine pladr0
 
 !***********************************************************************
 !> date: 97/12/01
 !
 ! dual range space quadratic programming method.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  io  n  dimension of the manifold defined by active constraints.
-!  ii  nc  number of linear constraints.
-!  ru  x(nf)   vector of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ii  ixa(nf)  vector containing information on trust region activity.
-!  ri  xn(nf)  vector of scaling factors.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  cf(nf)  vector containing values of the constraint functions.
-!  ro  cfd(nc)  vector containing increments of the constraint
-!            functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ii  ica(nf)  vector containing indices of active constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ro  cz(nf)  vector of lagrange multipliers.
-!  ro  g(nf)  gradient of the lagrangian function.
-!  ro  go(nf)  saved gradient of the objective function.
-!  ru  h(nf*(nf+1)/2)  triangular decomposition or inversion of the
-!         hessian matrix approximation.
-!  ri  s(nf)  direction vector.
-!  ri  eta2  tolerance for positive definiteness of the hessian matrix.
-!  ri  eta9  maximum for real numbers.
-!  ri  eps7  tolerance for linear independence of constraints.
-!  ri  eps9  tolerance for activity of constraints.
-!  ru  xdel  trust region bound.
-!  ro  umax  maximum absolute value of a negative lagrange multiplier.
-!  ro  gmax  maximum absolute value of a partial derivative.
-!  ii  mfp  type of feasible point. mfp=1-arbitrary feasible point.
-!         mfp=2-optimum feasible point. mfp=3-repeated solution.
-!
-! common data :
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  ii  normf  scaling specification. normf=0-no scaling performed.
-!         normf=1-scaling factors are determined automatically.
-!         normf=2-scaling factors are supplied by user.
-!  iu  idecf  decomposition indicator. idecf=0-no decomposition.
-!         idecf=1-gill-murray decomposition. idecf=9-inversion.
-!         idecf=10-diagonal matrix.
-!  iu  ndecf  number of decompositions.
-!  io  iterq  type of feasible point. iterq=1-arbitrary feasible point.
-!         iterq=2-optimum feasible point. iterq=-1 feasible point does
-!         not exists. iterq=-2 optimum feasible point does not exists.
 
       subroutine plqdb1(me,nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,g,&
-                        go,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,eps9,   &
+                        go,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,eps9,&
                         umax,gmax,n,iterq)
       implicit none
 
       class(psqp_class),intent(inout) :: me
+      integer :: nf     !! number of variables.
+      integer :: nc     !! number of linear constraints.
+      integer :: ix(*)  !! ix(nf)  vector containing types of bounds.
+      integer :: ic(*)  !! ic(nc)  vector containing types of constraints.
+      integer :: ica(*) !! ica(nf)  vector containing indices of active constraints.
+      integer :: mfp    !! type of feasible point.
+                        !!
+                        !! * mfp=1-arbitrary feasible point.
+                        !! * mfp=2-optimum feasible point.
+                        !! * mfp=3-repeated solution.
+      integer :: kbf    !! specification of simple bounds.
+                        !!
+                        !! * kbf=0-no simple bounds.
+                        !! * kbf=1-one sided simple bounds.
+                        !! * kbf=2=two sided simple bounds.
+      integer :: kbc    !! specification of linear constraints.
+                        !!
+                        !! * kbc=0 - no linear constraints.
+                        !! * kbc=1 - one sided linear constraints.
+                        !! * kbc=2 - two sided linear constraints.
+      integer :: idecf  !! decomposition indicator.
+                        !!
+                        !! * idecf=0  - no decomposition.
+                        !! * idecf=1  - gill-murray decomposition.
+                        !! * idecf=9  - inversion.
+                        !! * idecf=10 - diagonal matrix.
+      integer :: n      !! dimension of the manifold defined by active constraints.
+      integer :: iterq  !! type of feasible point.
+                        !!
+                        !! * iterq=1  - arbitrary feasible point.
+                        !! * iterq=2  - optimum feasible point.
+                        !! * iterq=-1 - feasible point does not exists.
+                        !! * iterq=-2 - optimum feasible point does not exists.
+      real(wp) :: x(*)  !! x(nf)   vector of variables.
+      real(wp) :: xl(*) !! xl(nf)  vector containing lower bounds for variables.
+      real(wp) :: xu(*) !! xu(nf)  vector containing upper bounds for variables.
+      real(wp) :: cf(*) !! cf(nf)  vector containing values of the constraint functions.
+      real(wp) :: cfd(*)!! cfd(nc)  vector containing increments of the constraint functions.
+      real(wp) :: cl(*) !! cl(nc)  vector containing lower bounds for constraint functions.
+      real(wp) :: cu(*) !! cu(nc)  vector containing upper bounds for constraint functions.
+      real(wp) :: cg(*) !! cg(nf*nc)  matrix whose columns are normals of the linear constraints.
+      real(wp) :: cr(*) !! cr(nf*(nf+1)/2)  triangular decomposition of kernel of the orthogonal projection.
+      real(wp) :: cz(*) !! cz(nf)  vector of lagrange multipliers.
+      real(wp) :: g(*)  !! g(nf)  gradient of the lagrangian function.
+      real(wp) :: go(*) !! go(nf)  saved gradient of the objective function.
+      real(wp) :: h(*)  !! h(nf*(nf+1)/2)  triangular decomposition or inversion of the hessian matrix approximation.
+      real(wp) :: s(*)  !! s(nf)  direction vector.
+      real(wp) :: eta2  !! tolerance for positive definiteness of the hessian matrix.
+      real(wp) :: eta9  !! maximum for real numbers.
+      real(wp) :: eps7  !! tolerance for linear independence of constraints.
+      real(wp) :: eps9  !! tolerance for activity of constraints.
+      real(wp) :: umax  !! maximum absolute value of a negative lagrange multiplier.
+      real(wp) :: gmax  !! maximum absolute value of a partial derivative.
 
-      integer nf , nc , ix(*) , ic(*) , ica(*) , mfp , kbf , kbc ,      &
-              idecf , n , iterq
-      real(wp) x(*) , xl(*) , xu(*) , cf(*) , cfd(*) , cl(*) ,  &
-                       cu(*) , cg(*) , cr(*) , cz(*) , g(*) , go(*) ,   &
-                       h(*) , s(*) , eta2 , eta9 , eps7 , eps9 , umax , &
-                       gmax
-      real(wp) con , temp , step , step1 , step2 , dmax , par , &
-                       snorm
+      real(wp) con , temp , step , step1 , step2 , dmax , par , snorm
       integer nca , ncr , i , j , k , iold , jold , inew , jnew , knew ,&
               inf , ier , krem , kc , nred
 
@@ -1013,11 +1005,11 @@
          call mxdpgf(nf,h,inf,temp,step)
          me%ndec = me%ndec + 1
          idecf = 1
-      endif
+      end if
       if ( idecf>=2 .and. idecf<=8 ) then
          iterq = -10
          return
-      endif
+      end if
 !
 !     initiation
 !
@@ -1032,7 +1024,7 @@
          ncr = 0
          if ( kbf>0 ) call mxvina(nf,ix)
          if ( kbc>0 ) call mxvina(nc,ic)
-      endif
+      end if
 !
 !     direction determination
 !
@@ -1044,14 +1036,14 @@
          else
             k = -kc
             s(k) = s(k) + cz(j)
-         endif
-      enddo
+         end if
+      end do
       call mxvcop(nf,s,g)
       if ( idecf==1 ) then
          call mxdpgb(nf,h,s,0)
       else
          call mxdsmm(nf,h,g,s)
-      endif
+      end if
       if ( iterq/=3 ) then
 !
 !     check of feasibility
@@ -1069,7 +1061,7 @@
             return
          else
             snorm = 0.0_wp
-         endif
+         end if
  150     ier = 0
 !
 !     stepsize determination
@@ -1084,7 +1076,7 @@
             step1 = con
          else
             step1 = -par/umax
-         endif
+         end if
 !
 !     dual stepsize
 !
@@ -1097,7 +1089,7 @@
             else
                i = -kc
                k = ix(i)
-            endif
+            end if
             if ( k<=-5 ) then
             elseif ( (k==-1 .or. k==-3.) .and. g(j)<=0.0_wp ) then
             elseif ( .not.((k==-2 .or. k==-4.) .and. g(j)>=0.0_wp) ) then
@@ -1105,9 +1097,9 @@
                if ( step2>temp ) then
                   iold = j
                   step2 = temp
-               endif
-            endif
-         enddo
+               end if
+            end if
+         end do
 !
 !     final stepsize
 !
@@ -1118,7 +1110,7 @@
 !
             iterq = -1
             return
-         endif
+         end if
 !
 !     new lagrange multipliers
 !
@@ -1133,7 +1125,7 @@
 !
                iterq = -5
                return
-            endif
+            end if
 !
 !     constraint addition
 !
@@ -1142,7 +1134,7 @@
                nca = nca + 1
                ncr = ncr + nca
                cz(nca) = snorm
-            endif
+            end if
             if ( inew>0 ) then
                kc = inew
                call mxvinv(ic,kc,knew)
@@ -1153,7 +1145,7 @@
                i = -inew
                if ( knew>0 ) ix(i) = -3
                if ( knew<0 ) ix(i) = -4
-            endif
+            end if
             nred = nred + 1
             me%nadd = me%nadd + 1
             jnew = inew
@@ -1165,7 +1157,7 @@
 !
             do j = iold , nca - 1
                cz(j) = cz(j+1)
-            enddo
+            end do
             call me%plrmf0(nf,nc,ix,ic,ica,cr,ic,g,n,iold,krem,ier)
             ncr = ncr - nca
             nca = nca - 1
@@ -1180,11 +1172,12 @@
                else
                   kc = -kc
                   ix(kc) = -ix(kc)
-               endif
-            enddo
+               end if
+            end do
             goto 150
-         endif
-      endif
+         end if
+      end if
+
       end subroutine plqdb1
 
 !***********************************************************************
@@ -1192,40 +1185,42 @@
 !
 ! triangular decomposition of kernel of the general projection
 ! is updated after constraint addition.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  iu  n  actual number of variables.
-!  iu  ica(nf)  vector containing indices of active constraints.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ru  h(nf*(nf+1)/2)  triangular decomposition or inversion of the
-!         hessian matrix approximation.
-!  ra  s(nf)  auxiliary vector.
-!  ro  g(nf)  vector used in the dual range space quadratic programming
-!         method.
-!  ri  eps7  tolerance for linear independence of constraints.
-!  ro  gmax  maximum absolute value of a partial derivative.
-!  ro  umax  maximum absolute value of a negative lagrange multiplier.
-!  ro  e  auxiliary variable.
-!  ri  t  auxiliary variable.
-!  iu  idecf  decomposition indicator. idecf=0-no decomposition.
-!         idecf=1-gill-murray decomposition. idecf=9-inversion.
-!         idecf=10-diagonal matrix.
-!  ii  inew  index of the new active constraint.
-!  iu  nadd  number of constraint additions.
-!  io  ier  error indicator.
-!  ii  job  specification of computation. output vector g is not or is
-!         computed in case when n<=0 if job=0 or job=1 respectively.
 
       subroutine pladr1(nf,n,ica,cg,cr,h,s,g,eps7,gmax,umax,idecf,inew, &
                         nadd,ier,job)
+
       implicit none
-      integer nf , n , ica(*) , idecf , inew , nadd , ier , job
-      real(wp) cg(*) , cr(*) , h(*) , s(*) , g(*) , eps7 ,      &
-                       gmax , umax
+
+      integer :: nf       !! declared number of variables.
+      integer :: n        !! actual number of variables.
+      integer :: ica(*)   !! ica(nf)  vector containing indices of active constraints.
+      integer :: idecf    !! decomposition indicator.
+                          !!
+                          !! * idecf=0-no decomposition.
+                          !! * idecf=1-gill-murray decomposition.
+                          !! * idecf=9-inversion.
+                          !! * idecf=10-diagonal matrix.
+      integer :: inew     !! index of the new active constraint.
+      integer :: nadd     !! number of constraint additions.
+      integer :: ier      !! error indicator.
+      integer :: job      !! specification of computation.
+                          !! output vector g is not or is
+                          !! computed in case when n<=0 if
+                          !! job=0 or job=1 respectively.
+      real(wp) :: cg(*)   !! cg(nf*nc)  matrix whose columns are normals of
+                          !! the linear constraints.
+      real(wp) :: cr(*)   !! cr(nf*(nf+1)/2)  triangular decomposition of
+                          !! kernel of the orthogonal projection.
+      real(wp) :: h(*)    !! h(nf*(nf+1)/2)  triangular decomposition or
+                          !! inversion of the hessian matrix approximation.
+      real(wp) :: s(*)    !! s(nf)  auxiliary vector.
+      real(wp) :: g(*)    !! g(nf)  vector used in the dual range space
+                          !! quadratic programming method.
+      real(wp) :: eps7    !! tolerance for linear independence of constraints.
+      real(wp) :: gmax    !! maximum absolute value of a partial derivative.
+      real(wp) :: umax    !! maximum absolute value of a negative
+                          !! lagrange multiplier.
+
       integer nca , ncr , jcg , j , k , l
 
       ier = 0
@@ -1242,7 +1237,7 @@
             call mxdpgb(nf,h,s,0)
          else
             call mxdsmm(nf,h,cg(jcg),s)
-         endif
+         end if
          gmax = mxvdot(nf,cg(jcg),s)
       else
          k = -inew
@@ -1252,9 +1247,9 @@
             call mxdpgb(nf,h,s,0)
          else
             call mxdsmv(nf,h,s,k)
-         endif
+         end if
          gmax = s(k)
-      endif
+      end if
       do j = 1 , nca
          l = ica(j)
          if ( l>0 ) then
@@ -1262,8 +1257,8 @@
          else
             l = -l
             g(j) = s(l)
-         endif
-      enddo
+         end if
+      end do
       if ( n==0 ) then
          call mxdprb(nca,cr,g,1)
          umax = 0.0_wp
@@ -1275,7 +1270,7 @@
          call mxdprb(nca,cr,g,1)
          umax = gmax - mxvdot(nca,g,g)
          call mxvcop(nca,g,cr(ncr+1))
-      endif
+      end if
       if ( umax<=eps7*gmax ) then
          ier = 1
          return
@@ -1287,43 +1282,47 @@
          if ( job==0 ) then
             n = n - 1
             nadd = nadd + 1
-         endif
-      endif
+         end if
+      end if
+
       end subroutine pladr1
 
 !***********************************************************************
 !> date: 97/12/01
 !
 ! determination of the new active linear constraint.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ii  nc  number of constraints.
-!  ri  cf(nc)  vector containing values of the constraint functions.
-!  ro  cfd(nc)  vector containing increments of the constraint
-!            functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  s(nf)  direction vector.
-!  ri  eps9  tolerance for active constraints.
-!  ra  par  auxiliary variable.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  io  inew  index of the new active constraint.
-!  io  knew  signum of the new active normal.
 
-      subroutine plminn(nf,nc,cf,cfd,ic,cl,cu,cg,s,eps9,par,kbc,inew,   &
-                        knew)
+      subroutine plminn(nf,nc,cf,cfd,ic,cl,cu,cg,s,eps9,par,kbc,inew,knew)
+
       implicit none
-      integer nf , nc , ic(*) , kbc , inew , knew
-      real(wp) cf(*) , cfd(*) , cl(*) , cu(*) , cg(*) , s(*) ,  &
-                       eps9 , par
-      real(wp) temp , pom !, mxvdot
-      integer jcg , kc
+
+      integer :: nf      !! number of variables.
+      integer :: nc      !! number of constraints.
+      integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
+      integer :: kbc     !! specification of linear constraints.
+                         !!
+                         !! * kbc=0 - no linear constraints.
+                         !! * kbc=1 - one sided linear constraints.
+                         !! * kbc=2 - two sided linear constraints.
+      integer :: inew    !! index of the new active constraint.
+      integer :: knew    !! signum of the new active normal.
+      real(wp) :: cf(*)  !! cf(nc)  vector containing values of the
+                         !! constraint functions.
+      real(wp) :: cfd(*) !! cfd(nc)  vector containing increments of
+                         !! the constraint functions.
+      real(wp) :: cl(*)  !! cl(nc)  vector containing lower bounds for
+                         !! constraint functions.
+      real(wp) :: cu(*)  !! cu(nc)  vector containing upper bounds for
+                         !! constraint functions.
+      real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals
+                         !! of the linear constraints.
+      real(wp) :: s(*)   !! s(nf)  direction vector.
+      real(wp) :: eps9   !! tolerance for active constraints.
+      real(wp) :: par    !! auxiliary variable.
+
+      real(wp) :: temp, pom
+      integer :: jcg , kc
+
       if ( kbc>0 ) then
          jcg = 1
          do kc = 1 , nc
@@ -1337,49 +1336,53 @@
                      inew = kc
                      knew = 1
                      par = pom
-                  endif
-               endif
+                  end if
+               end if
                if ( ic(kc)==2 .or. ic(kc)>=3 ) then
                   pom = cu(kc) - temp
                   if ( pom<min(par,-eps9*max(abs(cu(kc)),1.0_wp)) ) then
                      inew = kc
                      knew = -1
                      par = pom
-                  endif
-               endif
-            endif
+                  end if
+               end if
+            end if
             jcg = jcg + nf
-         enddo
-      endif
+         end do
+      end if
+
       end subroutine plminn
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! determination of the new active simple bound.
-!
-! parameters :
-!  ii  nf declared number of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ri  xo(nf)  saved vector of variables.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  s(nf)  direction vector.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  io  inew  index of the new active constraint.
-!  io  knew  signum of the new normal.
-!  ri  eps9  tolerance for active constraints.
-!  ra  par  auxiliary variable.
-!
+
       subroutine plmins(nf,ix,xo,xl,xu,s,kbf,inew,knew,eps9,par)
+
       implicit none
-      real(wp) eps9 , par
-      integer inew , kbf , knew , nf
-      real(wp) s(*) , xl(*) , xo(*) , xu(*)
-      integer ix(*)
-      real(wp) pom , temp
-      integer i
+
+      real(wp) :: eps9   !! tolerance for active constraints.
+      real(wp) :: par    !! auxiliary variable.
+      integer :: inew    !! index of the new active constraint.
+      integer :: kbf     !! specification of simple bounds.
+                         !!
+                         !! * kbf=0-no simple bounds.
+                         !! * kbf=1-one sided simple bounds.
+                         !! * kbf=2=two sided simple bounds.
+      integer :: knew    !! signum of the new normal.
+      integer :: nf      !! declared number of variables.
+      real(wp) :: s(*)   !! s(nf)  direction vector.
+      real(wp) :: xl(*)  !! xl(nf)  vector containing lower bounds
+                         !! for variables.
+      real(wp) :: xo(*)  !! xo(nf)  saved vector of variables.
+      real(wp) :: xu(*)  !! xu(nf)  vector containing upper bounds
+                         !! for variables.
+      integer :: ix(*)   !! ix(nf)  vector containing types of bounds.
+
+      real(wp) :: pom , temp
+      integer :: i
+
       if ( kbf>0 ) then
          do i = 1 , nf
             if ( ix(i)>0 ) then
@@ -1390,133 +1393,135 @@
                      inew = -i
                      knew = 1
                      par = pom
-                  endif
-               endif
+                  end if
+               end if
                if ( ix(i)==2 .or. ix(i)>=3 ) then
                   pom = xu(i) - s(i)*temp - xo(i)
                   if ( pom<min(par,-eps9*max(abs(xu(i)),temp)) ) then
                      inew = -i
                      knew = -1
                      par = pom
-                  endif
-               endif
-            endif
-         enddo
-      endif
+                  end if
+               end if
+            end if
+         end do
+      end if
+
       end subroutine plmins
 
 !***********************************************************************
 !> date: 97/12/01
 !
 ! test on activity of a given simple bound.
-!
-! parameters :
-!  ri  x(nf)  vector of variables.
-!  iu  ix(nf)  vector containing types of bounds.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  eps9  tolerance for active constraints.
-!  ii  i  index of tested simple bound.
-!  io  inew  index of the new active constraint.
-!
+
       subroutine plnews(x,ix,xl,xu,eps9,i,inew)
+
       implicit none
-      integer ix(*) , i , inew
-      real(wp) x(*) , xl(*) , xu(*) , eps9
-      real(wp) temp
+
+      integer :: ix(*)   !! ix(nf)  vector containing types of bounds.
+      integer :: i       !! index of tested simple bound.
+      integer :: inew    !! index of the new active constraint.
+      real(wp) :: x(*)   !! x(nf)  vector of variables.
+      real(wp) :: xl(*)  !! xl(nf)  vector containing lower bounds for variables.
+      real(wp) :: xu(*)  !! xu(nf)  vector containing upper bounds for variables.
+      real(wp) :: eps9   !! tolerance for active constraints.
+
+      real(wp) :: temp
+
       temp = 1.0_wp
       if ( ix(i)<=0 ) then
       elseif ( ix(i)==1 ) then
          if ( x(i)<=xl(i)+eps9*max(abs(xl(i)),temp) ) then
             ix(i) = 11
             inew = -i
-         endif
+         end if
       elseif ( ix(i)==2 ) then
          if ( x(i)>=xu(i)-eps9*max(abs(xu(i)),temp) ) then
             ix(i) = 12
             inew = -i
-         endif
+         end if
       elseif ( ix(i)==3 .or. ix(i)==4 ) then
          if ( x(i)<=xl(i)+eps9*max(abs(xl(i)),temp) ) then
             ix(i) = 13
             inew = -i
-         endif
+         end if
          if ( x(i)>=xu(i)-eps9*max(abs(xu(i)),temp) ) then
             ix(i) = 14
             inew = -i
-         endif
-      endif
+         end if
+      end if
+
       end subroutine plnews
 
 !***********************************************************************
 !> date: 98/12/01
 !
 ! transformation of the incompatible quadratic programming subproblem.
-!
-! parameters :
-!  ii  nc  number of current linear constraints.
-!  ri  cf(nf)  vector containing values of the constraint functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!
+
       subroutine plredl(nc,cf,ic,cl,cu,kbc)
+
       implicit none
-      integer nc , ic(nc) , kbc , k
-      real(wp) cf(*) , cl(*) , cu(*)
-      real(wp) temp
-      integer kc
+
+      integer :: nc     !! number of current linear constraints.
+      integer :: ic(nc) !! ic(nc)  vector containing types of constraints.
+      integer :: kbc    !! specification of linear constraints.
+                        !!
+                        !! * kbc=0-no linear constraints.
+                        !! * kbc=1-one sided linear constraints.
+                        !! * kbc=2=two sided linear constraints.
+      real(wp) :: cf(*) !! cf(nf)  vector containing values of the constraint functions.
+      real(wp) :: cl(*) !! cl(nc)  vector containing lower bounds for constraint functions.
+      real(wp) :: cu(*) !! cu(nc)  vector containing upper bounds for constraint functions.
+
+      real(wp) :: temp
+      integer :: k, kc
+
       if ( kbc>0 ) then
          do kc = 1 , nc
             k = ic(kc)
             if ( abs(k)==1 .or. abs(k)==3 .or. abs(k)==4 ) then
                temp = (cf(kc)-cl(kc))
                if ( temp<0 ) cf(kc) = cl(kc) + 0.1_wp*temp
-            endif
+            end if
             if ( abs(k)==2 .or. abs(k)==3 .or. abs(k)==4 ) then
                temp = (cf(kc)-cu(kc))
                if ( temp>0 ) cf(kc) = cu(kc) + 0.1_wp*temp
-            endif
+            end if
             if ( abs(k)==5 .or. abs(k)==6 ) then
                temp = (cf(kc)-cl(kc))
                cf(kc) = cl(kc) + 0.1_wp*temp
-            endif
-         enddo
-      endif
+            end if
+         end do
+      end if
+
       end subroutine plredl
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! operations after constraint deletion.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  nc  number of constraints.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ii  ia(na)  vector containing types of deviations.
-!  iu  iaa(nf+1)  vector containing indices of active functions.
-!  ru  ar((nf+1)*(nf+2)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ra  s(nf+1)  auxiliary vector.
-!  ii  n  actual number of variables.
-!  ii  iold  index of the old active constraint.
-!  io  krem  auxiliary variable.
-!  io  ier  error indicator.
 
       subroutine plrmf0(me,nf,nc,ix,ia,iaa,ar,ic,s,n,iold,krem,ier)
+
       implicit none
 
       class(psqp_class),intent(inout) :: me
+      integer :: ier    !! error indicator.
+      integer :: iold   !! index of the old active constraint.
+      integer :: krem   !! auxiliary variable.
+      integer :: n      !! actual number of variables.
+      integer :: nc     !! number of constraints.
+      integer :: nf     !! declared number of variables.
+      real(wp) :: ar(*) !! ar((nf+1)*(nf+2)/2)  triangular decomposition
+                        !! of kernel of the orthogonal projection.
+      real(wp) :: s(*)  !! s(nf+1)  auxiliary vector.
+      integer :: ia(*)  !! ia(na)  vector containing types of deviations.
+      integer :: iaa(*) !! iaa(nf+1)  vector containing indices of active
+                        !! functions.
+      integer :: ic(*)  !! ic(nc)  vector containing types of constraints.
+      integer :: ix(*)  !! ix(nf)  vector containing types of bounds.
 
-      integer ier , iold , krem , n , nc , nf
-      real(wp) ar(*) , s(*)
-      integer ia(*) , iaa(*) , ic(*) , ix(*)
-      integer l
+      integer :: l
 
       call plrmr0(nf,iaa,ar,s,n,iold,krem,ier)
       n = n + 1
@@ -1530,7 +1535,8 @@
       else
          l = -l
          ix(l) = -ix(l)
-      endif
+      end if
+
       end subroutine plrmf0
 
 !***********************************************************************
@@ -1538,25 +1544,24 @@
 !
 ! triangular decomposition of kernel of the orthogonal projection is
 ! updated after constraint deletion.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  iu  ica(nf)  vector containing indices of active constraints.
-!  ru  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ra  g(nf)  auxiliary vector.
-!  ii  n  actual number of variables.
-!  ii  iold  index of the old active constraint.
-!  io  krem  auxiliary variable.
-!  io  ier  error indicator.
 
       subroutine plrmr0(nf,ica,cr,g,n,iold,krem,ier)
+
       implicit none
-      integer ier , iold , krem , n , nf
-      real(wp) cr(*) , g(*)
-      integer ica(*)
-      real(wp) ck , cl
-      integer i , j , k , kc , l , nca
+
+      integer :: ier    !! error indicator.
+      integer :: iold   !! index of the old active constraint.
+      integer :: krem   !! auxiliary variable.
+      integer :: n      !! actual number of variables.
+      integer :: nf     !! declared number of variables.
+      real(wp) :: cr(*) !! cr(nf*(nf+1)/2)  triangular decomposition
+                        !! of kernel of the orthogonal projection.
+      real(wp) :: g(*)  !! g(nf)  auxiliary vector.
+      integer :: ica(*) !! ica(nf)  vector containing indices of active constraints.
+
+      real(wp) :: ck , cl
+      integer :: i , j , k , kc , l , nca
+
       nca = nf - n
       if ( iold<nca ) then
          k = iold*(iold-1)/2
@@ -1572,70 +1577,72 @@
             do j = i , nca - 1
                l = l + j
                call mxvrot(cr(l-1),cr(l),ck,cl,ier)
-            enddo
-         enddo
+            end do
+         end do
          k = iold*(iold-1)/2
          do i = iold , nca - 1
             l = k + i
             ica(i) = ica(i+1)
             call mxvcop(i,cr(l+1),cr(k+1))
             k = l
-         enddo
+         end do
          ica(nca) = kc
          call mxvcop(nca,g,cr(k+1))
-      endif
+      end if
       krem = 1
+
       end subroutine plrmr0
 
 !***********************************************************************
 !> date: 97/12/01
 !
 ! determination of initial values of the constraint functions.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ii  nc  number of current linear constraints.
-!  ri  x(nf)  vector of variables.
-!  ri  xo(nf)  saved vector of variables.
-!  ru  cf(nf)  vector containing values of the constraint funcyions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  cg(nf*mcl)  matrix whose columns are normals of the linear
-!         constraints.
-!  ra  s(nf)  auxiliary vector.
 
       subroutine plsetc(nf,nc,x,xo,cf,ic,cg,s)
+
       implicit none
-      integer nf , nc , ic(*)
-      real(wp) x(*) , xo(*) , cf(*) , cg(*) , s(*)
-      integer jcg , kc
+
+      integer :: nf      !! number of variables.
+      integer :: nc      !! number of current linear constraints.
+      integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
+      real(wp) :: x(*)   !! x(nf)  vector of variables.
+      real(wp) :: xo(*)  !! xo(nf)  saved vector of variables.
+      real(wp) :: cf(*)  !! cf(nf)  vector containing values of the
+                         !! constraint functions.
+      real(wp) :: cg(*)  !! cg(nf*mcl)  matrix whose columns are normals
+                         !! of the linear constraints.
+      real(wp) :: s(*)   !! s(nf)  auxiliary vector.
+
+      integer :: jcg , kc
 
       call mxvdif(nf,x,xo,s)
       jcg = 0
       do kc = 1 , nc
          if ( ic(kc)/=0 ) cf(kc) = cf(kc) + mxvdot(nf,s,cg(jcg+1))
          jcg = jcg + nf
-      enddo
+      end do
+
       end subroutine plsetc
 
 !***********************************************************************
 !> date: 97/12/01
 !
 ! gradient determination in the first phase of lp subroutine.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  nc  number of constraints.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ro  g(nf)  gradient of the objective function.
-!  io  inew  index of the new active constraint.
 
       subroutine plsetg(nf,nc,ic,cg,g,inew)
+
       implicit none
-      integer nf , nc , ic(*) , inew
-      real(wp) cg(*) , g(*)
-      integer kc
+
+      integer :: nf      !! declared number of variables.
+      integer :: nc      !! number of constraints.
+      integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
+      integer :: inew    !! index of the new active constraint.
+      real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals
+                         !! of the linear constraints.
+      real(wp) :: g(*)   !! g(nf)  gradient of the objective function.
+
+      integer :: kc
+
       call mxvset(nf,0.0_wp,g)
       inew = 0
       do kc = 1 , nc
@@ -1646,8 +1653,9 @@
          elseif ( ic(kc)==-12 .or. ic(kc)==-14 .or. ic(kc)==-16 ) then
             call mxvdir(nf,1.0_wp,cg((kc-1)*nf+1),g,g)
             inew = 1
-         endif
-      enddo
+         end if
+      end do
+
       end subroutine plsetg
 
 !***********************************************************************
@@ -1655,26 +1663,26 @@
 !
 ! maximum absolute value of the negative lagrange multiplier is
 ! computed.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  n  actual number of variables.
-!  ii  nc  number of linearized constraints.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ii  ia(na)  vector containing types of deviations.
-!  ii  iaa(nf+1)  vector containing indices of active functions.
-!  ri  az(nf+1)  vector of lagrange multipliers.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ri  eps7  tolerance for linear and quadratic programming.
-!  ro  umax  maximum absolute value of the negative lagrange multiplier.
-!  io  iold  index of the removed constraint.
-!
+
       subroutine pltlag(nf,n,nc,ix,ia,iaa,az,ic,eps7,umax,iold)
+
       implicit none
-      integer nf , n , nc , ix(*) , ia(*) , iaa(*) , ic(*) , iold
-      real(wp) az(*) , eps7 , umax
-      real(wp) temp
-      integer naa , j , k , l
+
+      integer :: nf      !! declared number of variables.
+      integer :: n       !! actual number of variables.
+      integer :: nc      !! number of linearized constraints.
+      integer :: ix(*)   !! ix(nf)  vector containing types of bounds.
+      integer :: ia(*)   !! ia(na)  vector containing types of deviations.
+      integer :: iaa(*)  !! iaa(nf+1)  vector containing indices of active functions.
+      integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
+      integer :: iold    !! index of the removed constraint.
+      real(wp) :: az(*)  !! az(nf+1)  vector of lagrange multipliers.
+      real(wp) :: eps7   !! tolerance for linear and quadratic programming.
+      real(wp) :: umax   !! maximum absolute value of the negative lagrange multiplier.
+
+      real(wp) :: temp
+      integer :: naa , j , k , l
+
       iold = 0
       umax = 0.0_wp
       naa = nf - n
@@ -1689,16 +1697,16 @@
          else
             l = -l
             k = ix(l)
-         endif
+         end if
          if ( k<=-5 ) then
          elseif ( (k==-1 .or. k==-3) .and. umax+temp>=0.0_wp ) then
-         elseif ( .not.((k==-2 .or. k==-4) .and. umax-temp>=0.0_wp) )    &
-                  then
+         elseif ( .not.((k==-2 .or. k==-4) .and. umax-temp>=0.0_wp) ) then
             iold = j
             umax = abs(temp)
-         endif
-      enddo
+         end if
+      end do
       if ( umax<=eps7 ) iold = 0
+
       end subroutine pltlag
 
 !***********************************************************************
@@ -1706,42 +1714,41 @@
 !
 ! gradient of the objective function is scaled and reduced. lagrange
 ! multipliers are determined. test values gmax and umax are computed.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  n  actual number of variables.
-!  ii  nc  number of current linear constraints.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ii  ica(nf)  vector containing indices of active constraints.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ru  cz(nf*nf)  matrix whose columns are basic vectors from the
-!         current reduced subspace. vector cz(1,nf) contains lagrange
-!         multipliers being determined.
-!  ri  g(nf)  gradient of the objective function.
-!  ro  gn(nf)  transformed gradient of the objective function if it is
-!         nonzero.
-!  ri  eps7  tolerance for linear and quadratic programming.
-!  ro  gmax  norm of the transformed gradient.
-!  ro  umax  maximum absolute value of the negative lagrange multiplier.
-!  io  iold  index of the removed constraint.
 
-      subroutine pltrbg(nf,n,nc,ix,ic,ica,cg,cr,cz,g,gn,eps7,gmax,umax, &
-                        iold)
+      subroutine pltrbg(nf,n,nc,ix,ic,ica,cg,cr,cz,g,gn,eps7,gmax,umax,iold)
+
       implicit none
-      integer nf , n , nc , ix(*) , ic(*) , ica(*) , iold
-      real(wp) cg(*) , cr(*) , cz(*) , g(*) , gn(*) , eps7 ,    &
-                       gmax , umax
+
+      integer :: nf      !! declared number of variables.
+      integer :: n       !! actual number of variables.
+      integer :: nc      !! number of current linear constraints.
+      integer :: ix(*)   !! vector containing types of bounds.
+      integer :: ic(*)   !! vector containing types of constraints.
+      integer :: ica(*)  !! vector containing indices of active constraints.
+      integer :: iold    !! index of the removed constraint.
+      real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals of
+                         !! the linear constraints.
+      real(wp) :: cr(*)  !! cr(nf*(nf+1)/2)  triangular decomposition of
+                         !! kernel of the orthogonal projection.
+      real(wp) :: cz(*)  !! cz(nf*nf)  matrix whose columns are basic
+                         !! vectors from the current reduced subspace.
+                         !! vector cz(1,nf) contains lagrange
+                         !! multipliers being determined.
+      real(wp) :: g(*)   !! g(nf)  gradient of the objective function.
+      real(wp) :: gn(*)  !! gn(nf)  transformed gradient of the objective
+                         !! function if it is nonzero.
+      real(wp) :: eps7   !! tolerance for linear and quadratic programming.
+      real(wp) :: gmax   !! norm of the transformed gradient.
+      real(wp) :: umax   !! maximum absolute value of the negative
+                         !! lagrange multiplier.
+
       integer nca , ncz
 
       gmax = 0.0_wp
       if ( n>0 ) then
          call mxdrmm(nf,n,cz,g,gn)
          gmax = mxvmax(n,gn)
-      endif
+      end if
       if ( nf>n .and. gmax<=eps7 ) then
          nca = nf - n
          ncz = n*nf
@@ -1754,7 +1761,8 @@
       else
          iold = 0
          umax = 0.0_wp
-      endif
+      end if
+
       end subroutine pltrbg
 
 !***********************************************************************
@@ -1763,23 +1771,21 @@
 ! gradient of the objective function is premultiplied by transpose
 ! of the matrix whose columns are normals of current active constraints
 ! and gradients of current active functions.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  n  actual number of variables.
-!  ii  nc  number of linearized constraints.
-!  ii  iaa(nf+1)  vector containing indices of active functions.
-!  ri  ag(nf*na)  vector containing scaling parameters.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ri  g(nf)  gradient of the objective function.
-!  ro  gn(nf+1)  output vector.
 
       subroutine plvlag(nf,n,nc,iaa,ag,cg,g,gn)
+
       implicit none
-      integer nf , n , nc , iaa(*)
-      real(wp) ag(*) , cg(*) , g(*) , gn(*)
-      integer naa , j , l
+
+      integer :: nf      !! declared number of variables.
+      integer :: n       !! actual number of variables.
+      integer :: nc      !! number of linearized constraints.
+      integer :: iaa(*)  !! iaa(nf+1)  vector containing indices of active functions.
+      real(wp) :: ag(*)  !! ag(nf*na)  vector containing scaling parameters.
+      real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals of the linear constraints.
+      real(wp) :: g(*)   !! g(nf)  gradient of the objective function.
+      real(wp) :: gn(*)  !! gn(nf+1)  output vector.
+
+      integer :: naa , j , l
 
       naa = nf - n
       do j = 1 , naa
@@ -1792,8 +1798,9 @@
          else
             l = -l
             gn(j) = g(l)
-         endif
-      enddo
+         end if
+      end do
+
       end subroutine plvlag
 
 !***********************************************************************
@@ -1802,30 +1809,32 @@
 ! extrapolation or interpolation for line search with directional
 ! derivatives.
 !
-! parameters :
-!  ri  rl  lower value of the stepsize parameter.
-!  ri  ru  upper value of the stepsize parameter.
-!  ri  fl  value of the objective function for r=rl.
-!  ri  fu  value of the objective function for r=ru.
-!  ri  pl  directional derivative for r=rl.
-!  ri  pu  directional derivative for r=ru.
-!  ro  r  value of the stepsize parameter obtained.
-!  ii  mode  mode of line search.
-!  ii  mtyp  method selection. mtyp=1-bisection. mtyp=2-quadratic
-!         interpolation (with one directional derivative).
-!         mtyp=3-quadratic interpolation (with two directional
-!         derivatives). mtyp=4-cubic interpolation. mtyp=5-conic
-!         interpolation.
-!  io  merr  error indicator. merr=0 for normal return.
-!
 !### Method
 ! extrapolation or interpolation with standard model functions.
-!
+
       subroutine pnint1(rl,ru,fl,fu,pl,pu,r,mode,mtyp,merr)
+
       implicit none
-      real(wp) rl , ru , fl , fu , pl , pu , r
-      integer mode , mtyp , merr , ntyp
-      real(wp) a , b , c , d , dis , den
+
+      real(wp) :: rl   !! lower value of the stepsize parameter.
+      real(wp) :: ru   !! upper value of the stepsize parameter.
+      real(wp) :: fl   !! value of the objective function for r=rl.
+      real(wp) :: fu   !! value of the objective function for r=ru.
+      real(wp) :: pl   !! directional derivative for r=rl.
+      real(wp) :: pu   !! directional derivative for r=ru.
+      real(wp) :: r    !! value of the stepsize parameter obtained.
+      integer :: mode  !! mode of line search.
+      integer :: mtyp  !! method selection.
+                       !!
+                       !! * mtyp=1-bisection.
+                       !! * mtyp=2-quadratic interpolation (with one directional derivative).
+                       !! * mtyp=3-quadratic interpolation (with two directional derivatives).
+                       !! * mtyp=4-cubic interpolation.
+                       !! * mtyp=5-conic interpolation.
+      integer :: merr  !! error indicator. merr=0 for normal return.
+
+      integer :: ntyp
+      real(wp) :: a , b , c , d , dis , den
 
       real(wp),parameter :: c1l = 1.1_wp
       real(wp),parameter :: c1u = 1000.0_wp
@@ -1841,7 +1850,7 @@
       elseif ( ru<=rl ) then
          merr = 3
          return
-      endif
+      end if
       do ntyp = mtyp , 1 , -1
          if ( ntyp==1 ) then
 !
@@ -1853,11 +1862,11 @@
             else
                r = 0.5_wp*(rl+ru)
                return
-            endif
+            end if
          elseif ( ntyp==mtyp ) then
             a = (fu-fl)/(pl*(ru-rl))
             b = pu/pl
-         endif
+         end if
          if ( ntyp==2 ) then
 !
 !     quadratic extrapolation or interpolation with one directional
@@ -1888,7 +1897,7 @@
             den = a + sqrt(dis)
             if ( den<=0.0_wp ) goto 100
             den = 1.0_wp - b*(1.0_wp/den)**3
-         endif
+         end if
          if ( mode==1 .and. den>0.0_wp .and. den<1.0_wp ) then
 !
 !     extrapolation accepted
@@ -1906,11 +1915,12 @@
                r = max(r,rl+c2l*(ru-rl))
             else
                r = max(r,rl+c3l*(ru-rl))
-            endif
+            end if
             r = min(r,rl+c2u*(ru-rl))
             return
-         endif
- 100  enddo
+         end if
+ 100  end do
+
       end subroutine pnint1
 
 !***********************************************************************
@@ -1919,57 +1929,55 @@
 ! extrapolation or interpolation for line search without directional
 ! derivatives.
 !
-! parameters :
-!  ri  ro  initial value of the stepsize parameter.
-!  ri  rl  lower value of the stepsize parameter.
-!  ri  ru  upper value of the stepsize parameter.
-!  ri  ri  inner value of the stepsize parameter.
-!  ri  fo  value of the objective function for r=ro.
-!  ri  fl  value of the objective function for r=rl.
-!  ri  fu  value of the objective function for r=ru.
-!  ri  fi  value of the objective function for r=ri.
-!  ro  po  initial value of the directional derivative.
-!  ro  r  value of the stepsize parameter obtained.
-!  ii  mode  mode of line search.
-!  ii  mtyp  method selection. mtyp=1-bisection. mtyp=2-two point
-!         quadratic interpolation. mtyp=2-three point quadratic
-!         interpolation.
-!  io  merr  error indicator. merr=0 for normal return.
-!
 !### Method
 ! extrapolation or interpolation with standard model functions.
-!
+
       subroutine pnint3(ro,rl,ru,ri,fo,fl,fu,fi,po,r,mode,mtyp,merr)
 
       implicit none
 
-      real(wp),parameter :: zero = 0.0_wp
-      real(wp),parameter :: half = 0.5_wp
-      real(wp),parameter :: one = 1.0_wp
-      real(wp),parameter :: two = 2.0_wp
-      real(wp),parameter :: three = 3.0_wp
-      real(wp),parameter :: c1l = 1.1_wp
-      real(wp),parameter :: c1u = 1000.0_wp
-      real(wp),parameter :: c2l = 1.0e-2_wp
-      real(wp),parameter :: c2u = 0.9_wp
-      real(wp),parameter :: c3l = 1.0e-1_wp
+      real(wp) :: fo   !! value of the objective function for r=ro.
+      real(wp) :: fl   !! value of the objective function for r=rl.
+      real(wp) :: fu   !! value of the objective function for r=ru.
+      real(wp) :: fi   !! value of the objective function for r=ri.
+      real(wp) :: po   !! initial value of the directional derivative.
+      real(wp) :: r    !! value of the stepsize parameter obtained.
+      real(wp) :: rl   !! lower value of the stepsize parameter.
+      real(wp) :: ru   !! upper value of the stepsize parameter.
+      real(wp) :: ri   !! inner value of the stepsize parameter.
+      real(wp) :: ro   !! initial value of the stepsize parameter.
+      integer :: merr  !! error indicator. merr=0 for normal return.
+      integer :: mode  !! mode of line search.
+      integer :: mtyp  !! method selection
+                       !!
+                       !! * mtyp=1 - bisection.
+                       !! * mtyp=2 - two point quadratic interpolation.
+                       !! * mtyp=2 - three point quadratic interpolation.
 
-      real(wp) :: fi , fl , fo , fu , po , r , ri , rl , ro , ru
-      integer :: merr , mode , mtyp
       real(wp) :: ai , al , au , den , dis
       integer :: ntyp
       logical :: l1 , l2
+
+      real(wp),parameter :: zero  = 0.0_wp
+      real(wp),parameter :: half  = 0.5_wp
+      real(wp),parameter :: one   = 1.0_wp
+      real(wp),parameter :: two   = 2.0_wp
+      real(wp),parameter :: three = 3.0_wp
+      real(wp),parameter :: c1l   = 1.1_wp
+      real(wp),parameter :: c1u   = 1000.0_wp
+      real(wp),parameter :: c2l   = 1.0e-2_wp
+      real(wp),parameter :: c2u   = 0.9_wp
+      real(wp),parameter :: c3l   = 1.0e-1_wp
 
       merr = 0
       if ( mode<=0 ) return
       if ( po>=zero ) then
          merr = 2
          return
-
       elseif ( ru<=rl ) then
          merr = 3
          return
-      endif
+      end if
       l1 = rl<=ro
       l2 = ri<=rl
       do ntyp = mtyp , 1 , -1
@@ -1986,11 +1994,11 @@
             else
                r = half*(rl+ri)
                return
-            endif
+            end if
          elseif ( ntyp==mtyp .and. l1 ) then
             if ( .not.l2 ) ai = (fi-fo)/(ri*po)
             au = (fu-fo)/(ru*po)
-         endif
+         end if
          if ( l1 .and. (ntyp==2 .or. l2) ) then
 !
 !     two point quadratic extrapolation or interpolation
@@ -2020,7 +2028,7 @@
             r = (ru-ri)/den
          else
             goto 100
-         endif
+         end if
          if ( mode==1 .and. r>ru ) then
 !
 !     extrapolation accepted
@@ -2036,38 +2044,39 @@
                r = max(r,rl+c2l*(ru-rl))
             else
                r = max(r,rl+c3l*(ru-rl))
-            endif
+            end if
             r = min(r,rl+c2u*(ru-rl))
             if ( r/=ri ) return
-         endif
- 100  enddo
+         end if
+ 100  end do
+
       end subroutine pnint3
 
 !***********************************************************************
 !> date: 97/12/01
 !
 ! computation of value of the augmented lagrangian function.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ii  n  dimension of the constraint null space.
-!  ii  nc  number of constraints.
-!  ri  cf(nc+1)  vector containing values of the constraints.
-!  ii  ic(nc)  vector containing types of constraints.
-!  ii  ica(nf)  vector containing indices of active constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  cz(nc)  vector of lagrange multipliers.
-!  ri  rpf  penalty coefficient.
-!  ro  fc  value of the penalty term.
-!  ro  f  value of the penalty function.
-!
+
       subroutine pp0af8(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
+
       implicit none
-      integer nf , n , nc , ic(*) , ica(*)
-      real(wp) cf(*) , cl(*) , cu(*) , cz(*) , rpf , fc , f
-      real(wp) pom , temp
-      integer j , kc
+
+      integer :: nf      !! number of variables.
+      integer :: n       !! dimension of the constraint null space.
+      integer :: nc      !! number of constraints.
+      integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
+      integer :: ica(*)  !! ica(nf)  vector containing indices of active constraints.
+      real(wp) :: cf(*)  !! cf(nc+1)  vector containing values of the constraints.
+      real(wp) :: cl(*)  !! cl(nc)  vector containing lower bounds for constraint functions.
+      real(wp) :: cu(*)  !! cu(nc)  vector containing upper bounds for constraint functions.
+      real(wp) :: cz(*)  !! cz(nc)  vector of lagrange multipliers.
+      real(wp) :: rpf    !! penalty coefficient.
+      real(wp) :: fc     !! value of the penalty term.
+      real(wp) :: f      !! value of the penalty function.
+
+      real(wp) :: pom , temp
+      integer :: j , kc
+
       fc = 0.0_wp
       do kc = 1 , nc
          if ( ic(kc)>0 ) then
@@ -2076,52 +2085,54 @@
             if ( ic(kc)==1 .or. ic(kc)>=3 ) pom = min(pom,temp-cl(kc))
             if ( ic(kc)==2 .or. ic(kc)>=3 ) pom = min(pom,cu(kc)-temp)
             fc = fc + rpf*abs(pom)
-         endif
-      enddo
+         end if
+      end do
       do j = 1 , nf - n
          kc = ica(j)
          if ( kc>0 ) then
             pom = 0.0_wp
             temp = cf(kc)
-            if ( ic(kc)==1 .or. ic(kc)==3 .or. ic(kc)==5 )              &
+            if ( ic(kc)==1 .or. ic(kc)==3 .or. ic(kc)==5 ) &
                  pom = min(pom,temp-cl(kc))
-            if ( ic(kc)==2 .or. ic(kc)==4 .or. ic(kc)==6 )              &
+            if ( ic(kc)==2 .or. ic(kc)==4 .or. ic(kc)==6 ) &
                  pom = max(pom,temp-cu(kc))
             fc = fc - cz(j)*pom
-         endif
-      enddo
+         end if
+      end do
       f = cf(nc+1) + fc
+
       end subroutine pp0af8
 
 !***********************************************************************
 !> date: 97/12/01
 !
 ! computation of the new penalty parameters.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  n  actual number of variables.
-!  ii  nc  number of constraints.
-!  ii  ica(nf)  vector containing indices of active constraints.
-!  ri  cz(nf)  vector of lagrange multipliers.
-!  ri  cp(nc)  vector containing penalty parameters.
-!
+
       subroutine ppset2(nf,n,nc,ica,cz,cp)
+
       implicit none
-      integer nf , n , nc , ica(*)
-      real(wp) cz(*) , cp(*)
-      real(wp) temp
-      integer j , l , kc
+
+      integer :: nf      !! declared number of variables.
+      integer :: n       !! actual number of variables.
+      integer :: nc      !! number of constraints.
+      integer :: ica(*)  !! vector containing indices of active constraints.
+      real(wp) :: cz(*)  !! vector of lagrange multipliers.
+      real(wp) :: cp(*)  !! vector containing penalty parameters.
+
+      real(wp) :: temp
+      integer :: j , l , kc
+
       do kc = 1 , nc
          cp(kc) = 0.5_wp*cp(kc)
-      enddo
+      end do
       do j = 1 , nf - n
          l = ica(j)
          if ( l>0 ) then
             temp = abs(cz(j))
             cp(l) = max(temp,cp(l)+0.5_wp*temp)
-         endif
-      enddo
+         end if
+      end do
+
       end subroutine ppset2
 
 !***********************************************************************
@@ -2208,12 +2219,12 @@
             iters = -2
             isys = 0
             return
-         endif
+         end if
          if ( rmax<=0.0_wp ) then
             iters = 0
             isys = 0
             return
-         endif
+         end if
 !
 !     initial stepsize selection
 !
@@ -2223,7 +2234,7 @@
             rtemp = f - fp
          else
             rtemp = max(f-fp,10.0_wp*(fmin-f))
-         endif
+         end if
          init1 = abs(inits)
          rp = 0.0_wp
          fp = fo
@@ -2237,7 +2248,7 @@
             r = min(1.0_wp,2.0_wp*rtemp/po)
          elseif ( init1==4 ) then
             r = 2.0_wp*rtemp/po
-         endif
+         end if
          rtemp = r
          r = max(r,rmin)
          r = min(r,rmax)
@@ -2265,7 +2276,7 @@
             l7 = me%mes2<=2 .or. me%mode/=0
             maxst = 0
             if ( l2 ) maxst = 1
-         endif
+         end if
 !
 !     test on termination
 !
@@ -2304,7 +2315,7 @@
             me%mode = max(me%mode,1)
             me%mtyp = abs(mes)
             if ( f>=fmax ) me%mtyp = 1
-         endif
+         end if
          if ( me%mode==1 ) then
 !
 !     interval change after extrapolation
@@ -2320,7 +2331,7 @@
                me%mode = 2
             elseif ( me%mes1==1 ) then
                me%mtyp = 1
-            endif
+            end if
 !
 !     interval change after interpolation
 !
@@ -2333,7 +2344,7 @@
             else
                me%rl = r
                me%fl = f
-            endif
+            end if
          elseif ( f<=me%fi ) then
             me%rl = me%ri
             me%fl = me%fi
@@ -2342,8 +2353,8 @@
          else
             me%ru = r
             me%fu = f
-         endif
-      endif
+         end if
+      end if
 !
 !     new stepsize selection (extrapolation or interpolation)
 !
@@ -2357,7 +2368,7 @@
          r = min(r,rmax)
       elseif ( me%mode==2 ) then
          nred = nred + 1
-      endif
+      end if
 !
 !     computation of the new function value
 !
@@ -2372,35 +2383,39 @@
 ! variable metric update of a dense symmetric positive definite matrix
 ! using the factorization b=l*d*trans(l).
 !
-! parameters :
-!  ii  n  actual number of variables.
-!  ru  h(m)  factorization b=l*d*trans(l) of a positive
-!         definite approximation of the hessian matrix.
-!  ri  g(nf)  gradient of the objective function.
-!  ra  s(nf)  auxiliary vector.
-!  ru  xo(nf)  vectors of variables difference.
-!  ri  go(nf)  gradients difference.
-!  ri  r  value of the stepsize parameter.
-!  ri  po  old value of the directional derivative.
-!  ii  nit  actual number of iterations.
-!  ii  kit  number of the iteration after last restart.
-!  io  iterh  termination indicator. iterh<0-bad decomposition.
-!         iterh=0-successful update. iterh>0-nonpositive parameters.
-!  ii  met1  selection of self scaling. met1=1-self scaling suppressed.
-!         met1=2 initial self scaling.
-!  ii  mec  correction if the negative curvature occurs.
-!         mec=1-correction suppressed. mec=2-powell's correction.
-!
 !### Method
 ! bfgs variable metric method.
-!
+
       subroutine pudbg1(n,h,g,s,xo,go,r,po,nit,kit,iterh,met,met1,mec)
 
       implicit none
 
-      real(wp) po , r
-      integer iterh , kit , met , met1 , mec , n , nit
-      real(wp) g(*) , go(*) , h(*) , s(*) , xo(*)
+      real(wp) :: po  !! old value of the directional derivative.
+      real(wp) :: r  !! value of the stepsize parameter.
+      integer :: iterh   !! termination indicator.
+                         !!
+                         !! * iterh<0-bad decomposition.
+                         !! * iterh=0-successful update.
+                         !! * iterh>0-nonpositive parameters.
+      integer :: kit   !! number of the iteration after last restart.
+      integer :: met   !!
+      integer :: met1   !! selection of self scaling.
+                        !!
+                        !! * met1=1-self scaling suppressed.
+                        !! * met1=2 initial self scaling.
+      integer :: mec   !! correction if the negative curvature occurs.
+                       !!
+                       !! * mec=1-correction suppressed.
+                       !! * mec=2-powell's correction.
+      integer :: n   !! actual number of variables.
+      integer :: nit  !! actual number of iterations.
+      real(wp) :: g(*)   !! g(nf)  gradient of the objective function.
+      real(wp) :: go(*)   !! go(nf)  gradients difference.
+      real(wp) :: h(*)   !! h(m)  factorization b=l*d*trans(l) of a positive
+                         !! definite approximation of the hessian matrix.
+      real(wp) :: s(*)   !! s(nf)  auxiliary vector.
+      real(wp) :: xo(*)  !! xo(nf)  vectors of variables difference.
+
       real(wp) a , b , c , gam , par , den , dis
       logical l1 , l3
 
@@ -2418,17 +2433,17 @@
          if ( a<=0.0_wp ) then
             iterh = 1
             return
-         endif
-      endif
+         end if
+      end if
       call mxvdif(n,go,g,s)
       call mxvscl(n,r,s,s)
       c = -r*po
       if ( c<=0.0_wp ) then
          iterh = 3
          return
-      endif
+      end if
       if ( mec>1 ) then
-         if ( b<=1.0d-4*c ) then
+         if ( b<=1.0e-4_wp*c ) then
 !
 !     powell's correction
 !
@@ -2437,11 +2452,11 @@
             call mxvdir(n,dis,go,s,go)
             b = c + dis*(b-c)
             if ( l1 ) a = c + 2.0_wp*(1.0_wp-dis)*(b-c) + dis*dis*(a-c)
-         endif
-      elseif ( b<=1.0d-4*c ) then
+         end if
+      elseif ( b<=1.0e-4_wp*c ) then
          iterh = 2
          return
-      endif
+      end if
       if ( l1 ) then
 !
 !     determination of the parameter gam (self scaling)
@@ -2452,16 +2467,16 @@
             par = c/b
          else
             par = sqrt(c/a)
-         endif
+         end if
          gam = par
          if ( met1>1 ) then
             if ( nit/=kit ) l3 = gam<0.5_wp .or. gam>4.0_wp
-         endif
-      endif
+         end if
+      end if
       if ( l3 ) then
          gam = 1.0_wp
          par = gam
-      endif
+      end if
       if ( met==1 ) then
 !
 !     bfgs update
@@ -2477,7 +2492,7 @@
          call mxvdir(n,par,go,s,s)
          call mxdpgu(n,h,par/dis,go,xo)
          call mxdpgu(n,h,-1.0_wp/den,s,xo)
-      endif
+      end if
       iterh = 0
       if ( gam==1.0_wp ) return
       call mxdpgs(n,h,1.0_wp/gam)
@@ -2488,44 +2503,35 @@
 !
 ! dual range space quadratic programming method for minimax
 ! approximation.
-!
-! parameters :
-!  ii  nf declared number of variables.
-!  ii  n  actual number of variables.
-!  ii  nc number of constraints.
-!  ri  x(nf)  vector of variables.
-!  ri  xn(nf)  vector of scaling factors.
-!  ro  xo(nf)  saved vector of variables.
-!  ii  ica(nf)  vector containing indices of active constraints.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ro  cz(nf)  vector of lagrange multipliers.
-!  ro  czs(nf)  saved vector of lagrange multipliers.
-!  ri  g(nf)  gradient of the lagrangian function.
-!  ri  go(nf)  saved gradient of the lagrangian function.
-!  ro  r  value of the stepsize parameter.
-!  ro  f  new value of the objective function.
-!  ri  fo  old value of the objective function.
-!  ro  p  new value of the directional derivative.
-!  ri  po  old value of the directional derivative.
-!  ri  cmax  value of the constraint violation.
-!  ro  cmaxo  saved value of the constraint violation.
-!  ro  dmax  maximum relative difference of variables.
-!
-! common data :
-!  ii  iters  termination indicator for steplength determination.
-!         iters=0 for zero step.
 
       subroutine pytrnd(nf,n,x,xo,ica,cg,cz,g,go,r,f,fo,p,po,cmax,cmaxo,&
                         dmax,kd,ld,iters)
 
       implicit none
 
-      integer nf , n , kd , ld , iters
-      integer ica(*)
-      real(wp) x(*) , xo(*) , cg(*) , cz(*) , g(*) , go(*) , r ,&
-                       f , fo , p , po , cmax , cmaxo , dmax
-      integer i , j , l
+      integer :: nf  !! declared number of variables.
+      integer :: n  !! actual number of variables.
+      integer :: ica(*)  !! ica(nf)  vector containing indices of active constraints.
+      real(wp) :: x(*)  !! x(nf)  vector of variables.
+      real(wp) :: xo(*)  !! xo(nf)  saved vector of variables.
+      real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals of the linear constraints.
+      real(wp) :: cz(*)  !! cz(nf)  vector of lagrange multipliers.
+      real(wp) :: g(*)  !! g(nf)  gradient of the lagrangian function.
+      real(wp) :: go(*)  !! go(nf)  saved gradient of the lagrangian function.
+      real(wp) :: r  !! value of the stepsize parameter.
+      real(wp) :: f  !! new value of the objective function.
+      real(wp) :: fo  !! old value of the objective function.
+      real(wp) :: p  !! new value of the directional derivative.
+      real(wp) :: po  !! old value of the directional derivative.
+      real(wp) :: cmax  !! value of the constraint violation.
+      real(wp) :: cmaxo  !! saved value of the constraint violation.
+      real(wp) :: dmax  !! maximum relative difference of variables.
+      integer :: kd  !!
+      integer :: ld  !!
+      integer :: iters  !! termination indicator for steplength determination.
+                        !! iters=0 for zero step.
+
+      integer :: i , j , l
 
       do j = 1 , nf - n
          l = ica(j)
@@ -2534,8 +2540,8 @@
          else
             l = -l
             g(l) = g(l) - cz(j)
-         endif
-      enddo
+         end if
+      end do
       if ( iters>0 ) then
          call mxvdif(nf,x,xo,xo)
          call mxvdif(nf,g,go,go)
@@ -2548,11 +2554,11 @@
          call mxvsav(nf,x,xo)
          call mxvsav(nf,g,go)
          ld = kd
-      endif
+      end if
       dmax = 0.0_wp
       do i = 1 , nf
          dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0_wp))
-      enddo
+      end do
       n = nf
       end subroutine pytrnd
 
