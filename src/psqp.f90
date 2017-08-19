@@ -15,14 +15,14 @@
         private
 
         ! these were formerly in the `stat` common block:
-        integer :: nres = 0 !! number of restarts.
-        integer :: ndec = 0 !! number of matrix decomposition.
-        integer :: nrem = 0 !! number of constraint deletions.
-        integer :: nadd = 0 !! number of constraint additions.
-        integer :: nit  = 0 !! number of iterations.
-        integer :: nfv  = 0 !! number of function evaluations.
-        integer :: nfg  = 0 !! number of gradient evaluations.
-        integer :: nfh  = 0 !! number of hessian evaluations.
+        integer,public :: nres = 0 !! number of restarts.
+        integer,public :: ndec = 0 !! number of matrix decomposition.
+        integer,public :: nrem = 0 !! number of constraint deletions.
+        integer,public :: nadd = 0 !! number of constraint additions.
+        integer,public :: nit  = 0 !! number of iterations.
+        integer,public :: nfv  = 0 !! number of function evaluations.
+        integer,public :: nfg  = 0 !! number of gradient evaluations.
+        integer,public :: nfh  = 0 !! number of hessian evaluations.
 
         procedure(obj_func) ,pointer :: obj  => null()
         procedure(dobj_func),pointer :: dobj => null()
@@ -37,53 +37,59 @@
         procedure,public :: psqp
 
         procedure :: pf1f01
-        procedure :: pllpb1  ! not used?
         procedure :: plqdb1
         procedure :: plrmf0
-        procedure :: pyadb4  ! not used?
-        procedure :: pyrmb1  ! not used?
+        procedure :: pc1f01
+        !procedure :: pyadb4  ! not used?
+        !procedure :: pyrmb1  ! not used?
+        !procedure :: pllpb1  ! not used?
 
     end type psqp_class
 
     abstract interface
+
         subroutine obj_func(me,nf,x,ff)
-        !! computation of the value of the objective function
-        import
-        implicit none
-        class(psqp_class),intent(inout) :: me
-        integer          :: nf    !! the number of variables
-        double precision :: x(nf) !! a vector of variables
-        double precision :: ff    !! the value of the objective function
+            !! computation of the value of the objective function
+            import
+            implicit none
+            class(psqp_class),intent(inout) :: me
+            integer          :: nf    !! the number of variables
+            double precision :: x(nf) !! a vector of variables
+            double precision :: ff    !! the value of the objective function
         end subroutine obj_func
+
         subroutine dobj_func(me,nf,x,gf)
-        !! computation of the gradient of the objective function
-        import
-        implicit none
-        class(psqp_class),intent(inout) :: me
-        integer          :: nf     !! the number of variables
-        double precision :: x(nf)  !! a vector of variables
-        double precision :: gf(nf) !! the gradient of the objective function
+            !! computation of the gradient of the objective function
+            import
+            implicit none
+            class(psqp_class),intent(inout) :: me
+            integer          :: nf     !! the number of variables
+            double precision :: x(nf)  !! a vector of variables
+            double precision :: gf(nf) !! the gradient of the objective function
         end subroutine dobj_func
+
         subroutine con_func(me,nf,kc,x,fc)
-        !! computation of the value of the constraint function
-        import
-        implicit none
-        class(psqp_class),intent(inout) :: me
-        integer          :: nf      !! the number of variables
-        double precision :: kc      !! the index of the constraint function
-        double precision :: x(nf)   !! a vector of variables
-        double precision :: fc      !! the value of the constraint function
+            !! computation of the value of the constraint function
+            import
+            implicit none
+            class(psqp_class),intent(inout) :: me
+            integer          :: nf      !! the number of variables
+            integer          :: kc      !! the index of the constraint function
+            double precision :: x(nf)   !! a vector of variables
+            double precision :: fc      !! the value of the constraint function
         end subroutine con_func
+
         subroutine dcon_func(me,nf,kc,x,gc)
-        !! computation of the gradient of the constraint function
-        import
-        implicit none
-        class(psqp_class),intent(inout) :: me
-        integer          :: nf     !! the number of variables
-        double precision :: kc     !! the index of the constraint function
-        double precision :: x(nf)  !! a vector of variables and
-        double precision :: gc(nf) !! the gradient of the constraint function
+            !! computation of the gradient of the constraint function
+            import
+            implicit none
+            class(psqp_class),intent(inout) :: me
+            integer          :: nf     !! the number of variables
+            integer          :: kc     !! the index of the constraint function
+            double precision :: x(nf)  !! a vector of variables and
+            double precision :: gc(nf) !! the gradient of the constraint function
         end subroutine dcon_func
+
     end interface
 
     contains
@@ -95,7 +101,8 @@
 ! easy to use subroutine for general nonlinear programming problems.
 
       subroutine psqpn(me,nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,ipar,rpar,f,gmax,&
-                       cmax,iprnt,iterm)
+                       cmax,iprnt,iterm,obj,dobj,con,dcon)
+
       implicit none
 
       class(psqp_class),intent(inout) :: me
@@ -163,10 +170,20 @@
                                    !! * ix(i) = 2 -- upper bound x(i) <= xu(i).
                                    !! * ix(i) = 3 -- two side bound xl(i) <= x(i) <= xu(i).
                                    !! * ix(i) = 5 -- variable x(i) is fixed.
+      procedure(obj_func)  :: obj  !! computation of the value of the objective function
+      procedure(dobj_func) :: dobj !! computation of the gradient of the objective function
+      procedure(con_func)  :: con  !! computation of the value of the constraint function
+      procedure(dcon_func) :: dcon !! computation of the gradient of the constraint function
 
       integer :: lcfd,lcfo,lcg,lcp,lcr,lcz,lg,lgc,lgf,lgo,lh,lia,ls,lxo
       integer,dimension(:),allocatable :: ia
       double precision,dimension(:),allocatable :: ra
+
+      ! set the functions:
+      me%obj  => obj
+      me%dobj => dobj
+      me%con  => con
+      me%dcon => dcon
 
       allocate (ia(nf),ra((nf+nc+8)*nf+3*nc+1))
 
@@ -185,8 +202,8 @@
       lgo = lxo + nf
       lia = 1
       call me%psqp(nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,ra,ra(lcfo),ra(lcfd),&
-                ra(lgc),ia,ra(lcr),ra(lcz),ra(lcp),ra(lgf),ra(lg),ra(lh)&
-                ,ra(ls),ra(lxo),ra(lgo),rpar(1),rpar(2),rpar(3),rpar(4),&
+                ra(lgc),ia,ra(lcr),ra(lcz),ra(lcp),ra(lgf),ra(lg),ra(lh),&
+                ra(ls),ra(lxo),ra(lgo),rpar(1),rpar(2),rpar(3),rpar(4),&
                 rpar(5),cmax,gmax,f,ipar(1),ipar(2),ipar(5),ipar(6),    &
                 iprnt,iterm)
       deallocate (ia,ra)
@@ -195,8 +212,8 @@
 !***********************************************************************
 
 !***********************************************************************
-! subroutine psqp               all systems                   97/01/22
-! purpose :
+!> date: 97/01/22
+!
 ! recursive quadratic programming method with the bfgs variable metric
 ! update for general nonlinear programming problems.
 !
@@ -248,8 +265,8 @@
 !  ro  gmax  maximum partial derivative of the lagrangian function.
 !  ro  f  value of the objective function.
 !         functions.
-!  ii  mit  maximun number of iterations.
-!  ii  mfv  maximun number of function evaluations.
+!  ii  mit  maximum number of iterations.
+!  ii  mfv  maximum number of function evaluations.
 !  ii  met  variable metric update used. met=1-the bfgs update.
 !         met=2-the hoshino update.
 !  ii  mec  correction if the negative curvature occurs.
@@ -271,55 +288,10 @@
 !         if iterm=-6, then the termination criterion has not been
 !         satisfied, but the point obtained if usually acceptable.
 !
-! subprograms used :
-!  s   pc1f01  computation of the value and the gradient of the
-!         constraint function.
-!  s   pf1f01  computation of the value and the gradient of the
-!         objective function.
-!  s   plqdb1  general quadratic programming subroutine based on the
-!         goldfarb-idnani dual method.
-!  s   plnews  identification of active simple bounds.
-!  s   plredl  transformation of the incompatible quadratic programming
-!         subproblem.
-!  s   pp0af8  computation of value of the augmented lagrangian
-!         function.
-!  s   ppset2  computation of the new penalty parameters.
-!  s   ps0l02  line search using only function values.
-!  s   pytrnd  determination of differences for variable metric
-!         updates.
-!  s   pudbg1  variable metric update after gill-murray decomposition.
-!  s   mxdsmi  symmetric matrix is replaced by the unit matrix.
-!  s   mxvdir  vector augmented by the scaled vector.
-!  rf  mxvdot  dot product of two vectors.
-!  s   mxvcop  copying of a vector.
-!  s   mxvina  absolute values of elements of an integer vector.
-!  rf  mxvmax  l-infinity norm of a vector.
-!  s   mxvset  initiation of a vector.
-!
-! external subroutines :
-!  se  obj  computation of the value of the objective function.
-!         calling sequence: call obj(nf,x,ff) where nf is the number
-!         of variables, x(nf) is a vector of variables and ff is the
-!         value of the objective function.
-!  se  dobj  computation of the gradient of the objective function.
-!         calling sequence: call dobj(nf,x,gf) where nf is the number
-!         of variables, x(nf) is a vector of variables and gc(nf) is
-!         the gradient of the objective function.
-!  se  con  computation of the value of the constraint function.
-!         calling sequence: call con(nf,kc,x,fc) where nf is the
-!         number of variables, kc is the index of the constraint
-!         function, x(nf) is a vector of variables and fc is the
-!         value of the constraint function.
-!  se  dcon  computation of the gradient of the constraint function.
-!         calling sequence: call dcon(nf,kc,x,gc) where nf is the
-!         number of variables, kc is the index of the constraint
-!         function, x(nf) is a vector of variables and gc(nf) is the
-!         gradient of the constraint function.
-!
-! method :
+!### Method
 ! recursive quadratic programming method with the bfgs variable metric
 ! update.
-!
+
       subroutine psqp(me,nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,cg,cfo,cfd,gc,ica,&
                       cr,cz,cp,gf,g,h,s,xo,go,xmax,tolx,tolc,tolg,rpf,  &
                       cmax,gmax,f,mit,mfv,met,mec,iprnt,iterm)
@@ -456,7 +428,7 @@
  100  lds = ld
       call me%pf1f01(nf,x,gf,gf,ff,f,kd,ld,iext)
       ld = lds
-      call pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+      call me%pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
       cf(nc+1) = f
       if ( abs(iprnt)>1 ) &
         write (6,'(1x,''nit='',i9,2x,''nfv='',i9,2x,''nfg='',i9,2x,&
@@ -594,7 +566,7 @@
                lds = ld
                call me%pf1f01(nf,x,gf,gf,ff,f,kd,ld,iext)
                ld = lds
-               call pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+               call me%pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
             endif
 !
 !     preparation of variable metric update
@@ -617,7 +589,7 @@
             lds = ld
             call me%pf1f01(nf,x,gf,g,ff,f,kd,ld,iext)
             ld = lds
-            call pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+            call me%pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
             cf(nc+1) = f
             call pp0af8(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
             goto 450
@@ -632,207 +604,8 @@
       if ( iprnt<0 ) write (6,'(1x,''x='',5(g14.7,1x):/(3x,5(g14.7,1x)))') (x(i),i=1,nf)
       end subroutine psqp
 
-! subroutine pa0gs1             all systems                 97/12/01
-! 97/12/01 lu : original version
-!
-! purpose:
-! numerical computation of the gradient of the model function.
-!
-! parameters :
-!  ii  n  number of variables.
-!  ii  ka  indef of the approximated function.
-!  ri  x(n)  vector of variables.
-!  ro  ga(n)  gradient of the approximated function.
-!  ri  fa  value of the approximated function.
-!  ri  eta1  precision of the computed values.
-!  iu  nav  number of approximated function evaluations.
-!
-      subroutine pa0gs1(n,ka,x,ga,fa,eta1,nav)
-      implicit none
-      integer n , ka , nav
-      double precision x(*) , ga(*) , fa , eta1
-      double precision xstep , xtemp , ftemp , eta
-      integer ivar
-      eta = sqrt(eta1)
-      ftemp = fa
-      do ivar = 1 , n
-!
-!     step selection
-!
-         xstep = 1.0d0
-         xstep = eta*max(abs(x(ivar)),xstep)*sign(1.0d0,x(ivar))
-         xtemp = x(ivar)
-         x(ivar) = x(ivar) + xstep
-         xstep = x(ivar) - xtemp
-         nav = nav + 1
-         call fun(n,ka,x,fa)
-!
-!     numerical differentiation
-!
-         ga(ivar) = (fa-ftemp)/xstep
-         x(ivar) = xtemp
-      enddo
-      fa = ftemp
-      end subroutine pa0gs1
-
-! subroutine pa1sq1             all systems                 97/12/01
-! 97/12/01 lu : original version
-!
-! purpose :
-! computation of the value and the gradient of the objective function
-! which is defined as a sum of squares.
-!
-! parameters:
-!  ii  n  number of variables.
-!  ri  x(n)  vector of variables.
-!  ro  f  value of the objective function.
-!  ro  af(n)  values of the approximated functions.
-!  ri  ga(nf)  gradient of the approximated function.
-!  ri  ag(n*n)  rectangular matrix which is used for the direction
-!         vector determination.
-!  ro  g(nf)  gradient of the objective function.
-!  ri  eta1  precision of the computes function values.
-!  ii  kda  degree of computed derivatives.
-!  ii  kd  degree of required dervatives.
-!  io  ld  degree of previously computed derivatives.
-!  iu  nfv  number of objective function values computed.
-!  iu  nfg  number of objective function gradients computed.
-!
-! subprograms used :
-!  s   mxvcop  copying of a vector.
-!  s   mxvdir  vector augmented by the scaled vector.
-!  s   mxvset  initiation of a vector.
-!
-      subroutine pa1sq1(n,x,f,af,ga,ag,g,eta1,kda,kd,ld,nfv,nfg)
-      implicit none
-      integer n , kda , kd , ld , nfv , nfg
-      double precision x(*) , f , af(*) , ga(*) , ag(*) , g(*) , eta1
-      integer ka , nav
-      double precision fa
-      if ( kd<=ld ) return
-      if ( kd>=0 .and. ld<0 ) then
-         f = 0.0d0
-         nfv = nfv + 1
-      endif
-      if ( kd>=1 .and. ld<1 ) then
-         call mxvset(n,0.0d0,g)
-         if ( kda>0 ) nfg = nfg + 1
-      endif
-      nav = 0
-      do ka = 1 , n
-         if ( kd>=0 ) then
-            if ( ld>=0 ) then
-               fa = af(ka)
-               goto 20
-            else
-               call fun(n,ka,x,fa)
-               af(ka) = fa
-            endif
-            if ( ld<0 ) f = f + fa*fa
- 20         if ( kd>=1 ) then
-               if ( kda>0 ) then
-                  call dfun(n,ka,x,ga)
-               else
-                  call pa0gs1(n,ka,x,ga,fa,eta1,nav)
-               endif
-               call mxvdir(n,fa,ga,g,g)
-               call mxvcop(n,ga,ag((ka-1)*n+1))
-            endif
-         endif
-      enddo
-      nfv = nfv + nav/n
-      if ( kd>=0 .and. ld<0 ) f = 0.5d0*f
-      ld = kd
-      end subroutine pa1sq1
-
-! subroutine pa2sq1             all systems                97/12/01
-! 97/12/01 lu : original version
-!
-! purpose :
-!  computation of the value and the gradient and the hessian matrix
-!  of the objective function which is defined as a sum of squares.
-!
-! parameters:
-!  ii  nf  number of variables.
-!  ii  na  number of approximated functions.
-!  ri  ga(nf)  gradient of the approximated function.
-!  ro  g(nf)  gradient of the objective function.
-!  ri  ha(nf*(nf+1)/2)  hessian matrix of the approximated function.
-!  ro  h(nf*(nf+1)/2)  hessian matrix of the objective function.
-!  ri  fa  value of the selected function.
-!  ro  f  value of the objective function.
-!
-! common data :
-!  ii  kda  degree of analytically computed derivatives.
-!  ii  kd  degree of required dervatives.
-!  io  ld  degree of previously computed derivatives.
-!  iu  nav  number of approximated function values computed.
-!  iu  nag  number of approximated function gradients computed.
-!  iu  nah  number of approximated function hessian matrices computed.
-!  iu  nfv  number of objective function values computed.
-!  iu  nfg  number of objective function gradients computed.
-!  iu  nfh  number of objective function hessian matrices computed.
-!  iu  idecf  decomposition indicator. idecf=0-no decomposition.
-!
-! status variables :
-!  ns,isp,tss
-!
-! subprograms used :
-!  s  uypro1  prologue.
-!  s  uyepi1  epilogue.
-!  s  uyset0  status definition.
-!  s  mxvset  initiation of a vector.
-!  s  mxvdir  vector augmented by the scaled vector.
-!  s  mxdsmo  initiation of a dense symmetric matrix.
-!  s  mxdsma  dense symmetric matrix augmented by the scaled dense
-!         symmetric matrix.
-!  s  mxdsmu  correction of a dense symmetric matrix.
-!
-      subroutine pa2sq1(nf,na,x,f,af,ga,g,h,eta1,kda,kd,ld,nfv,nfg)
-      implicit none
-      integer nf , na , kda , kd , ld , nfv , nfg
-      double precision x(*) , f , af(*) , ga(*) , g(*) , h(*) , eta1
-      integer ka , nav
-      double precision fa
-      if ( kd<=ld ) return
-      if ( kd>=0 .and. ld<0 ) then
-         f = 0.0d0
-         nfv = nfv + 1
-      endif
-      if ( kd>=1 .and. ld<1 ) then
-         call mxvset(nf,0.0d0,g)
-         if ( kda>0 ) nfg = nfg + 1
-      endif
-      if ( kd>=2 .and. ld<2 ) call mxvset(nf*(nf+1)/2,0.0d0,h)
-      nav = 0
-      do ka = 1 , na
-         if ( kd>=0 ) then
-            if ( ld>=0 ) then
-               fa = af(ka)
-               goto 20
-            else
-               call fun(nf,ka,x,fa)
-               af(ka) = fa
-            endif
-            if ( ld<0 ) f = f + fa*fa
- 20         if ( kd>=1 ) then
-               if ( kda>0 ) then
-                  call dfun(nf,ka,x,ga)
-               else
-                  call pa0gs1(nf,ka,x,ga,fa,eta1,nav)
-               endif
-               call mxvdir(nf,fa,ga,g,g)
-               if ( kd>=2 ) call mxdsmu(nf,h,1.0d0,ga)
-            endif
-         endif
-      enddo
-      nfv = nfv + nav/na
-      if ( kd>=0 .and. ld<0 ) f = 0.5d0*f
-      ld = kd
-      end subroutine pa2sq1
-
-! subroutine pc1f01             all systems                 97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! computation of the value and the gradient of the constraint function.
@@ -852,12 +625,12 @@
 !  ro  cmax  maximum constraint violation.
 !  ii  kd  degree of required dervatives.
 !  ii  ld  degree of previously computed derivatives.
-!
-! subprograms used :
-!  s   mxvcop  copying of a vector.
-!
-      subroutine pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+
+      subroutine pc1f01(me,nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+
       implicit none
+
+      class(psqp_class),intent(inout) :: me
       double precision fc , cmax
       integer kd , ld , nc , nf
       double precision cf(*) , cg(*) , cl(*) , cu(*) , gc(*) , x(*)
@@ -872,7 +645,7 @@
                fc = cf(kc)
                goto 20
             else
-               call con(nf,kc,x,fc)
+               call me%con(nf,kc,x,fc)
                cf(kc) = fc
             endif
             if ( ic(kc)>0 ) then
@@ -888,7 +661,7 @@
                if ( ld>=1 ) then
                   call mxvcop(nf,cg((kc-1)*nf+1),gc)
                else
-                  call dcon(nf,kc,x,gc)
+                  call me%dcon(nf,kc,x,gc)
                   call mxvcop(nf,gc,cg((kc-1)*nf+1))
                endif
             endif
@@ -897,8 +670,8 @@
       ld = kd
       end subroutine pc1f01
 
-! subroutine pf1f01                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! computation of the value and the gradient of the objective function.
@@ -913,11 +686,7 @@
 !  ii  kd  degree of required derivatives.
 !  ii  ld  degree of previously computed derivatives.
 !  ii  iext  type of extremum. iext=0-minimum. iext=1-maximum.
-!
-! subprograms used :
-!  s   mxvcop  copying of a vector.
-!  s   mxvneg  copying of a vector with change of the sign.
-!
+
       subroutine pf1f01(me,nf,x,gf,g,ff,f,kd,ld,iext)
 
       implicit none
@@ -930,7 +699,7 @@
       if ( kd<=ld ) return
       if ( ld<0 ) then
          me%nfv = me%nfv + 1
-         call obj(nf,x,ff)
+         call me%obj(nf,x,ff)
          if ( iext<=0 ) then
             f = ff
          else
@@ -940,15 +709,15 @@
       if ( kd>=1 ) then
          if ( ld<1 ) then
             me%nfg = me%nfg + 1
-            call dobj(nf,x,gf)
+            call me%dobj(nf,x,gf)
             if ( iext>0 ) call mxvneg(nf,gf,g)
          endif
       endif
       ld = kd
       end subroutine pf1f01
 
-! subroutine pladb0               all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! new linear constraint or a new simple bound is added to the
@@ -971,18 +740,7 @@
 !  ii  inew  index of the new active constraint.
 !  iu  nadd  number of constraint additions.
 !  io  ier  error indicator.
-!
-! subprograms used :
-!  s   pladr0  correction of kernel of the orthogonal projection
-!         after constraint addition.
-!  s   mxdrmm  premultiplication of a vector by a rowwise stored dense
-!         rectangular matrix.
-!  s   mxdrmv  copy of the selected column of a rowwise stored dense
-!         rectangular matrix.
-!  s   mxdrgr  plane rotation of a transposed dense rectangular matrix.
-!  s   mxvort  determination of an elementary orthogonal matrix for
-!         plane rotation.
-!
+
       subroutine pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,nadd,ier)
       implicit none
       integer nf , n , ica(*) , inew , nadd , ier
@@ -1008,8 +766,8 @@
       ier = 0
       end subroutine pladb0
 
-! subroutine pladb4               all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! new linear constraint or a new simple bound is added to the active
@@ -1038,20 +796,7 @@
 !  ii  inew  index of the new active constraint.
 !  iu  nadd  number of constraint additions.
 !  io  ier  error indicator.
-!
-! subprograms used :
-!  s   pladr0  correction of kernel of the orthogonal projection
-!         after constraint addition.
-!  s   mxdrmm  premultiplication of a vector by a rowwise stored dense
-!         rectangular matrix.
-!  s   mxdrmv  copy of the selected column of a rowwise stored dense
-!         rectangular matrix.
-!  s   mxdrgr  plane rotation of a transposed dense rectangular matrix.
-!         rectangular matrix.
-!  s   mxdsmr  plane rotation of a dense symmetric matrix.
-!  s   mxvort  determination of an elementary orthogonal matrix for
-!         plane rotation.
-!
+
       subroutine pladb4(nf,n,ica,cg,cr,cz,h,s,eps7,gmax,umax,idecf,inew,&
                         nadd,ier)
       implicit none
@@ -1098,8 +843,8 @@
       ier = 0
       end subroutine pladb4
 
-! subroutine pladr0               all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! triangular decomposition of kernel of the orthogonal projection
@@ -1120,12 +865,7 @@
 !  ii  inew  index of the new active constraint.
 !  iu  nadd  number of constraint additions.
 !  io  ier  error indicator.
-!
-! subprograms used :
-!  s   mxsprb  sparse back substitution.
-!  s   mxvcop  copying of a vector.
-!  rf  mxvdot  dot product of two vectors.
-!
+
       subroutine pladr0(nf,n,ica,cg,cr,s,eps7,gmax,umax,inew,nadd,ier)
       implicit none
       integer nf , n , ica(*) , inew , nadd , ier
@@ -1181,270 +921,239 @@
       endif
       end subroutine pladr0
 
-! subroutine pllpb1             all systems                   97/12/01
-! 97/12/01 lu : original version
-!
-! purpose :
-! determination of the initial feasible point and the linear programming
-! subroutine.
-!
-! parameters :
-!  ii  nf  number of variables.
-!  ii  nc  number of linear constraints.
-!  ru  x(nf)  vector of variables.
-!  ii  ix(nf)  vector containing types of bounds.
-!  ro  xo(nf)  saved vector of variables.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ru  cf(nf)  vector containing values of the constraint functions.
-!  ra  cfd(nf)  vector containing increments of the constraint
-!         functions.
-!  ii  ic(nc)  vector containing types of constraints.
-!  io  ica(nf)  vector containing indices of active constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ro  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ro  cz(nf*nf)  matrix whose columns are basic vectors from the
-!         current reduced subspace.
-!  ri  g(nf)  gradient of the objective function.
-!  ro  go(nf)  saved gradient of the objective function.
-!  ra  s(nf)  direction vector.
-!  ii  mfp  type of feasible point. mfp=1-arbitrary feasible point.
-!         mfp=2-optimum feasible point. mfp=3-repeated solution.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  ri  eta9  maximum for real numbers.
-!  ri  eps7  tolerance for linear independence of constraints.
-!  ri  eps9  tolerance for activity of constraints.
-!  ro  umax  maximum absolute value of a negative lagrange multiplier.
-!  ro  gmax  maximum absolute value of a partial derivative.
-!  io  n  dimension of the manifold defined by active constraints.
-!  io  iterl  type of feasible point. iterl=1-arbitrary feasible point.
-!         iterl=2-optimum feasible point. iterl=-1 feasible point does
-!         not exists. iterl=-2 optimum feasible point does not exists.
-!
-! subprograms used :
-!  s   plinit  determination of initial point satisfying simple bounds.
-!  s   plmaxl  maximum stepsize using linear constraints.
-!  s   plmaxs  maximum stepsize using simple bounds.
-!  s   plmaxt  maximum stepsize using trust region bounds.
-!  s   plnewl  identification of active linear constraints.
-!  s   plnews  identification of active simple bounds.
-!  s   plnewt  identification of active trust region bounds.
-!  s   pldirl  new values of constraint functions.
-!  s   pldirs  new values of variables.
-!  s   plsetc  initial values of constraint functions.
-!  s   plsetg  determination of the first phase gradient vector.
-!  s   pltrbg  determination of lagrange multipliers and computation
-!  s   pladb0  constraint addition.
-!  s   plrmb0  constraint deletion.
-!  s   mxdcmm  premultiplication of a vector by a dense rectangular
-!         matrix stored by columns.
-!  s   mxdrmm  premultiplication of a vector by a dense rectangular
-!         matrix stored by rows.
-!  s   mxdsmi  determination of the initial unit dense symmetric
-!         matrix.
-!  s   mxvcop  copying of a vector.
-!  s   mxvina  absolute values of elements of an integer vector.
-!  s   mxvinc  update of an integer vector.
-!  s   mxvind  change of the integer vector for constraint addition.
-!  s   mxvint  change of the integer vector for trust region bound
-!         addition.
-!  s   mxvmul  diagonal premultiplication of a vector.
-!  s   mxvneg  copying of a vector with change of the sign.
-!  s   mxvset  initiation of a vector.
-!
-      subroutine pllpb1(me,nf,nc,x,ix,xo,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,  &
-                        cz,g,go,s,mfp,kbf,kbc,eta9,eps7,eps9,umax,gmax, &
-                        n,iterl)
-      implicit none
+!***********************************************************************
+!> date: 97/12/01
+! !
+! ! purpose :
+! ! determination of the initial feasible point and the linear programming
+! ! subroutine.
+! !
+! ! parameters :
+! !  ii  nf  number of variables.
+! !  ii  nc  number of linear constraints.
+! !  ru  x(nf)  vector of variables.
+! !  ii  ix(nf)  vector containing types of bounds.
+! !  ro  xo(nf)  saved vector of variables.
+! !  ri  xl(nf)  vector containing lower bounds for variables.
+! !  ri  xu(nf)  vector containing upper bounds for variables.
+! !  ru  cf(nf)  vector containing values of the constraint functions.
+! !  ra  cfd(nf)  vector containing increments of the constraint
+! !         functions.
+! !  ii  ic(nc)  vector containing types of constraints.
+! !  io  ica(nf)  vector containing indices of active constraints.
+! !  ri  cl(nc)  vector containing lower bounds for constraint functions.
+! !  ri  cu(nc)  vector containing upper bounds for constraint functions.
+! !  ri  cg(nf*nc)  matrix whose columns are normals of the linear
+! !         constraints.
+! !  ro  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
+! !         orthogonal projection.
+! !  ro  cz(nf*nf)  matrix whose columns are basic vectors from the
+! !         current reduced subspace.
+! !  ri  g(nf)  gradient of the objective function.
+! !  ro  go(nf)  saved gradient of the objective function.
+! !  ra  s(nf)  direction vector.
+! !  ii  mfp  type of feasible point. mfp=1-arbitrary feasible point.
+! !         mfp=2-optimum feasible point. mfp=3-repeated solution.
+! !  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
+! !         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
+! !  ii  kbc  specification of linear constraints. kbc=0-no linear
+! !         constraints. kbc=1-one sided linear constraints. kbc=2=two
+! !         sided linear constraints.
+! !  ri  eta9  maximum for real numbers.
+! !  ri  eps7  tolerance for linear independence of constraints.
+! !  ri  eps9  tolerance for activity of constraints.
+! !  ro  umax  maximum absolute value of a negative lagrange multiplier.
+! !  ro  gmax  maximum absolute value of a partial derivative.
+! !  io  n  dimension of the manifold defined by active constraints.
+! !  io  iterl  type of feasible point. iterl=1-arbitrary feasible point.
+! !         iterl=2-optimum feasible point. iterl=-1 feasible point does
+! !         not exists. iterl=-2 optimum feasible point does not exists.
 
-      class(psqp_class),intent(inout) :: me
+!       subroutine pllpb1(me,nf,nc,x,ix,xo,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,  &
+!                         cz,g,go,s,mfp,kbf,kbc,eta9,eps7,eps9,umax,gmax, &
+!                         n,iterl)
+!       implicit none
 
-      integer nf , nc , ix(*) , ic(*) , ica(*) , mfp , kbf , kbc , n ,  &
-              iterl
-      double precision x(*) , xo(*) , xl(*) , xu(*) , cf(*) , cfd(*) ,  &
-                       cl(*) , cu(*) , cg(*) , cr(*) , cz(*) , g(*) ,   &
-                       go(*) , s(*) , eta9 , eps7 , eps9 , umax , gmax
-      double precision pom , con , dmax
-      integer nca , ncr , ncz , ipom , i , k , iold , inew , ier ,      &
-              krem , kc , nred
+!       class(psqp_class),intent(inout) :: me
 
-      con = eta9
-!
-!     initiation
-!
-      call mxvcop(nf,x,xo)
-      ipom = 0
-      nred = 0
-      krem = 0
-      iterl = 1
-      dmax = 0.0d0
-      if ( mfp==3 ) goto 200
-      if ( kbf>0 ) call mxvina(nf,ix)
-!
-!     shift of variables for satisfying simple bounds
-!
-      call plinit(nf,x,ix,xl,xu,eps9,kbf,inew,iterl)
-      if ( iterl<0 ) return
-      n = 0
-      nca = 0
-      ncz = 0
-      do i = 1 , nf
-         if ( kbf>0 .and. ix(i)<0 ) then
-            nca = nca + 1
-            ica(nca) = -i
-         else
-            n = n + 1
-            call mxvset(nf,0.0d0,cz(ncz+1))
-            cz(ncz+i) = 1.0d0
-            ncz = ncz + nf
-         endif
-      enddo
-      call mxdsmi(nca,cr)
-      if ( nc>0 ) then
-         call mxdrmm(nf,nc,cg,x,cf)
-!
-!     addition of active constraints and initial check of feasibility
-!
-         call mxvina(nc,ic)
-!      if (nf.gt.n) call plsetc(nf,nc,x,xo,cf,ic,cg,s)
-         do kc = 1 , nc
-            if ( ic(kc)/=0 ) then
-               inew = 0
-               call plnewl(kc,cf,ic,cl,cu,eps9,inew)
-               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
-               call mxvind(ic,kc,ier)
-               if ( ic(kc)<-10 ) ipom = 1
-            endif
-         enddo
-      endif
- 100  if ( ipom==1 ) then
-!
-!     check of feasibility and update of the first phase objective
-!     function
-!
-         call plsetg(nf,nc,ic,cg,go,inew)
-         if ( inew==0 ) ipom = 0
-      endif
-      if ( ipom==0 .and. iterl==0 ) then
-!
-!     feasibility achieved
-!
-         iterl = 1
-         call mxvcop(nf,g,go)
-         if ( mfp==1 ) return
-      endif
-!
-!     lagrange multipliers and reduced gradient determination
-!
- 200  call pltrbg(nf,n,nc,ix,ic,ica,cg,cr,cz,go,s,eps7,gmax,umax,iold)
-      inew = 0
-      if ( gmax/=0.0d0 ) then
-!
-!     direction determination
-!
-         nca = nf - n
-         ncr = nca*(nca+1)/2
-         call mxdcmm(nf,n,cz,s,cr(ncr+1))
-         call mxvneg(nf,cr(ncr+1),s)
-!
-!     stepsize selection
-!
-         pom = con
-         call plmaxl(nf,nc,cf,cfd,ic,cl,cu,cg,s,pom,kbc,krem,inew)
-         call plmaxs(nf,x,ix,xl,xu,s,pom,kbf,krem,inew)
-         if ( inew/=0 ) then
-!
-!     step realization
-!
-            call pldirs(nf,x,ix,s,pom,kbf)
-            call pldirl(nc,cf,cfd,ic,pom,kbc)
-!
-!     constraint addition
-!
-            if ( inew>0 ) then
-               kc = inew
-               inew = 0
-               call plnewl(kc,cf,ic,cl,cu,eps9,inew)
-               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
-               call mxvind(ic,kc,ier)
-            elseif ( inew+nf>=0 ) then
-               i = -inew
-               inew = 0
-               call plnews(x,ix,xl,xu,eps9,i,inew)
-               call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
-               call mxvind(ix,i,ier)
-            endif
-            dmax = pom
-            if ( dmax>0.0d0 ) nred = nred + 1
-            goto 100
-         elseif ( ipom==0 ) then
-!
-!     bounded solution does not exist
-!
-            iterl = -2
-         else
-!
-!     feasible solution does not exist
-!
-            iterl = -3
-         endif
-!
-!     optimum on a linear manifold obtained
-!
-      elseif ( iold/=0 ) then
-!
-!     constraint deletion
-!
-         call plrmb0(nf,n,ica,cg,cr,cz,go,s,iold,krem,me%nrem,ier)
-         kc = ica(nf-n+1)
-         if ( kc>0 ) then
-            ic(kc) = -ic(kc)
-         else
-            k = -kc
-            ix(k) = -ix(k)
-         endif
-         dmax = 0.0d0
-         goto 200
-      elseif ( ipom==0 ) then
-!
-!     optimal solution achieved
-!
-         iterl = 2
-      else
-         ipom = 0
-         do kc = 1 , nc
-            if ( ic(kc)<-10 ) then
-               inew = 0
-               call plnewl(kc,cf,ic,cl,cu,eps9,inew)
-               if ( ic(kc)<-10 ) ipom = 1
-            endif
-         enddo
-         if ( ipom==0 ) then
-!
-!     optimal solution achieved
-!
-            call mxvcop(nf,go,g)
-            iterl = 2
-         else
-!
-!     feasible solution does not exist
-!
-            call mxvcop(nf,go,g)
-            iterl = -1
-         endif
-      endif
-      end subroutine pllpb1
+!       integer nf , nc , ix(*) , ic(*) , ica(*) , mfp , kbf , kbc , n ,  &
+!               iterl
+!       double precision x(*) , xo(*) , xl(*) , xu(*) , cf(*) , cfd(*) ,  &
+!                        cl(*) , cu(*) , cg(*) , cr(*) , cz(*) , g(*) ,   &
+!                        go(*) , s(*) , eta9 , eps7 , eps9 , umax , gmax
+!       double precision pom , con , dmax
+!       integer nca , ncr , ncz , ipom , i , k , iold , inew , ier ,      &
+!               krem , kc , nred
 
-! subroutine plrmb0               all systems                92/12/01
-! 92/12/01 lu : original version
+!       con = eta9
+! !
+! !     initiation
+! !
+!       call mxvcop(nf,x,xo)
+!       ipom = 0
+!       nred = 0
+!       krem = 0
+!       iterl = 1
+!       dmax = 0.0d0
+!       if ( mfp==3 ) goto 200
+!       if ( kbf>0 ) call mxvina(nf,ix)
+! !
+! !     shift of variables for satisfying simple bounds
+! !
+!       call plinit(nf,x,ix,xl,xu,eps9,kbf,inew,iterl)
+!       if ( iterl<0 ) return
+!       n = 0
+!       nca = 0
+!       ncz = 0
+!       do i = 1 , nf
+!          if ( kbf>0 .and. ix(i)<0 ) then
+!             nca = nca + 1
+!             ica(nca) = -i
+!          else
+!             n = n + 1
+!             call mxvset(nf,0.0d0,cz(ncz+1))
+!             cz(ncz+i) = 1.0d0
+!             ncz = ncz + nf
+!          endif
+!       enddo
+!       call mxdsmi(nca,cr)
+!       if ( nc>0 ) then
+!          call mxdrmm(nf,nc,cg,x,cf)
+! !
+! !     addition of active constraints and initial check of feasibility
+! !
+!          call mxvina(nc,ic)
+! !      if (nf.gt.n) call plsetc(nf,nc,x,xo,cf,ic,cg,s)
+!          do kc = 1 , nc
+!             if ( ic(kc)/=0 ) then
+!                inew = 0
+!                call plnewl(kc,cf,ic,cl,cu,eps9,inew)
+!                call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
+!                call mxvind(ic,kc,ier)
+!                if ( ic(kc)<-10 ) ipom = 1
+!             endif
+!          enddo
+!       endif
+!  100  if ( ipom==1 ) then
+! !
+! !     check of feasibility and update of the first phase objective
+! !     function
+! !
+!          call plsetg(nf,nc,ic,cg,go,inew)
+!          if ( inew==0 ) ipom = 0
+!       endif
+!       if ( ipom==0 .and. iterl==0 ) then
+! !
+! !     feasibility achieved
+! !
+!          iterl = 1
+!          call mxvcop(nf,g,go)
+!          if ( mfp==1 ) return
+!       endif
+! !
+! !     lagrange multipliers and reduced gradient determination
+! !
+!  200  call pltrbg(nf,n,nc,ix,ic,ica,cg,cr,cz,go,s,eps7,gmax,umax,iold)
+!       inew = 0
+!       if ( gmax/=0.0d0 ) then
+! !
+! !     direction determination
+! !
+!          nca = nf - n
+!          ncr = nca*(nca+1)/2
+!          call mxdcmm(nf,n,cz,s,cr(ncr+1))
+!          call mxvneg(nf,cr(ncr+1),s)
+! !
+! !     stepsize selection
+! !
+!          pom = con
+!          call plmaxl(nf,nc,cf,cfd,ic,cl,cu,cg,s,pom,kbc,krem,inew)
+!          call plmaxs(nf,x,ix,xl,xu,s,pom,kbf,krem,inew)
+!          if ( inew/=0 ) then
+! !
+! !     step realization
+! !
+!             call pldirs(nf,x,ix,s,pom,kbf)
+!             call pldirl(nc,cf,cfd,ic,pom,kbc)
+! !
+! !     constraint addition
+! !
+!             if ( inew>0 ) then
+!                kc = inew
+!                inew = 0
+!                call plnewl(kc,cf,ic,cl,cu,eps9,inew)
+!                call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
+!                call mxvind(ic,kc,ier)
+!             elseif ( inew+nf>=0 ) then
+!                i = -inew
+!                inew = 0
+!                call plnews(x,ix,xl,xu,eps9,i,inew)
+!                call pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,me%nadd,ier)
+!                call mxvind(ix,i,ier)
+!             endif
+!             dmax = pom
+!             if ( dmax>0.0d0 ) nred = nred + 1
+!             goto 100
+!          elseif ( ipom==0 ) then
+! !
+! !     bounded solution does not exist
+! !
+!             iterl = -2
+!          else
+! !
+! !     feasible solution does not exist
+! !
+!             iterl = -3
+!          endif
+! !
+! !     optimum on a linear manifold obtained
+! !
+!       elseif ( iold/=0 ) then
+! !
+! !     constraint deletion
+! !
+!          call plrmb0(nf,n,ica,cg,cr,cz,go,s,iold,krem,me%nrem,ier)
+!          kc = ica(nf-n+1)
+!          if ( kc>0 ) then
+!             ic(kc) = -ic(kc)
+!          else
+!             k = -kc
+!             ix(k) = -ix(k)
+!          endif
+!          dmax = 0.0d0
+!          goto 200
+!       elseif ( ipom==0 ) then
+! !
+! !     optimal solution achieved
+! !
+!          iterl = 2
+!       else
+!          ipom = 0
+!          do kc = 1 , nc
+!             if ( ic(kc)<-10 ) then
+!                inew = 0
+!                call plnewl(kc,cf,ic,cl,cu,eps9,inew)
+!                if ( ic(kc)<-10 ) ipom = 1
+!             endif
+!          enddo
+!          if ( ipom==0 ) then
+! !
+! !     optimal solution achieved
+! !
+!             call mxvcop(nf,go,g)
+!             iterl = 2
+!          else
+! !
+! !     feasible solution does not exist
+! !
+!             call mxvcop(nf,go,g)
+!             iterl = -1
+!          endif
+!       endif
+!       end subroutine pllpb1
+
+!***********************************************************************
+!> date: 92/12/01
 !
 ! purpose :
 ! old linear constraint or an old simple bound is removed from the
@@ -1466,17 +1175,7 @@
 !  io  krem  auxiliary variable.
 !  iu  nrem number of constraint deletion.
 !  io  ier  error indicator.
-!
-! subprograms used :
-!  s   plrmr0  correction of kernel of the orthogonal projection
-!         after constraint deletion.
-!  s   mxdprb  back substitution.
-!  s   mxvcop  copying of a vector.
-!  s   mxvdir  vector augmented by the scaled vector.
-!  rf  mxvdot  dot product of two vectors.
-!  s   mxvmul  diagonal premultiplication of a vector.
-!  s   mxvset  initiation of a vector.
-!
+
       subroutine plrmb0(nf,n,ica,cg,cr,cz,g,gn,iold,krem,nrem,ier)
       implicit none
       integer nf , n , ica(*) , iold , krem , nrem , ier
@@ -1510,8 +1209,8 @@
       ier = 0
       end subroutine plrmb0
 
-! subroutine plqdb1             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! dual range space quadratic programming method.
@@ -1569,25 +1268,7 @@
 !  io  iterq  type of feasible point. iterq=1-arbitrary feasible point.
 !         iterq=2-optimum feasible point. iterq=-1 feasible point does
 !         not exists. iterq=-2 optimum feasible point does not exists.
-!
-! subprograms used :
-!  s   plmins  determination of the new active simple bound.
-!  s   plminl  determination of the new active linear constraint.
-!  s   plmint  determination of the new active trust region bound.
-!  s   pladr1  addition of a new active constraint.
-!  s   plrmr0  constrain deletion.
-!  s   plsob1  transformation of the local solution to the solution
-!         of the original qp problem.
-!  s   mxdpgf  gill-murray decomposition of a dense symmetric matrix.
-!  s   mxdpgb  back substitution after gill-murray decomposition.
-!  s   mxdprb  back substitution.
-!  s   mxdsmm  matrix vector product.
-!  s   mxvcop  copying of a vector.
-!  s   mxvdir  vector augmented by the scaled vector.
-!  s   mxvina  absolute values of elements of an integer vector.
-!  s   mxvinv  change of an integer vector after constraint addition.
-!  s   mxvneg  copying of a vector with change of the sign.
-!
+
       subroutine plqdb1(me,nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,g,&
                         go,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,eps9,   &
                         umax,gmax,n,iterq)
@@ -1790,8 +1471,8 @@
       endif
       end subroutine plqdb1
 
-! subroutine pladr1               all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! triangular decomposition of kernel of the general projection
@@ -1823,15 +1504,7 @@
 !  io  ier  error indicator.
 !  ii  job  specification of computation. output vector g is not or is
 !         computed in case when n<=0 if job=0 or job=1 respectively.
-!
-! subprograms used :
-!  s   mxdpgb  back substitution.
-!  s   mxdprb  back substitution.
-!  s   mxdsmm  matrix-vector product.
-!  s   mxdsmv  copying of a row of dense symmetric matrix.
-!  s   mxvcop  copying of a vector.
-!  rf  mxvdot  dot product of two vectors.
-!
+
       subroutine pladr1(nf,n,ica,cg,cr,h,s,g,eps7,gmax,umax,idecf,inew, &
                         nadd,ier,job)
       implicit none
@@ -1903,8 +1576,8 @@
       endif
       end subroutine pladr1
 
-! subroutine pldirl               all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! determination of the new values of the constraint functions.
@@ -1936,8 +1609,8 @@
       endif
       end subroutine pldirl
 
-! subroutine pldirs               all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! determination of the new vector of variables.
@@ -1967,8 +1640,8 @@
       enddo
       end subroutine pldirs
 
-! subroutine plinit             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! determination of the initial point which satisfies simple bounds.
@@ -1983,10 +1656,7 @@
 !  io  inew  index of the new active constraint.
 !  io  ind  indicator. if ind.ne.0 then trust region bounds cannot
 !         be satisfied.
-!
-! subprograms used :
-!  s   plnews  test on activity of a given simple bound.
-!
+
       subroutine plinit(nf,x,ix,xl,xu,eps9,kbf,inew,ind)
       implicit none
       integer nf , ix(*) , kbf , inew , ind
@@ -2010,8 +1680,8 @@
       endif
       end subroutine plinit
 
-! subroutine plmaxl               all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! determination of the maximum stepsize using linear constraints.
@@ -2034,10 +1704,7 @@
 !         sided linear constraints.
 !  ii  krem  indication of linearly dependent gradients.
 !  io  inew  index of the new active function.
-!
-! subprograms used :
-!  rf  mxvdot  dot product of two vectors.
-!
+
       subroutine plmaxl(nf,nc,cf,cfd,ic,cl,cu,cg,s,step,kbc,krem,inew)
       implicit none
       integer nf , nc , ic(*) , kbc , krem , inew
@@ -2097,8 +1764,8 @@
       endif
       end subroutine plmaxl
 
-! subroutine plmaxs               all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! determination of the maximum stepsize using the simple bounds
@@ -2150,8 +1817,8 @@
       krem = 0
       end subroutine plmaxs
 
-! subroutine plnewl             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! test on activity of a given linear constraint.
@@ -2227,8 +1894,8 @@
       endif
       end subroutine plnewl
 
-! subroutine plminn             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! determination of the new active linear constraint.
@@ -2252,10 +1919,7 @@
 !         sided linear constraints.
 !  io  inew  index of the new active constraint.
 !  io  knew  signum of the new active normal.
-!
-! subprograms used :
-!  rf  mxvdot  dot product of two vectors.
-!
+
       subroutine plminn(nf,nc,cf,cfd,ic,cl,cu,cg,s,eps9,par,kbc,inew,   &
                         knew)
       implicit none
@@ -2293,8 +1957,8 @@
       endif
       end subroutine plminn
 
-! subroutine plmins             all systems                   91/12/01
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
 ! purpose :
 ! determination of the new active simple bound.
@@ -2346,8 +2010,8 @@
       endif
       end subroutine plmins
 
-! subroutine plnews             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! test on activity of a given simple bound.
@@ -2390,8 +2054,8 @@
       endif
       end subroutine plnews
 
-! subroutine plredl               all systems                   98/12/01
-! 98/12/01 lu : original version
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! transformation of the incompatible quadratic programming subproblem.
@@ -2431,8 +2095,8 @@
       endif
       end subroutine plredl
 
-! subroutine plrmf0             all systems                   91/12/01
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
 ! purpose :
 ! operations after constraint deletion.
@@ -2451,11 +2115,7 @@
 !  ii  iold  index of the old active constraint.
 !  io  krem  auxiliary variable.
 !  io  ier  error indicator.
-!
-! subprograms used :
-!  s   plrmr0  correction of kernel of the orthogonal projection
-!         after constraint deletion.
-!
+
       subroutine plrmf0(me,nf,nc,ix,ia,iaa,ar,ic,s,n,iold,krem,ier)
       implicit none
 
@@ -2481,8 +2141,8 @@
       endif
       end subroutine plrmf0
 
-! subroutine plrmr0               all systems                91/12/01
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
 ! purpose :
 ! triangular decomposition of kernel of the orthogonal projection is
@@ -2498,14 +2158,7 @@
 !  ii  iold  index of the old active constraint.
 !  io  krem  auxiliary variable.
 !  io  ier  error indicator.
-!
-! subprograms used :
-!  s   mxvcop  copying of a vector.
-!  s   mxvort  determination of an elementary orthogonal matrix for
-!         plane rotation.
-!  s   mxvrot  plane rotation of a vector.
-!  s   mxvset  initiation of a vector.
-!
+
       subroutine plrmr0(nf,ica,cr,g,n,iold,krem,ier)
       implicit none
       integer ier , iold , krem , n , nf
@@ -2543,8 +2196,8 @@
       krem = 1
       end subroutine plrmr0
 
-! subroutine plsetc             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! determination of initial values of the constraint functions.
@@ -2559,12 +2212,7 @@
 !  ri  cg(nf*mcl)  matrix whose columns are normals of the linear
 !         constraints.
 !  ra  s(nf)  auxiliary vector.
-!
-! subprograms used :
-!  s   mxvdif  difference of two vectors.
-!  rf  mxvdot  dot product of two vectors.
-!  s   mxvmul  diagonal premultiplication of a vector.
-!
+
       subroutine plsetc(nf,nc,x,xo,cf,ic,cg,s)
       implicit none
       integer nf , nc , ic(*)
@@ -2579,8 +2227,8 @@
       enddo
       end subroutine plsetc
 
-! subroutine plsetg             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! gradient determination in the first phase of lp subroutine.
@@ -2593,11 +2241,7 @@
 !         constraints.
 !  ro  g(nf)  gradient of the objective function.
 !  io  inew  index of the new active constraint.
-!
-! subprograms used :
-!  s   mxvdir  vector augmented by the scaled vector.
-!  s   mxvset  initiation of a vector.
-!
+
       subroutine plsetg(nf,nc,ic,cg,g,inew)
       implicit none
       integer nf , nc , ic(*) , inew
@@ -2617,8 +2261,8 @@
       enddo
       end subroutine plsetg
 
-! subroutine pltlag               all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! maximum absolute value of the negative lagrange multiplier is
@@ -2669,8 +2313,8 @@
       if ( umax<=eps7 ) iold = 0
       end subroutine pltlag
 
-! subroutine pltrbg               all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! gradient of the objective function is scaled and reduced. lagrange
@@ -2697,18 +2341,7 @@
 !  ro  gmax  norm of the transformed gradient.
 !  ro  umax  maximum absolute value of the negative lagrange multiplier.
 !  io  iold  index of the removed constraint.
-!
-! subprograms used :
-!  s   plvlag  gradient is premultiplied by the matrix whose columns
-!         are normals of the active constraints.
-!  s   pltlag  computation of the maximum absolute value of the negative
-!         lagrange multiplier.
-!  s   mxdrmm  premultiplication of a vector by a rowwise stored dense
-!         rectangular matrix.
-!  s   mxdprb  back substitution after a choleski decomposition.
-!  rf  mxvmax  l-infinity norm of a vector.
-!  s   mxvset  initiation of a vector.
-!
+
       subroutine pltrbg(nf,n,nc,ix,ic,ica,cg,cr,cz,g,gn,eps7,gmax,umax, &
                         iold)
       implicit none
@@ -2737,8 +2370,8 @@
       endif
       end subroutine pltrbg
 
-! subroutine plvlag               all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! gradient of the objective function is premultiplied by transpose
@@ -2755,10 +2388,7 @@
 !         constraints.
 !  ri  g(nf)  gradient of the objective function.
 !  ro  gn(nf+1)  output vector.
-!
-! subprograms used :
-!  rf  mxvdot  dot product of two vectors.
-!
+
       subroutine plvlag(nf,n,nc,iaa,ag,cg,g,gn)
       implicit none
       integer nf , n , nc , iaa(*)
@@ -2780,8 +2410,8 @@
       enddo
       end subroutine plvlag
 
-! subroutine pnint1                all systems                91/12/01
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
 ! purpose :
 ! extrapolation or interpolation for line search with directional
@@ -2803,7 +2433,7 @@
 !         interpolation.
 !  io  merr  error indicator. merr=0 for normal return.
 !
-! method :
+!### Method
 ! extrapolation or interpolation with standard model functions.
 !
       subroutine pnint1(rl,ru,fl,fu,pl,pu,r,mode,mtyp,merr)
@@ -2893,8 +2523,8 @@
  100  enddo
       end subroutine pnint1
 
-! subroutine pnint3                all systems                91/12/01
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
 ! purpose :
 ! extrapolation or interpolation for line search without directional
@@ -2917,7 +2547,7 @@
 !         interpolation.
 !  io  merr  error indicator. merr=0 for normal return.
 !
-! method :
+!### Method
 ! extrapolation or interpolation with standard model functions.
 !
       subroutine pnint3(ro,rl,ru,ri,fo,fl,fu,fi,po,r,mode,mtyp,merr)
@@ -3014,8 +2644,8 @@
  100  enddo
       end subroutine pnint3
 
-! subroutine pnstep                all systems                89/12/01
-! 89/01/01 lu : original version
+!***********************************************************************
+!> date: 89/12/01
 !
 ! purpose :
 ! determination of a scaling factor for the boundary step.
@@ -3045,8 +2675,8 @@
       endif
       end subroutine pnstep
 
-! subroutine pp0af8             all systems                 97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! computation of value of the augmented lagrangian function.
@@ -3096,8 +2726,8 @@
       f = cf(nc+1) + fc
       end subroutine pp0af8
 
-! subroutine ppset2             all systems                   97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! computation of the new penalty parameters.
@@ -3128,8 +2758,8 @@
       enddo
       end subroutine ppset2
 
-! subroutine ps0g01                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! simple search with trust region update.
@@ -3186,7 +2816,7 @@
 !
 ! common data :
 !
-! method :
+!### Method
 ! g.a.schultz, r.b.schnabel, r.h.byrd: a family of trust-region-based
 ! algorithms for unconstrained minimization with strong global
 ! convergence properties, siam j. numer.anal. 22 (1985) pp. 47-67.
@@ -3281,8 +2911,8 @@
       isys = 1
       end subroutine ps0g01
 
-! subroutine ps0l02                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 !  extended line search without directional derivatives.
@@ -3339,7 +2969,7 @@
 !  s   pnint3  extrapolation or interpolation without directional
 !         derivatives.
 !
-! method :
+!### Method
 ! safeguarded extrapolation and interpolation with extended termination
 ! criteria.
 !
@@ -3525,8 +3155,8 @@
       isys = 1
       end subroutine ps0l02
 
-! subroutine ps1l01                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 !  standard line search with directional derivatives.
@@ -3589,7 +3219,7 @@
 !  s   pnint1  extrapolation or interpolation with directional
 !         derivatives.
 !
-! method :
+!### Method
 ! safeguarded extrapolation and interpolation with standard termination
 ! criteria.
 !
@@ -3778,8 +3408,8 @@
       isys = 1
       end subroutine ps1l01
 
-! subroutine pudbg1                all systems                92/12/01
-! 92/12/01 lu : original version
+!***********************************************************************
+!> date: 92/12/01
 !
 ! purpose :
 ! variable metric update of a dense symmetric positive definite matrix
@@ -3804,16 +3434,7 @@
 !  ii  mec  correction if the negative curvature occurs.
 !         mec=1-correction suppressed. mec=2-powell's correction.
 !
-! subprograms used :
-!  s   mxdpgu  correction of a dense symmetric positive definite
-!         matrix in the factored form b=l*d*trans(l).
-!  s   mxdpgs  scaling of a dense symmetric positive definite matrix
-!         in the factored form b=l*d*trans(l).
-!  s   mxvdif  difference of two vectors.
-!  rf  mxvdot  dot product of vectors.
-!  s   mxvscl  scaling of a vector.
-!
-! method :
+!### Method
 ! bfgs variable metric method.
 !
       subroutine pudbg1(n,h,g,s,xo,go,r,po,nit,kit,iterh,met,met1,mec)
@@ -3903,8 +3524,8 @@
       call mxdpgs(n,h,1.0d0/gam)
       end subroutine pudbg1
 
-! subroutine pudbi1                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! variable metric updates.
@@ -3937,7 +3558,7 @@
 !  io  iterh  update indicator. iterh=0-successful update.
 !         iterh>0-unsuccessful update.
 !
-! method :
+!### Method
 ! various variable metric updates including bfgs update.
 !
       subroutine pudbi1(n,h,s,xo,go,r,po,par1,par2,f,fo,p,nit,kit,met,  &
@@ -4059,8 +3680,8 @@
  100  iterh = 0
       end subroutine pudbi1
 
-! subroutine pudbm2                all systems                92/12/01
-! 92/12/01 lu : original version
+!***********************************************************************
+!> date: 92/12/01
 !
 ! purpose :
 ! variable metric update of a dense symmetric positive definite matrix.
@@ -4106,19 +3727,7 @@
 !  ri  po  old value of the directional derivative.
 !  to  tuxx  text information on the correction used.
 !
-! subprograms used :
-!  s   mxdsmm  matrix-vector product.
-!  s   mxdsmu  correction of a dense symmetric matrix.
-!  s   mxdsms  scaling of a dense symmetric matrix.
-!  s   mxvdif  difference of two vectors.
-!  s   mxvdir  vector augmented by the scaled vector.
-!  rf  mxvdot  dot product of vectors.
-!  s   mxvneg  copying of a vector with the change of the sign.
-!  s   mxvscl  scaling of a vector.
-!  s   uou1d1  print of entry to variable metric update.
-!  s   uou1d2  print of exit from variable metric update.
-!
-! method :
+!### Method
 ! basic variable metric methods.
 !
       subroutine pudbm2(nf,n,h,hh,s,xo,go,so,fo,par,met1,met3,idecf,    &
@@ -4182,8 +3791,8 @@
       if ( gam/=1.0d0 ) call mxdsms(n,hh,1.0d0/gam)
       end subroutine pudbm2
 
-! subroutine pudbq1                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! broyden good update of a rectangular matrix after the qr
@@ -4204,7 +3813,7 @@
 !  iu  ideca  decomposition indicator.
 !  ii  ndeca  number of decompositions.
 !
-! method :
+!### Method
 ! various variable metric updates including bfgs update.
 !
       subroutine pudbq1(n,na,h,eta2,ag,s,xo,afo,met,iterh,ideca,ndeca)
@@ -4242,8 +3851,8 @@
       iterh = 0
       end subroutine pudbq1
 
-! subroutine pudfm1                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! variable metric update of a dense symmetric positive definite matrix.
@@ -4272,16 +3881,7 @@
 !  ii  idecf  decomposition indicator. idecf=0-no decomposition.
 !  to  tuxx  text information on the correction used.
 !
-! subprograms used :
-!  s   mxdsmm  matrix-vector product.
-!  s   mxdsmu  correction of a dense symmetric matrix.
-!  s   mxdsms  scaling of a dense symmetric matrix.
-!  rf  mxvdot  dot product of vectors.
-!  s   uoerr1  error mesages.
-!  s   uou1d1  print of entry to variable metric update.
-!  s   uou1d2  print of exit from variable metric update.
-!
-! method :
+!### Method
 !  fletcher's combination of the gauss-newton and the bfgs methods.
 !
       subroutine pudfm1(n,b,s,xo,go,f,fo,eta5,ipom1,ipom2,met1,idecf,   &
@@ -4339,8 +3939,8 @@
       if ( l1 ) call mxdsms(n,b,1.0d0/gam)
       end subroutine pudfm1
 
-! subroutine pudrv1                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! driver for hybrid quasi-newton updates.
@@ -4406,8 +4006,8 @@
       end select
       end subroutine pudrv1
 
-! subroutine pudsd2                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! initiation of a dense symmetric positive definite matrix
@@ -4434,17 +4034,7 @@
 !         reduction. idir=2-determination after stepsize expansion.
 !  iu  ld  degree of previously computed derivatives.
 !  to  tuxx   text information on the restart used.
-!
-! subprograms used :
-!  s   mxdsmi  generation of the unit matrix.
-!  s   mxdsdo  initiation of a diagonal matrix.
-!  s   mxdsma  dense symmetric matrix augmented
-!              by the scaled dense symmetric matrix.
-!  s   mxdsmo  a scalar is set to all elements
-!              of a dense symmetric matrix.
-!  s   mxdsms  scaling of a dense symmetric matrix.
-!  s   uyset3  definition of the restart variables.
-!
+
       subroutine pudsd2(n,h,b,f,fo,eta5,met3,ld,idir,idecf,irest,ind)
       implicit none
       integer n , met3 , ld , idir , idecf , irest , ind
@@ -4486,8 +4076,8 @@
       idecf = 0
       end subroutine pudsd2
 
-! subroutine pudsd3                all systems                97/12/01
-! 97/12/01 lu : original version
+!***********************************************************************
+!> date: 97/12/01
 !
 ! purpose :
 ! initiation of a dense symmetric positive definite matrix
@@ -4508,14 +4098,7 @@
 !         restart is performed.
 !  ii  iters  termination indicator. iters=0-zero step.
 !  iu  ld  degree of previously computed derivatives.
-!
-! subprograms used :
-!  s   mxdsmi  generation of the unit matrix.
-!  s   mxdsdo  initiation of a diagonal matrix.
-!  s   uudsmc  copying of a dense symmetric matrix.
-!  rf  unran1  random number generator.
-!  s   uyset3  definition of the restart variables.
-!
+
       subroutine pudsd3(n,h,b,ipom1,ipom2,ld,idecf,iters,irest,ind)
       implicit none
       integer n , ipom1 , ipom2 , ld , idecf , iters , irest , ind
@@ -4543,152 +4126,145 @@
       endif
       end subroutine pudsd3
 
-! subroutine pyadb4             all systems                   98/12/01
-! 98/12/01 lu : original version
-!
-! purpose :
-! new linear constraints or new simple bounds are added to the active
-! set. gill-murray factorization of the transformed hessian matrix
-! approximation is updated.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  iu  n  actual number of variables.
-!  ii  nc  number of linearized constraints.
-!  ri  x(nf)  vector of variables.
-!  iu  ix(nf)  vector containing types of bounds.
-!  ri  xl(nf)  vector containing lower bounds for variables.
-!  ri  xu(nf)  vector containing upper bounds for variables.
-!  ri  cf(nc)  vector containing values of the constraint functions.
-!  ri  cfd(nc) vector containing increments of the constraint functions.
-!  iu  ic(nc)  vector containing types of constraints.
-!  iu  ica(nf)  vector containing indices of active constraints.
-!  ri  cl(nc)  vector containing lower bounds for constraint functions.
-!  ri  cu(nc)  vector containing upper bounds for constraint functions.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ru  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ru  cz(nf*nf)  matrix whose columns are basic vectors from the
-!         current reduced subspace.
-!  ru  h(nf*(nf+1)/2)  gill-murray factorization of the transformed
-!         hessian matrix approximation.
-!  ra  s(nf)  auxiliary vector.
-!  ri  r  value of the stepsize parameter.
-!  ri  eps7  tolerance for linear independence of constraints.
-!  ri  eps9  tolerance for active constraints.
-!  ro  gmax  maximum absolute value of a partial derivative.
-!  ro  umax  maximum absolute value of a negative lagrange multiplier.
-!  ii  kbf  type of simple bounds. kbf=0-no simple bounds. kbf=1-one
-!         sided simple bounds. kbf=2-two sided simple bounds.
-!  ii  kbc  type of constraints. kbc=0-no constraints. kbc=1-constraints
-!         with one sided bounds. kbc=2-constraints with two sided
-!         bounds.
-!  iu  inew  index of the new active constraint.
-!  io  ier  error indicator.
-!  io  iterm  termination indicator.
-!
-! subprograms used :
-!  s   pladb4  addition of a new active constraint.
-!  s   plnews  identification of active upper bounds.
-!  s   plnewl  identification of active linear constrainrs.
-!  s   pldirl  new values of constraint functions.
-!  s   mxvind  change of the integer vector for constraint addition.
-!
-      subroutine pyadb4(me,nf,n,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,&
-                        h,s,r,eps7,eps9,gmax,umax,kbf,kbc,inew,ier,     &
-                        iterm)
-      implicit none
+!***********************************************************************
+!> date: 98/12/01
+! !
+! ! purpose :
+! ! new linear constraints or new simple bounds are added to the active
+! ! set. gill-murray factorization of the transformed hessian matrix
+! ! approximation is updated.
+! !
+! ! parameters :
+! !  ii  nf  declared number of variables.
+! !  iu  n  actual number of variables.
+! !  ii  nc  number of linearized constraints.
+! !  ri  x(nf)  vector of variables.
+! !  iu  ix(nf)  vector containing types of bounds.
+! !  ri  xl(nf)  vector containing lower bounds for variables.
+! !  ri  xu(nf)  vector containing upper bounds for variables.
+! !  ri  cf(nc)  vector containing values of the constraint functions.
+! !  ri  cfd(nc) vector containing increments of the constraint functions.
+! !  iu  ic(nc)  vector containing types of constraints.
+! !  iu  ica(nf)  vector containing indices of active constraints.
+! !  ri  cl(nc)  vector containing lower bounds for constraint functions.
+! !  ri  cu(nc)  vector containing upper bounds for constraint functions.
+! !  ri  cg(nf*nc)  matrix whose columns are normals of the linear
+! !         constraints.
+! !  ru  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
+! !         orthogonal projection.
+! !  ru  cz(nf*nf)  matrix whose columns are basic vectors from the
+! !         current reduced subspace.
+! !  ru  h(nf*(nf+1)/2)  gill-murray factorization of the transformed
+! !         hessian matrix approximation.
+! !  ra  s(nf)  auxiliary vector.
+! !  ri  r  value of the stepsize parameter.
+! !  ri  eps7  tolerance for linear independence of constraints.
+! !  ri  eps9  tolerance for active constraints.
+! !  ro  gmax  maximum absolute value of a partial derivative.
+! !  ro  umax  maximum absolute value of a negative lagrange multiplier.
+! !  ii  kbf  type of simple bounds. kbf=0-no simple bounds. kbf=1-one
+! !         sided simple bounds. kbf=2-two sided simple bounds.
+! !  ii  kbc  type of constraints. kbc=0-no constraints. kbc=1-constraints
+! !         with one sided bounds. kbc=2-constraints with two sided
+! !         bounds.
+! !  iu  inew  index of the new active constraint.
+! !  io  ier  error indicator.
+! !  io  iterm  termination indicator.
 
-      class(psqp_class),intent(inout) :: me
+!       subroutine pyadb4(me,nf,n,nc,x,ix,xl,xu,cf,cfd,ic,ica,cl,cu,cg,cr,cz,&
+!                         h,s,r,eps7,eps9,gmax,umax,kbf,kbc,inew,ier,     &
+!                         iterm)
+!       implicit none
 
-      integer nf , n , nc , ix(*) , ic(*) , ica(*) , kbf , kbc , inew , &
-              ier , iterm
-      double precision x(*) , xl(*) , xu(*) , cf(*) , cfd(*) , cl(*) ,  &
-                       cu(*) , cg(*) , cr(*) , cz(*) , h(*) , s(*) , r ,&
-                       eps7 , eps9 , gmax , umax
-      integer i , j , k , l , ij , ik , kc , kj , kk , ll
-      double precision den , temp
+!       class(psqp_class),intent(inout) :: me
 
-      if ( kbc>0 ) then
-         if ( r/=0.0d0 ) call pldirl(nc,cf,cfd,ic,r,kbc)
-         if ( inew/=0 ) then
-            if ( kbf>0 ) then
-               do i = 1 , nf
-                  inew = 0
-                  call plnews(x,ix,xl,xu,eps9,i,inew)
-                  call pladb4(nf,n,ica,cg,cr,cz,h,s,eps7,gmax,umax,9,   &
-                              inew,me%nadd,ier)
-                  call mxvind(ix,i,ier)
-                  if ( ier<0 ) then
-                     iterm = -15
-                     return
-                  endif
-               enddo
-            endif
-            do kc = 1 , nc
-               inew = 0
-               call plnewl(kc,cf,ic,cl,cu,eps9,inew)
-               call pladb4(nf,n,ica,cg,cr,cz,h,s,eps7,gmax,umax,9,inew, &
-                           me%nadd,ier)
-               call mxvind(ic,kc,ier)
-               if ( ier<0 ) then
-                  iterm = -15
-                  return
-               endif
-            enddo
-         endif
-      elseif ( kbf>0 ) then
-         k = 0
-         do l = 1 , nf
-            if ( ix(l)>=0 ) k = k + 1
-            inew = 0
-            call plnews(x,ix,xl,xu,eps9,l,inew)
-            if ( inew/=0 ) then
-               ix(l) = 10 - ix(l)
-               kk = k*(k-1)/2
-               den = h(kk+k)
-               if ( den/=0.0d0 ) then
-                  ij = 0
-                  kj = kk
-                  do j = 1 , n
-                     if ( j<=k ) then
-                        kj = kj + 1
-                     else
-                        kj = kj + j - 1
-                     endif
-                     if ( j/=k ) temp = h(kj)/den
-                     ik = kk
-                     do i = 1 , j
-                        if ( i<=k ) then
-                           ik = ik + 1
-                        else
-                           ik = ik + i - 1
-                        endif
-                        ij = ij + 1
-                        if ( i/=k .and. j/=k ) h(ij) = h(ij)            &
-                             + temp*h(ik)
-                     enddo
-                  enddo
-               endif
-               ll = kk + k
-               do i = k + 1 , n
-                  do j = 1 , i
-                     ll = ll + 1
-                     if ( j/=k ) then
-                        kk = kk + 1
-                        h(kk) = h(ll)
-                     endif
-                  enddo
-               enddo
-               n = n - 1
-            endif
-         enddo
-      endif
-      end subroutine pyadb4
+!       integer nf , n , nc , ix(*) , ic(*) , ica(*) , kbf , kbc , inew , &
+!               ier , iterm
+!       double precision x(*) , xl(*) , xu(*) , cf(*) , cfd(*) , cl(*) ,  &
+!                        cu(*) , cg(*) , cr(*) , cz(*) , h(*) , s(*) , r ,&
+!                        eps7 , eps9 , gmax , umax
+!       integer i , j , k , l , ij , ik , kc , kj , kk , ll
+!       double precision den , temp
 
-! subroutine pyfut1                all systems                98/12/01
-! 98/12/01 lu : original version
+!       if ( kbc>0 ) then
+!          if ( r/=0.0d0 ) call pldirl(nc,cf,cfd,ic,r,kbc)
+!          if ( inew/=0 ) then
+!             if ( kbf>0 ) then
+!                do i = 1 , nf
+!                   inew = 0
+!                   call plnews(x,ix,xl,xu,eps9,i,inew)
+!                   call pladb4(nf,n,ica,cg,cr,cz,h,s,eps7,gmax,umax,9,   &
+!                               inew,me%nadd,ier)
+!                   call mxvind(ix,i,ier)
+!                   if ( ier<0 ) then
+!                      iterm = -15
+!                      return
+!                   endif
+!                enddo
+!             endif
+!             do kc = 1 , nc
+!                inew = 0
+!                call plnewl(kc,cf,ic,cl,cu,eps9,inew)
+!                call pladb4(nf,n,ica,cg,cr,cz,h,s,eps7,gmax,umax,9,inew, &
+!                            me%nadd,ier)
+!                call mxvind(ic,kc,ier)
+!                if ( ier<0 ) then
+!                   iterm = -15
+!                   return
+!                endif
+!             enddo
+!          endif
+!       elseif ( kbf>0 ) then
+!          k = 0
+!          do l = 1 , nf
+!             if ( ix(l)>=0 ) k = k + 1
+!             inew = 0
+!             call plnews(x,ix,xl,xu,eps9,l,inew)
+!             if ( inew/=0 ) then
+!                ix(l) = 10 - ix(l)
+!                kk = k*(k-1)/2
+!                den = h(kk+k)
+!                if ( den/=0.0d0 ) then
+!                   ij = 0
+!                   kj = kk
+!                   do j = 1 , n
+!                      if ( j<=k ) then
+!                         kj = kj + 1
+!                      else
+!                         kj = kj + j - 1
+!                      endif
+!                      if ( j/=k ) temp = h(kj)/den
+!                      ik = kk
+!                      do i = 1 , j
+!                         if ( i<=k ) then
+!                            ik = ik + 1
+!                         else
+!                            ik = ik + i - 1
+!                         endif
+!                         ij = ij + 1
+!                         if ( i/=k .and. j/=k ) h(ij) = h(ij)            &
+!                              + temp*h(ik)
+!                      enddo
+!                   enddo
+!                endif
+!                ll = kk + k
+!                do i = k + 1 , n
+!                   do j = 1 , i
+!                      ll = ll + 1
+!                      if ( j/=k ) then
+!                         kk = kk + 1
+!                         h(kk) = h(ll)
+!                      endif
+!                   enddo
+!                enddo
+!                n = n - 1
+!             endif
+!          enddo
+!       endif
+!       end subroutine pyadb4
+
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! termination criteria and test on restart.
@@ -4697,7 +4273,7 @@
 !  ii  n  actual number of variables.
 !  ri  f  new value of the objective function.
 !  ri  fo  old value of the objective function.
-!  ri  umax  maximun absolute value of the negative lagrange multiplier.
+!  ri  umax  maximum absolute value of the negative lagrange multiplier.
 !  ro  gmax  norm of the transformed gradient.
 !  ri  dmax  maximum relative difference of variables.
 !  ri  tolx  lower bound for steplength.
@@ -4795,115 +4371,111 @@
       nit = nit + 1
       end subroutine pyfut1
 
-! subroutine pyrmb1               all systems                98/12/01
-! 98/12/01 lu : original version
-!
-! purpose :
-! old linear constraint or an old simple bound is removed from the
-! active set. transformed gradient of the objective function and
-! transformed hessian matrix approximation are updated.
-!
-! parameters :
-!  ii  nf  declared number of variables.
-!  ii  n  actual number of variables.
-!  iu  ix(nf)  vector containing types of bounds.
-!  iu  ic(nc)  vector containing types of constraints.
-!  iu  ica(nf)  vector containing indices of active constraints.
-!  ri  cg(nf*nc)  matrix whose columns are normals of the linear
-!         constraints.
-!  ru  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
-!         orthogonal projection.
-!  ru  cz(nf*nf)  matrix whose columns are basic vectors from the
-!         current reduced subspace.
-!  ri  g(nf)  gradient of the objective function.
-!  ru  gn(nf)  transformed gradient of the objective function.
-!  ru  h(nf*(nf+1)/2)  transformed hessian matrix approximation.
-!  ri  eps8  tolerance for constraint to be removed.
-!  ri  umax  maximun absolute value of the negative lagrange multiplier.
-!  ri  gmax  norm of the transformed gradient.
-!  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
-!         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
-!  ii  kbc  specification of linear constraints. kbc=0-no linear
-!         constraints. kbc=1-one sided linear constraints. kbc=2=two
-!         sided linear constraints.
-!  ii  iold  index of the removed constraint.
-!  ia  kold  auxiliary variable.
-!  ia  krem  auxiliary variable.
-!  io  ier  error indicator.
-!  io  iterm  termination indicator.
-!
-! subprograms used :
-!  s   plrmb0  constraint deletion.
-!  s   mxvset  initiation of a vector.
-!
-      subroutine pyrmb1(me,nf,n,ix,ic,ica,cg,cr,cz,g,gn,h,eps8,umax,gmax,  &
-                        kbf,kbc,iold,kold,krem,ier,iterm)
-      implicit none
+!***********************************************************************
+!> date: 98/12/01
+! !
+! ! purpose :
+! ! old linear constraint or an old simple bound is removed from the
+! ! active set. transformed gradient of the objective function and
+! ! transformed hessian matrix approximation are updated.
+! !
+! ! parameters :
+! !  ii  nf  declared number of variables.
+! !  ii  n  actual number of variables.
+! !  iu  ix(nf)  vector containing types of bounds.
+! !  iu  ic(nc)  vector containing types of constraints.
+! !  iu  ica(nf)  vector containing indices of active constraints.
+! !  ri  cg(nf*nc)  matrix whose columns are normals of the linear
+! !         constraints.
+! !  ru  cr(nf*(nf+1)/2)  triangular decomposition of kernel of the
+! !         orthogonal projection.
+! !  ru  cz(nf*nf)  matrix whose columns are basic vectors from the
+! !         current reduced subspace.
+! !  ri  g(nf)  gradient of the objective function.
+! !  ru  gn(nf)  transformed gradient of the objective function.
+! !  ru  h(nf*(nf+1)/2)  transformed hessian matrix approximation.
+! !  ri  eps8  tolerance for constraint to be removed.
+! !  ri  umax  maximum absolute value of the negative lagrange multiplier.
+! !  ri  gmax  norm of the transformed gradient.
+! !  ii  kbf  specification of simple bounds. kbf=0-no simple bounds.
+! !         kbf=1-one sided simple bounds. kbf=2=two sided simple bounds.
+! !  ii  kbc  specification of linear constraints. kbc=0-no linear
+! !         constraints. kbc=1-one sided linear constraints. kbc=2=two
+! !         sided linear constraints.
+! !  ii  iold  index of the removed constraint.
+! !  ia  kold  auxiliary variable.
+! !  ia  krem  auxiliary variable.
+! !  io  ier  error indicator.
+! !  io  iterm  termination indicator.
 
-      class(psqp_class),intent(inout) :: me
+!       subroutine pyrmb1(me,nf,n,ix,ic,ica,cg,cr,cz,g,gn,h,eps8,umax,gmax,  &
+!                         kbf,kbc,iold,kold,krem,ier,iterm)
+!       implicit none
 
-      integer nf , n , ix(*) , ic(*) , ica(*) , kbf , kbc , iold ,      &
-              kold , krem , ier , iterm
-      double precision cg(*) , cr(*) , cz(*) , g(*) , gn(*) , h(*) ,    &
-                       eps8 , umax , gmax
-      integer i , j , k , kc , l
+!       class(psqp_class),intent(inout) :: me
 
-      if ( kbc>0 ) then
-         if ( umax>eps8*gmax ) then
-            call plrmb0(nf,n,ica,cg,cr,cz,g,gn,iold,krem,me%nrem,ier)
-            if ( ier<0 ) then
-               iterm = -16
-            elseif ( ier>0 ) then
-               iold = 0
-            else
-               k = n*(n-1)/2
-               call mxvset(n,0.0d0,h(k+1))
-               h(k+n) = 1.0d0
-               kc = ica(nf-n+1)
-               if ( kc>0 ) then
-                  ic(kc) = -ic(kc)
-               else
-                  k = -kc
-                  ix(k) = -ix(k)
-               endif
-            endif
-         else
-            iold = 0
-         endif
-      elseif ( kbf>0 ) then
-         if ( umax>eps8*gmax ) then
-            ix(iold) = min(abs(ix(iold)),3)
-            do i = n , kold , -1
-               gn(i+1) = gn(i)
-            enddo
-            gn(kold) = g(iold)
-            n = n + 1
-            k = n*(n-1)/2
-            l = k + n
-            do i = n , kold , -1
-               do j = i , 1 , -1
-                  if ( i/=kold .and. j/=kold ) then
-                     h(l) = h(k)
-                     k = k - 1
-                     l = l - 1
-                  elseif ( i==kold .and. j==kold ) then
-                     h(l) = 1.0d0
-                     l = l - 1
-                  else
-                     h(l) = 0.0d0
-                     l = l - 1
-                  endif
-               enddo
-            enddo
-         else
-            iold = 0
-            kold = 0
-         endif
-      endif
-      end subroutine pyrmb1
+!       integer nf , n , ix(*) , ic(*) , ica(*) , kbf , kbc , iold ,      &
+!               kold , krem , ier , iterm
+!       double precision cg(*) , cr(*) , cz(*) , g(*) , gn(*) , h(*) ,    &
+!                        eps8 , umax , gmax
+!       integer i , j , k , kc , l
 
-! subroutine pytrbd             all systems                   98/12/01
-! 98/12/01 lu : original version
+!       if ( kbc>0 ) then
+!          if ( umax>eps8*gmax ) then
+!             call plrmb0(nf,n,ica,cg,cr,cz,g,gn,iold,krem,me%nrem,ier)
+!             if ( ier<0 ) then
+!                iterm = -16
+!             elseif ( ier>0 ) then
+!                iold = 0
+!             else
+!                k = n*(n-1)/2
+!                call mxvset(n,0.0d0,h(k+1))
+!                h(k+n) = 1.0d0
+!                kc = ica(nf-n+1)
+!                if ( kc>0 ) then
+!                   ic(kc) = -ic(kc)
+!                else
+!                   k = -kc
+!                   ix(k) = -ix(k)
+!                endif
+!             endif
+!          else
+!             iold = 0
+!          endif
+!       elseif ( kbf>0 ) then
+!          if ( umax>eps8*gmax ) then
+!             ix(iold) = min(abs(ix(iold)),3)
+!             do i = n , kold , -1
+!                gn(i+1) = gn(i)
+!             enddo
+!             gn(kold) = g(iold)
+!             n = n + 1
+!             k = n*(n-1)/2
+!             l = k + n
+!             do i = n , kold , -1
+!                do j = i , 1 , -1
+!                   if ( i/=kold .and. j/=kold ) then
+!                      h(l) = h(k)
+!                      k = k - 1
+!                      l = l - 1
+!                   elseif ( i==kold .and. j==kold ) then
+!                      h(l) = 1.0d0
+!                      l = l - 1
+!                   else
+!                      h(l) = 0.0d0
+!                      l = l - 1
+!                   endif
+!                enddo
+!             enddo
+!          else
+!             iold = 0
+!             kold = 0
+!          endif
+!       endif
+!       end subroutine pyrmb1
+
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! vectors of variables difference and gradients difference are computed
@@ -4932,17 +4504,7 @@
 !  ii  kbc  specification of linear constraints. kbc=0-no linear
 !         constraints. kbc=1-one sided linear constraints. kbc=2=two
 !         sided linear constraints.
-!
-! subprograms used :
-!  s   mxdrmm  premultiplication of a vector by transpose of a dense
-!         rectangular matrix.
-!  s   mxvcop  copying of a vector.
-!  s   mxvdif  difference of two vectors.
-!  s   mxvmul  diagonal premultiplication of a vector.
-!  s   mxvsav  difference of two vectors with copying and saving the
-!         substracted one.
-!  s   mxvscl  scaling of a vector.
-!
+
       subroutine pytrbd(nf,n,x,ix,xo,g,go,cz,sn,r,f,fo,p,po,dmax,iters, &
                         kbf,kbc)
       implicit none
@@ -4988,8 +4550,8 @@
       endif
       end subroutine pytrbd
 
-! subroutine pytrbg               all systems                98/12/01
-! 98/12/01 lu : original version
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! gradient of the objective function is scaled and reduced.
@@ -5019,16 +4581,7 @@
 !         sided linear constraints.
 !  ii  iold  index of the removed constraint.
 !  ia  kold  auxiliary variable.
-!
-! subprograms used :
-!  s   mxdrmm  premultiplication of a vector by a rowwise stored dense
-!         rectangular matrix.
-!  s   mxdprb  back substitution.
-!  s   mxvcop  copying of a vector.
-!  rf  mxvdot  dot product of two vectors.
-!  rf  mxvmax  l-infinity norm of a vector.
-!  s   mxvmul  diagonal premultiplication of a vector.
-!
+
       subroutine pytrbg(nf,n,ix,ic,ica,cg,cr,cz,g,gn,umax,gmax,kbf,kbc, &
                         iold,kold)
       implicit none
@@ -5108,8 +4661,8 @@
       endif
       end subroutine pytrbg
 
-! subroutine pytrbh               all systems                98/12/01
-! 98/12/01 lu : original version
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! hessian matrix of the objective function or its approximation is
@@ -5131,12 +4684,7 @@
 !         sided linear constraints.
 !  ii  ld  degree of previously computed derivatives.
 !  ii  iters  termination indicator for steplength determination.
-!
-! subprograms used :
-!  s   mxdsmm  matrix vector product.
-!  s   mxvcop  copying of a vector.
-!  rf  mxvdot  dot product of two vectors.
-!
+
       subroutine pytrbh(nf,n,ix,cr,cz,h,s,kbf,kbc,ld,iters)
       implicit none
       integer nf , n , ix(*) , kbf , kbc , ld , iters
@@ -5176,8 +4724,8 @@
       endif
       end subroutine pytrbh
 
-! subroutine pytrbs               all systems                98/12/01
-! 98/12/01 lu : original version
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! scaled and reduced direction vector is back transformed.
@@ -5220,16 +4768,7 @@
 !         sided linear constraints.
 !  io  krem  indication of linearly dependent gradients.
 !  io  inew  index of the new active function.
-!
-! subprograms used :
-!  s   plmaxs  determination of the maximum stepsize using simple
-!         bounds.
-!  s   plmaxl  determination of the maximum stepsize using linear
-!         constraints.
-!  s   mxdcmm  matrix vector product.
-!  s   mxvcop  copying of a vector.
-!  s   mxvset  initiation of a vector.
-!
+
       subroutine pytrbs(nf,n,nc,x,ix,xo,xl,xu,g,go,cf,cfd,ic,cl,cu,cg,  &
                         cz,sn,s,ro,fp,fo,f,po,p,rmax,kbf,kbc,krem,inew)
       implicit none
@@ -5268,8 +4807,8 @@
       endif
       end subroutine pytrbs
 
-! subroutine pytrfd             all systems                   90/12/01
-! 90/12/01 lu : original version
+!***********************************************************************
+!> date: 90/12/01
 !
 ! purpose :
 ! preparation of variable metric update.
@@ -5303,15 +4842,7 @@
 !         iters=7-maximum stepsize. iters=8-unbounded function.
 !         iters=-1-mred reached. iters=-2-positive directional
 !         derivative. iters=-3-error in interpolation.
-!
-! subprograms used :
-!  s   mxvcop  copying of a vector.
-!  s   mxvdif  difference of two vectors.
-!  s   mxvdir  vector augmented by the scaled vector.
-!  s   mxvset  initiation of a vector.
-!  s   mxvsav  difference of two vectors with copying and saving the
-!         substracted one.
-!
+
       subroutine pytrfd(nf,nc,x,xo,iaa,ag,az,cg,g,go,n,kd,ld,r,f,fo,p,  &
                         po,dmax,iters)
       implicit none
@@ -5354,8 +4885,8 @@
       n = nf
       end subroutine pytrfd
 
-! subroutine pytrnd             all systems                   91/12/01
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
 ! purpose :
 ! dual range space quadratic programming method for minimax
@@ -5390,14 +4921,7 @@
 !         normf=2-scaling factors are supplied by user.
 !  ii  iters  termination indicator for steplength determination.
 !         iters=0 for zero step.
-!
-! subprograms used :
-!  s   mxvcop  copying of a vector.
-!  s   mxvdir  vector augmented by the scaled vector.
-!  s   mxvset  initiation of a vector.
-!  s   mxvsav  difference of two vectors with copying and saving the
-!         substracted one.
-!
+
       subroutine pytrnd(nf,n,x,xo,ica,cg,cz,g,go,r,f,fo,p,po,cmax,cmaxo,&
                         dmax,kd,ld,iters)
       implicit none
@@ -5435,8 +4959,8 @@
       n = nf
       end subroutine pytrnd
 
-! subroutine pytrud             all systems                   98/12/01
-! 98/12/01 lu : original version
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! vectors of variables difference and gradients difference are computed
@@ -5458,13 +4982,7 @@
 !  io  ld  degree of previously computed derivatives.
 !  ii  iters  termination indicator for steplength determination.
 !         iters=0 for zero step.
-!
-! subprograms used :
-!  s   pyset1  degree definition of the computed derivatives.
-!  s   mxvdif  difference of two vectors.
-!  s   mxvsav  difference of two vectors with copying and saving the
-!         substracted one.
-!
+
       subroutine pytrud(nf,x,xo,g,go,r,f,fo,p,po,dmax,kd,ld,iters)
       implicit none
       integer nf , kd , ld , iters
@@ -5489,8 +5007,8 @@
       enddo
       end subroutine pytrud
 
-! subroutine pytruf             all systems                   98/12/01
-! 98/12/01 lu : original version
+!***********************************************************************
+!> date: 98/12/01
 !
 ! purpose :
 ! vectors of variables difference and right hand sides difference are
@@ -5513,13 +5031,7 @@
 !  io  ld  degree of previously computed derivatives.
 !  ii  iters  termination indicator for steplength determination.
 !         iters=0 for zero step.
-!
-! subprograms used :
-!  s   pyset1  degree definition of the computed derivatives.
-!  s   mxvdif  difference of two vectors.
-!  s   mxvsav  difference of two vectors with copying and saving the
-!         substracted one.
-!
+
       subroutine pytruf(nf,na,x,xo,af,afo,r,f,fo,p,po,dmax,kd,ld,iters)
       implicit none
       integer nf , na , kd , ld , iters

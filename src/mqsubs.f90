@@ -1,3 +1,9 @@
+!***********************************************************************
+!>
+!  Matrix routines.
+!
+!### History
+! * Original version: LU, 1991
 
    module matrix_routines
 
@@ -7,31 +13,24 @@
 
    contains
 
-! subroutine mxdcmm               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! multiplication of a columnwise stored dense rectangular matrix a
 ! by a vector x.
-!
-! parameters :
-!  ii  n  number of rows of the matrix a.
-!  ii  m  number of columns of the matrix a.
-!  ri  a(n*m)  rectangular matrix stored columnwise in the
-!         one-dimensional array.
-!  ri  x(m)  input vector.
-!  ro  y(n)  output vector equal to a*x.
-!
-! subprograms used :
-!  s   mxvdir  vector augmented by the scaled vector.
-!  s   mxvset  initiation of a vector.
-!
+
       subroutine mxdcmm(n,m,a,x,y)
+
       implicit none
-      integer n , m
-      double precision a(*) , x(*) , y(*)
-      integer j , k
+
+      integer :: n !! number of rows of the matrix a.
+      integer :: m !! number of columns of the matrix a.
+      double precision :: a(*) !! a(n*m) rectangular matrix stored columnwise in the one-dimensional array.
+      double precision :: x(*) !! x(m)  input vector.
+      double precision :: y(*) !! y(n)  output vector equal to a*x.
+
+      integer :: j , k
+
       call mxvset(n,0.0d0,y)
       k = 0
       do j = 1 , m
@@ -40,11 +39,9 @@
       enddo
       end subroutine mxdcmm
 
-! subroutine mxdpgb                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! solution of a system of linear equations with a dense symmetric
 ! positive definite matrix a+e using the factorization a+e=l*d*trans(l)
 ! obtained by the subroutine mxdpgf.
@@ -59,14 +56,14 @@
 !  ii  job  option. if job=0 then x:=(a+e)**(-1)*x. if job>0 then
 !         x:=l**(-1)*x. if job<0 then x:=trans(l)**(-1)*x.
 !
-! method :
+!### Method
 ! back substitution
-!
+
       subroutine mxdpgb(n,a,x,job)
       implicit none
-      integer job , n
-      double precision a(*) , x(*)
-      integer i , ii , ij , j
+      integer :: job , n
+      double precision :: a(*) , x(*)
+      integer :: i , ii , ij , j
       if ( job>=0 ) then
 !
 !     phase 1 : x:=l**(-1)*x
@@ -106,11 +103,9 @@
       endif
       end subroutine mxdpgb
 
-! subroutine mxdpgd                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! computation of a direction of negative curvature with respect to a
 ! dense symmetric matrix a using the factorization a+e=l*d*trans(l)
 !         obtained by the subroutine mxdpgf.
@@ -124,17 +119,17 @@
 !  ii  inf  information obtained in the factorization process. the
 !         direction of negative curvature exists only if inf>0.
 !
-! method :
+!### Method
 ! p.e.gill, w.murray : newton type methods for unconstrained and
 ! linearly constrained optimization, math. programming 28 (1974)
 ! pp. 311-350.
-!
+
       subroutine mxdpgd(n,a,x,inf)
       implicit none
-      integer n , inf
-      double precision a(n*(n+1)/2) , x(n)
-      integer i , j , ii , ij
-      double precision zero , one
+      integer :: n , inf
+      double precision :: a(n*(n+1)/2) , x(n)
+      integer :: i , j , ii , ij
+      double precision :: zero , one
       parameter (zero=0.0d0,one=1.0d0)
 !
 !     right hand side formation
@@ -158,11 +153,9 @@
       enddo
       end subroutine mxdpgd
 
-! subroutine mxdpgf                all systems                89/12/01
-! portability : all systems
-! 89/12/01 lu : original version
+!***********************************************************************
+!> date: 89/12/01
 !
-! purpose :
 ! factorization a+e=l*d*trans(l) of a dense symmetric positive definite
 ! matrix a+e where d and e are diagonal positive definite matrices and
 ! l is a lower triangular matrix. if a is sufficiently positive
@@ -184,18 +177,18 @@
 !         factorization process (if inf>0).
 !  ro  tau  maximum diagonal element of the matrix e.
 !
-! method :
+!### Method
 ! p.e.gill, w.murray : newton type methods for unconstrained and
 ! linearly constrained optimization, math. programming 28 (1974)
 ! pp. 311-350.
-!
+
       subroutine mxdpgf(n,a,inf,alf,tau)
       implicit none
-      double precision alf , tau
-      integer inf , n
-      double precision a(*)
-      double precision bet , del , gam , rho , sig , tol
-      integer i , ij , ik , j , k , kj , kk , l
+      double precision :: alf , tau
+      integer :: inf , n
+      double precision :: a(*)
+      double precision :: bet , del , gam , rho , sig , tol
+      integer :: i , ij , ik , j , k , kj , kk , l
       l = 0
       inf = 0
       tol = alf
@@ -263,11 +256,9 @@
       if ( l>0 .and. abs(alf)>del ) inf = l
       end subroutine mxdpgf
 
-! subroutine mxdpgn                all systems               91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! estimation of the minimum eigenvalue and the corresponding eigenvector
 ! of a dense symmetric positive definite matrix a+e using the
 ! factorization a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
@@ -282,22 +273,18 @@
 !         computed. is job>0 then both estimated eigenvalue and
 !         estimated eigenvector are computed by job iterations.
 !
-! subprograms used :
-!  s   mxdpgb  back substitution.
-!  rf  mxvdot  dot product of two vectors.
-!
-! method :
+!### Method
 ! a.k.cline, c.b.moler, g.w.stewart, j.h.wilkinson : an estimate
 ! for the condition number of a matrix. siam j. numer. anal. 16
 ! (1979) 368-373.
-!
+
       subroutine mxdpgn(n,a,x,alf,job)
       implicit none
-      integer n , job
-      double precision a(n*(n+1)/2) , x(n) , alf
-      double precision xp , xm , fp , fm !, mxvdot
-      integer i , k , ik , kk
-      double precision zero , one
+      integer :: n , job
+      double precision :: a(n*(n+1)/2) , x(n) , alf
+      double precision :: xp , xm , fp , fm !, mxvdot
+      integer :: i , k , ik , kk
+      double precision :: zero , one
       parameter (zero=0.0d0,one=1.0d0)
 !
 !     computation of the vector v with possible maximum norm such
@@ -403,10 +390,7 @@
       end subroutine mxdpgn
 
 ! function mxdpgp                  all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
 !
-! purpose :
 ! computation of the number mxdpgp=trans(x)*d**(-1)*y where d is a
 ! diagonal matrix in the factorization a+e=l*d*trans(l) obtained by the
 ! subroutine mxdpgf.
@@ -421,10 +405,10 @@
 !
       function mxdpgp(n,a,x,y)
       implicit none
-      integer n
-      double precision a(*) , x(*) , y(*) , mxdpgp
-      double precision temp
-      integer i , j
+      integer :: n
+      double precision :: a(*) , x(*) , y(*) , mxdpgp
+      double precision :: temp
+      integer :: i , j
       j = 0
       temp = 0.0d0
       do i = 1 , n
@@ -434,11 +418,9 @@
       mxdpgp = temp
       end function mxdpgp
 
-! subroutine mxdpgs                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! scaling of a dense symmetric positive definite matrix a+e using the
 ! factorization a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
 !
@@ -447,13 +429,13 @@
 !  ru  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
 !         subroutine mxdpgf.
 !  ri  alf  scaling factor.
-!
+
       subroutine mxdpgs(n,a,alf)
       implicit none
-      double precision alf
-      integer n
-      double precision a(*)
-      integer i , j
+      double precision :: alf
+      integer :: n
+      double precision :: a(*)
+      integer :: i , j
       j = 0
       do i = 1 , n
          j = j + i
@@ -461,11 +443,9 @@
       enddo
       end subroutine mxdpgs
 
-! subroutine mxdpgu                all systems                89/12/01
-! portability : all systems
-! 89/12/01 lu : original version
+!***********************************************************************
+!> date: 89/12/01
 !
-! purpose :
 ! correction of a dense symmetric positive definite matrix a+e in the
 ! factored form a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
 ! the correction is defined as a+e:=a+e+alf*x*trans(x) where alf is a
@@ -479,19 +459,19 @@
 !  ri  x(n)  vector in the correction term.
 !  ra  y(n) auxiliary vector.
 !
-! method :
+!### Method
 ! p.e.gill, w.murray, m.saunders: methods for computing and modifying
 ! the ldv factors of a matrix, math. of comp. 29 (1974) pp. 1051-1077.
-!
+
       subroutine mxdpgu(n,a,alf,x,y)
       implicit none
-      double precision zero , one , four , con
+      double precision :: zero , one , four , con
       parameter (zero=0.0d0,one=1.0d0,four=4.0d0,con=1.0d-8)
-      double precision alf , alfr
-      integer n
-      double precision a(*) , x(*) , y(*)
-      double precision b , d , p , r , t , to
-      integer i , ii , ij , j
+      double precision :: alf , alfr
+      integer :: n
+      double precision :: a(*) , x(*) , y(*)
+      double precision :: b , d , p , r , t , to
+      integer :: i , ii , ij , j
       if ( alf>=zero ) then
 !
 !     forward correction in case when the scaling factor is nonnegative
@@ -573,11 +553,9 @@
       endif
       end subroutine mxdpgu
 
-! subroutine mxdprb                all systems                89/12/01
-! portability : all systems
-! 89/12/01 lu : original version
+!***********************************************************************
+!> date: 89/12/01
 !
-! purpose :
 ! solution of a system of linear equations with a dense symmetric
 ! positive definite matrix a using the factorization a=trans(r)*r.
 !
@@ -590,14 +568,14 @@
 !  ii  job  option. if job=0 then x:=a**(-1)*x. if job>0 then
 !         x:=trans(r)**(-1)*x. if job<0 then x:=r**(-1)*x.
 !
-! method :
+!### Method
 ! back substitution
-!
+
       subroutine mxdprb(n,a,x,job)
       implicit none
-      integer job , n
-      double precision a(*) , x(*)
-      integer i , ii , ij , j
+      integer :: job , n
+      double precision :: a(*) , x(*)
+      integer :: i , ii , ij , j
       if ( job>=0 ) then
 !
 !     phase 1 : x:=trans(r)**(-1)*x
@@ -629,11 +607,9 @@
       endif
       end subroutine mxdprb
 
-! subroutine mxdprc                all systems                92/12/01
-! portability : all systems
-! 92/12/01 lu : original version
+!***********************************************************************
+!> date: 92/12/01
 !
-! purpose :
 ! correction of a singular dense symmetric positive semidefinite matrix
 ! a decomposed as a=trans(r)*r.
 !
@@ -645,13 +621,13 @@
 !         inf<0 then a is not sufficiently positive definite.
 !         process.
 !  ri  tol  desired tolerance for positive definiteness.
-!
+
       subroutine mxdprc(n,a,inf,tol)
       implicit none
-      integer n , inf
-      double precision a(n*(n+1)/2) , tol
-      double precision tol1 , temp
-      integer l , i
+      integer :: n , inf
+      double precision :: a(n*(n+1)/2) , tol
+      double precision :: tol1 , temp
+      integer :: l , i
       inf = 0
       tol1 = sqrt(tol)
       temp = tol1
@@ -669,11 +645,9 @@
       enddo
       end subroutine mxdprc
 
-! subroutine mxdprm                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! multiplication of a given vector x by a dense symmetric positive
 ! definite matrix a using the factorization a=trans(r)*r.
 !
@@ -684,12 +658,12 @@
 !         multiplication.
 !  ii  job  option. if job=0 then x:=a*x. if job>0 then x:=r*x.
 !         if job<0 then x:=trans(r)*x.
-!
+
       subroutine mxdprm(n,a,x,job)
       implicit none
-      integer n , job
-      double precision a(n*(n+1)/2) , x(n)
-      integer i , j , ii , ij
+      integer :: n , job
+      double precision :: a(n*(n+1)/2) , x(n)
+      integer :: i , j , ii , ij
       if ( job>=0 ) then
 !
 !     phase 1 : x:=r*x
@@ -721,11 +695,9 @@
       endif
       end subroutine mxdprm
 
-! subroutine mxdrgr               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! plane rotation is applied to a rowwise stored dense rectangular
 ! matrix a.
 !
@@ -739,15 +711,12 @@
 !  ri  cl  off-diagonal element of the elementary orthogonal matrix.
 !  ii  ier  type of the plane rotation. ier=0-general plane rotation.
 !         ier=1-permutation. ier=2-transformation suppressed.
-!
-! subprograms used :
-!  s   mxvrot  plane rotation applied to two elements.
-!
+
       subroutine mxdrgr(n,a,k,l,ck,cl,ier)
       implicit none
-      integer n , k , l , ier
-      double precision a(*) , ck , cl
-      integer i , ik , il
+      integer :: n , k , l , ier
+      double precision :: a(*) , ck , cl
+      integer :: i , ik , il
       if ( ier/=0 .and. ier/=1 ) return
       ik = (k-1)*n
       il = (l-1)*n
@@ -758,11 +727,9 @@
       enddo
       end subroutine mxdrgr
 
-! subroutine mxdrmd               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! multiplication of a rowwise stored dense rectangular matrix a by
 ! a vector x and addition of a scaled vector alf*y.
 !
@@ -775,13 +742,13 @@
 !  ri  alf  scaling factor.
 !  ri  y(m)  input vector.
 !  ro  z(m)  output vector equal to a*x+alf*y.
-!
+
       subroutine mxdrmd(n,m,a,x,alf,y,z)
       implicit none
-      integer n , m
-      double precision a(m*n) , x(n) , alf , y(m) , z(m)
-      double precision temp
-      integer i , j , k
+      integer :: n , m
+      double precision :: a(m*n) , x(n) , alf , y(m) , z(m)
+      double precision :: temp
+      integer :: i , j , k
       k = 0
       do j = 1 , m
          temp = alf*y(j)
@@ -793,11 +760,9 @@
       enddo
       end subroutine mxdrmd
 
-! subroutine mxdrmi               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! rowwise stored dense rectangular matrix a is set to be a part of the
 ! unit matrix.
 !
@@ -806,13 +771,13 @@
 !  ii  m  number of rows of the matrix a.
 !  ro  a(m*n)  rectangular matrix stored rowwise in the one-dimensional
 !          array. this matrix is set to trans([i,0]).
-!
+
       subroutine mxdrmi(n,m,a)
       implicit none
-      integer n , m
-      double precision a(m*n)
-      integer i , j , k
-      double precision zero , one
+      integer :: n , m
+      double precision :: a(m*n)
+      integer :: i , j , k
+      double precision :: zero , one
       parameter (zero=0.0d0,one=1.0d0)
       k = 0
       do j = 1 , m
@@ -824,11 +789,9 @@
       enddo
       end subroutine mxdrmi
 
-! subroutine mxdrmm               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! multiplication of a rowwise stored dense rectangular matrix a by
 ! a vector x.
 !
@@ -839,13 +802,13 @@
 !         one-dimensional array.
 !  ri  x(n)  input vector.
 !  ro  y(m)  output vector equal to a*x.
-!
+
       subroutine mxdrmm(n,m,a,x,y)
       implicit none
-      integer n , m
-      double precision a(*) , x(*) , y(*)
-      double precision temp
-      integer i , j , k
+      integer :: n , m
+      double precision :: a(*) , x(*) , y(*)
+      double precision :: temp
+      integer :: i , j , k
       k = 0
       do j = 1 , m
          temp = 0.0d0
@@ -857,11 +820,9 @@
       enddo
       end subroutine mxdrmm
 
-! function  mxdrmn               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! euclidean norm of a part of the i-th column of a rowwise stored dense
 ! rectangular matrix a is computed.
 !
@@ -872,14 +833,14 @@
 !         one-dimensional array.
 !  ii  i  index of the column whose norm is computed.
 !  ii  j  index of the first element from which the norm is computed.
-!
+
       function mxdrmn(n,m,a,i,j)
       implicit none
-      integer n , m , i , j
-      double precision a(m*n) , mxdrmn
-      double precision pom , den
-      integer k , l
-      double precision zero
+      integer :: n , m , i , j
+      double precision :: a(m*n) , mxdrmn
+      double precision :: pom , den
+      integer :: k , l
+      double precision :: zero
       parameter (zero=0.0d0)
       den = zero
       l = (j-1)*n
@@ -898,11 +859,9 @@
       mxdrmn = den*sqrt(pom)
       end function mxdrmn
 
-! subroutine mxdrmv               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! k-th column of a rowwise stored dense rectangular matrix a is copied
 ! to the vector x.
 !
@@ -913,12 +872,12 @@
 !         one-dimensional array.
 !  ro  x(m)  output vector such that x(j)=a(j,k) for all j.
 !  ii  k  index of the row being copied to the output vector.
-!
+
       subroutine mxdrmv(n,m,a,x,k)
       implicit none
-      integer n , m , k
-      double precision a(*) , x(*)
-      integer i , j
+      integer :: n , m , k
+      double precision :: a(*) , x(*)
+      integer :: i , j
       if ( k<1 .or. k>n ) return
       i = k
       do j = 1 , m
@@ -927,11 +886,9 @@
       enddo
       end subroutine mxdrmv
 
-! subroutine mxdrqf               all systems                92/12/01
-! portability : all systems
-! 92/12/01 lu : original version
+!***********************************************************************
+!> date: 92/12/01
 !
-! purpose :
 ! qr decomposition of rowwise stored dense rectangular matrix q using
 ! householder transformations without pivoting.
 !
@@ -942,21 +899,17 @@
 !         one-dimensional array.
 !  ro  r(n*(n+1)/2)  upper triangular matrix stored in the packed form.
 !
-! subprograms used :
-!  s   mxdrmn  euclidean norm of a part of the rowwise stored
-!         rectangular matrix column.
-!
-! method :
+!### Method
 ! p.a.bussinger, g.h.golub : linear least squares solution by
 ! householder transformation. numer. math. 7 (1965) 269-276.
-!
+
       subroutine mxdrqf(n,m,q,r)
       implicit none
-      integer n , m
-      double precision q(m*n) , r(n*(n+1)/2)
-      double precision alf , pom
-      integer i , j , k , l , jp , kp , nm
-      double precision zero , one
+      integer :: n , m
+      double precision :: q(m*n) , r(n*(n+1)/2)
+      double precision :: alf , pom
+      integer :: i , j , k , l , jp , kp , nm
+      double precision :: zero , one
       parameter (zero=0.0d0,one=1.0d0)
       nm = min(n,m)
 !
@@ -1032,11 +985,9 @@
       enddo
       end subroutine mxdrqf
 
-! subroutine mxdrqu               all systems                92/12/01
-! portability : all systems
-! 92/12/01 lu : original version
+!***********************************************************************
+!> date: 92/12/01
 !
-! purpose :
 ! update of a qr decomposition. this qr decomposition is updated
 ! by the rule q*r:=q*r+alf*x*trans(y).
 !
@@ -1053,22 +1004,18 @@
 !  io  inf  information. if inf=0 then x lies in the column space of q.
 !         if inf=1 then x does not lie in the column space of q.
 !
-! subprograms used :
-!  rf  mxvnor  euclidean norm of a vector.
-!  s   mxvort  computation of the plane rotation matrix.
-!  s   mxvrot  plane rotation is applied to two numbers.
-!
-! method :
+!### Method
 ! j.w.daniel, w.b.gragg, l.kaufman, g.w.steward : reorthogonalization
 ! and stable algorithms for updating the gram-schmidt qr factorization.
 ! mathematics of computation 30 (1976) 772-795.
+
       subroutine mxdrqu(n,m,q,r,alf,x,y,z,inf)
       implicit none
-      integer n , m , inf
-      double precision q(m*n) , r(n*(n+1)/2) , alf , x(m) , y(n) , z(n)
-      double precision ck , cl , zk , zl !, mxvnor
-      integer j , k , l , kj , kk , ier
-      double precision one , con
+      integer :: n , m , inf
+      double precision :: q(m*n) , r(n*(n+1)/2) , alf , x(m) , y(n) , z(n)
+      double precision :: ck , cl , zk , zl !, mxvnor
+      integer :: j , k , l , kj , kk , ier
+      double precision :: one , con
       parameter (one=1.0d0,con=1.0d-10)
       inf = 0
       kk = n*(n+1)/2
@@ -1170,11 +1117,9 @@
       endif
       end subroutine mxdrqu
 
-! subroutine mxdsda                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! a dense symmetric matrix a is augmented by the scaled unit matrix
 ! such that a:=a+alf*i (i is the unit matrix of order n).
 !
@@ -1182,12 +1127,12 @@
 !  ii  n  order of the matrix a.
 !  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
 !  ri  alf  scaling factor.
-!
+
       subroutine mxdsda(n,a,alf)
       implicit none
-      integer n
-      double precision a(*) , alf
-      integer i , j
+      integer :: n
+      double precision :: a(*) , alf
+      integer :: i , j
       j = 0
       do i = 1 , n
          j = j + i
@@ -1195,11 +1140,9 @@
       enddo
       end subroutine mxdsda
 
-! function mxdsdl                  all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! determination of the minimum diagonal element of a dense symmetric
 ! matrix.
 !
@@ -1208,13 +1151,13 @@
 !  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
 !  io  inf  index of the minimum diagonal element of the matrix a.
 !  rr  mxdsdl  minimum diagonal element of the matrix a.
-!
+
       function mxdsdl(n,a,inf)
       implicit none
-      integer n , inf
-      double precision a(n*(n+1)/2) , mxdsdl
-      double precision temp
-      integer i , j
+      integer :: n , inf
+      double precision :: a(n*(n+1)/2) , mxdsdl
+      double precision :: temp
+      integer :: i , j
       j = 1
       inf = 1
       temp = a(1)
@@ -1228,11 +1171,9 @@
       mxdsdl = temp
       end function mxdsdl
 
-! subroutine mxdsma             all systems                 91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! dense symmetric matrix augmented by the scaled dense symmetric matrix.
 !
 ! parameters :
@@ -1241,22 +1182,20 @@
 !  ri  a(n*(n+1)/2)  input matrix.
 !  ri  b(n*(n+1)/2)  input matrix.
 !  ro  c(n*(n+1)/2)  output matrix where c:=b+alf*a.
-!
+
       subroutine mxdsma(n,alf,a,b,c)
       implicit none
-      integer n
-      double precision alf , a(n*(n+1)/2) , b(n*(n+1)/2) , c(n*(n+1)/2)
-      integer i
+      integer :: n
+      double precision :: alf , a(n*(n+1)/2) , b(n*(n+1)/2) , c(n*(n+1)/2)
+      integer :: i
       do i = 1 , n*(n+1)/2
          c(i) = b(i) + alf*a(i)
       enddo
       end subroutine mxdsma
 
-! subroutine mxdsmc                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! copying of a dense symmetric matrix.
 !
 ! parameters :
@@ -1264,23 +1203,21 @@
 !  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
 !  ro  b(n*(n+1)/2)  dense symmetric matrix stored in the packed form
 !         where b:=a.
-!
+
       subroutine mxdsmc(n,a,b)
       implicit none
-      integer n
-      double precision a(n*(n+1)/2) , b(n*(n+1)/2)
-      integer m , i
+      integer :: n
+      double precision :: a(n*(n+1)/2) , b(n*(n+1)/2)
+      integer :: m , i
       m = n*(n+1)/2
       do i = 1 , m
          b(i) = a(i)
       enddo
       end subroutine mxdsmc
 
-! subroutine mxdsmg                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 !  gershgorin bounds for eigenvalues of a dense symmetric matrix.
 !  amin .le. any eigenvalue of a .le. amax.
 !
@@ -1289,14 +1226,14 @@
 !  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
 !  ro  amin  lower bound for eigenvalues of a.
 !  ro  amax  upper bound for eigenvalues of a.
-!
+
       subroutine mxdsmg(n,a,amin,amax)
       implicit none
-      integer n
-      double precision a(n*(n+1)/2) , amin , amax
-      double precision temp
-      integer i , j , k , l
-      double precision zero
+      integer :: n
+      double precision :: a(n*(n+1)/2) , amin , amax
+      double precision :: temp
+      integer :: i , j , k , l
+      double precision :: zero
       parameter (zero=0.0d0)
       amax = a(1)
       amin = a(1)
@@ -1319,11 +1256,9 @@
       enddo
       end subroutine mxdsmg
 
-! subroutine mxdsmi                all systems                88/12/01
-! portability : all systems
-! 88/12/01 lu : original version
+!***********************************************************************
+!> date: 88/12/01
 !
-! purpose :
 ! dense symmetric matrix a is set to the unit matrix with the same
 ! order.
 !
@@ -1331,12 +1266,12 @@
 !  ii  n  order of the matrix a.
 !  ro  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form
 !         which is set to the unit matrix (i.e. a:=i).
-!
+
       subroutine mxdsmi(n,a)
       implicit none
-      integer n
-      double precision a(*)
-      integer i , m
+      integer :: n
+      double precision :: a(*)
+      integer :: i , m
       m = n*(n+1)/2
       do i = 1 , m
          a(i) = 0.0d0
@@ -1348,11 +1283,9 @@
       enddo
       end subroutine mxdsmi
 
-! subroutine mxdsmm                all systems                89/12/01
-! portability : all systems
-! 89/12/01 lu : original version
+!***********************************************************************
+!> date: 89/12/01
 !
-! purpose :
 ! multiplication of a dense symmetric matrix a by a vector x.
 !
 ! parameters :
@@ -1360,13 +1293,13 @@
 !  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
 !  ri  x(n)  input vector.
 !  ro  y(n)  output vector equal to  a*x.
-!
+
       subroutine mxdsmm(n,a,x,y)
       implicit none
-      integer n
-      double precision a(*) , x(*) , y(*)
-      double precision temp
-      integer i , j , k , l
+      integer :: n
+      double precision :: a(*) , x(*) , y(*)
+      double precision :: temp
+      integer :: i , j , k , l
       k = 0
       do i = 1 , n
          temp = 0.0d0
@@ -1384,11 +1317,9 @@
       enddo
       end subroutine mxdsmm
 
-! function mxdsmq                  all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! value of a quadratic form with a dense symmetric matrix a.
 !
 ! parameters :
@@ -1397,15 +1328,15 @@
 !  ri  x(n)  given vector.
 !  ri  y(n)  given vector.
 !  rr  mxdsmq  value of the quadratic form mxdsmq=trans(x)*a*y.
-!
+
       double precision function mxdsmq(n,a,x,y)
       implicit none
-      double precision zero
+      double precision :: zero
       parameter (zero=0.0d0)
-      integer n
-      double precision a(*) , x(*) , y(*)
-      double precision temp , temp1 , temp2
-      integer i , j , k
+      integer :: n
+      double precision :: a(*) , x(*) , y(*)
+      double precision :: temp , temp1 , temp2
+      integer :: i , j , k
       temp = zero
       k = 0
       do i = 1 , n
@@ -1422,11 +1353,9 @@
       mxdsmq = temp
       end function mxdsmq
 
-! subroutine mxdsmr               all systems                92/12/01
-! portability : all systems
-! 92/12/01 lu : original version
+!***********************************************************************
+!> date: 92/12/01
 !
-! purpose :
 ! plane rotation is applied to a dense symmetric matrix a. the case
 ! k=l+1 is required.
 !
@@ -1440,16 +1369,13 @@
 !  io  ier  information on the transformation. ier<0-k or l out of
 !         range. ier=0-plane rotation. ier=1-permutation.
 !         ier=2-transformation suppressed.
-!
-! subprograms used :
-!  s   mxvrot  plane rotation is applied to two numbers.
-!
+
       subroutine mxdsmr(n,a,k,l,ck,cl,ier)
       implicit none
-      integer n , k , l , ier
-      double precision a(*) , ck , cl
-      double precision akk , akl , all , ckk , ckl , cll
-      integer j , kj , lj , kk , kl , ll
+      integer :: n , k , l , ier
+      double precision :: a(*) , ck , cl
+      double precision :: akk , akl , all , ckk , ckl , cll
+      integer :: j , kj , lj , kk , kl , ll
       if ( ier/=0 .and. ier/=1 ) return
       if ( k/=l+1 ) then
          ier = -1
@@ -1488,11 +1414,9 @@
       endif
       end subroutine mxdsmr
 
-! subroutine mxdsms                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! scaling of a dense symmetric matrix.
 !
 ! parameters :
@@ -1500,23 +1424,21 @@
 !  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form
 !         which is scaled by the value alf (i.e. a:=alf*a).
 !  ri  alf  scaling factor.
-!
+
       subroutine mxdsms(n,a,alf)
       implicit none
-      integer n
-      double precision a(n*(n+1)/2) , alf
-      integer i , m
+      integer :: n
+      double precision :: a(n*(n+1)/2) , alf
+      integer :: i , m
       m = n*(n+1)/2
       do i = 1 , m
          a(i) = a(i)*alf
       enddo
       end subroutine mxdsms
 
-! subroutine mxdsmu                all systems                89/12/01
-! portability : all systems
-! 89/12/01 lu : original version
+!***********************************************************************
+!> date: 89/12/01
 !
-! purpose :
 ! update of a dense symmetric matrix a. this update is defined as
 ! a:=a+alf*x*trans(x) where alf is a given scaling factor and x is
 ! a given vector.
@@ -1526,13 +1448,13 @@
 !  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
 !  ri  alf  scaling factor in the correction term.
 !  ri  x(n)  vector in the correction term.
-!
+
       subroutine mxdsmu(n,a,alf,x)
       implicit none
-      integer n
-      double precision a(n*(n+1)/2) , x(n) , alf
-      double precision temp
-      integer i , j , k
+      integer :: n
+      double precision :: a(n*(n+1)/2) , x(n) , alf
+      double precision :: temp
+      integer :: i , j , k
       k = 0
       do i = 1 , n
          temp = alf*x(i)
@@ -1543,11 +1465,9 @@
       enddo
       end subroutine mxdsmu
 
-! subroutine mxdsmv                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! k-th row of a dense symmetric matrix a is copied to the vector x.
 !
 ! parameters :
@@ -1555,12 +1475,12 @@
 !  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
 !  ro  x(n)  output vector.
 !  ii  k  index of copied row.
-!
+
       subroutine mxdsmv(n,a,x,k)
       implicit none
-      integer k , n
-      double precision a(*) , x(*)
-      integer i , l
+      integer :: k , n
+      double precision :: a(*) , x(*)
+      integer :: i , l
       l = k*(k-1)/2
       do i = 1 , n
          if ( i<=k ) then
@@ -1572,55 +1492,49 @@
       enddo
       end subroutine mxdsmv
 
-! subroutine mxvcop                all systems                88/12/01
-! portability : all systems
-! 88/12/01 lu : original version
+!***********************************************************************
+!> date: 88/12/01
 !
-! purpose :
 ! copying of a vector.
 !
 ! parameters :
 !  ii  n  vector dimension.
 !  ri  x(n)  input vector.
 !  ro  y(n)  output vector where y:= x.
-!
+
       subroutine mxvcop(n,x,y)
       implicit none
-      integer n
-      double precision x(*) , y(*)
-      integer i
+      integer :: n
+      double precision :: x(*) , y(*)
+      integer :: i
       do i = 1 , n
          y(i) = x(i)
       enddo
       end subroutine mxvcop
 
-! subroutine mxvdif                all systems                88/12/01
-! portability : all systems
-! 88/12/01 lu : original version
+!***********************************************************************
+!> date: 88/12/01
 !
-! purpose :
 ! vector difference.
 !
 ! parameters :
 !  ri  x(n)  input vector.
 !  ri  y(n)  input vector.
 !  ro  z(n)  output vector where z:= x - y.
-!
+
       subroutine mxvdif(n,x,y,z)
       implicit none
-      integer n
-      double precision x(*) , y(*) , z(*)
-      integer i
+      integer :: n
+      double precision :: x(*) , y(*) , z(*)
+      integer :: i
       do i = 1 , n
          z(i) = x(i) - y(i)
       enddo
       end subroutine mxvdif
 
-! subroutine mxvdir                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! vector augmented by the scaled vector.
 !
 ! parameters :
@@ -1629,23 +1543,21 @@
 !  ri  x(n)  input vector.
 !  ri  y(n)  input vector.
 !  ro  z(n)  output vector where z:= y + a*x.
-!
+
       subroutine mxvdir(n,a,x,y,z)
       implicit none
-      double precision a
-      integer n
-      double precision x(*) , y(*) , z(*)
-      integer i
+      double precision :: a
+      integer :: n
+      double precision :: x(*) , y(*) , z(*)
+      integer :: i
       do i = 1 , n
          z(i) = y(i) + a*x(i)
       enddo
       end subroutine mxvdir
 
-! function mxvdot                  all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! dot product of two vectors.
 !
 ! parameters :
@@ -1656,10 +1568,10 @@
 !
       function mxvdot(n,x,y)
       implicit none
-      integer n
-      double precision x(*) , y(*) , mxvdot
-      double precision temp
-      integer i
+      integer :: n
+      double precision :: x(*) , y(*) , mxvdot
+      double precision :: temp
+      integer :: i
       temp = 0.0d0
       do i = 1 , n
          temp = temp + x(i)*y(i)
@@ -1667,95 +1579,85 @@
       mxvdot = temp
       end function mxvdot
 
-! subroutine mxvina             all systems                   90/12/01
-! portability : all systems
-! 90/12/01 lu : original version
+!***********************************************************************
+!> date: 90/12/01
 !
-! purpose :
-! elements of the integer vector are replaced by their absolute values.
+! elements of the integer :: vector are replaced by their absolute values.
 !
 ! parameters :
-!  ii  n dimension of the integer vector.
-!  iu  ix(n)  integer vector which is updated so that ix(i):=abs(ix(i))
+!  ii  n dimension of the integer :: vector.
+!  iu  ix(n)  integer :: vector which is updated so that ix(i):=abs(ix(i))
 !         for all i.
-!
+
       subroutine mxvina(n,ix)
       implicit none
-      integer n
-      integer ix(*)
-      integer i
+      integer :: n
+      integer :: ix(*)
+      integer :: i
       do i = 1 , n
          ix(i) = abs(ix(i))
          if ( ix(i)>10 ) ix(i) = ix(i) - 10
       enddo
       end subroutine mxvina
 
-! subroutine mxvind               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
-! change of the integer vector element for the constraint addition.
+! change of the integer :: vector element for the constraint addition.
 !
 ! parameters :
-!  iu  ix(n)  integer vector.
+!  iu  ix(n)  integer :: vector.
 !  ii  i  index of the changed element.
 !  ii job  change specification. is job.eq.0 then ix(i)=10-ix(i).
-!
+
       subroutine mxvind(ix,i,job)
       implicit none
-      integer ix(*) , i , job
+      integer :: ix(*) , i , job
       if ( job==0 ) ix(i) = 10 - ix(i)
       end subroutine mxvind
 
-! subroutine mxvins             all systems                   90/12/01
-! portability : all systems
-! 90/12/01 lu : original version
+!***********************************************************************
+!> date: 90/12/01
 !
-! purpose :
-! initiation of the integer vector.
+! initiation of the integer :: vector.
 !
 ! parameters :
-!  ii  n dimension of the integer vector.
-!  ii  ip  integer parameter.
-!  io  ix(n)  integer vector such that ix(i)=ip for all i.
-!
+!  ii  n dimension of the integer :: vector.
+!  ii  ip  integer :: parameter.
+!  io  ix(n)  integer :: vector such that ix(i)=ip for all i.
+
       subroutine mxvins(n,ip,ix)
       implicit none
-      integer n , ip , ix(n)
-      integer i
+      integer :: n , ip , ix(n)
+      integer :: i
       do i = 1 , n
          ix(i) = ip
       enddo
       end subroutine mxvins
 
-! subroutine mxvinv               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
-! change of the integer vector element for the constraint addition.
+! change of the integer :: vector element for the constraint addition.
 !
 ! parameters :
 !  ii  n  vector dimension.
-!  iu  ix(n)  integer vector.
+!  iu  ix(n)  integer :: vector.
 !  ii  i  index of the changed element.
 !  ii  job  change specification
-!
+
       subroutine mxvinv(ix,i,job)
       implicit none
-      integer i , job
-      integer ix(*)
+      integer :: i , job
+      integer :: ix(*)
       if ( (ix(i)==3 .or. ix(i)==5) .and. job<0 ) ix(i) = ix(i) + 1
       if ( (ix(i)==4 .or. ix(i)==6) .and. job>0 ) ix(i) = ix(i) - 1
       ix(i) = -ix(i)
       end subroutine mxvinv
 
-! function mxvmax               all systems                   91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! l-infinity norm of a vector.
 !
 ! parameters :
@@ -1765,42 +1667,38 @@
 !
       function mxvmax(n,x)
       implicit none
-      integer n
-      double precision x(*) , mxvmax
-      integer i
+      integer :: n
+      double precision :: x(*) , mxvmax
+      integer :: i
       mxvmax = 0.0d0
       do i = 1 , n
          mxvmax = max(mxvmax,abs(x(i)))
       enddo
       end function mxvmax
 
-! subroutine mxvneg                all systems                88/12/01
-! portability : all systems
-! 88/12/01 lu : original version
+!***********************************************************************
+!> date: 88/12/01
 !
-! purpose :
 ! change the signs of vector elements.
 !
 ! parameters :
 !  ii  n  vector dimension.
 !  ri  x(n)  input vector.
 !  ro  y(n)  output vector where y:= - x.
-!
+
       subroutine mxvneg(n,x,y)
       implicit none
-      integer n
-      double precision x(*) , y(*)
-      integer i
+      integer :: n
+      double precision :: x(*) , y(*)
+      integer :: i
       do i = 1 , n
          y(i) = -x(i)
       enddo
       end subroutine mxvneg
 
-! function  mxvnor               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! euclidean norm of a vector.
 !
 ! parameters :
@@ -1810,11 +1708,11 @@
 !
       function mxvnor(n,x)
       implicit none
-      integer n
-      double precision x(*) , mxvnor
-      double precision pom , den
-      integer i
-      double precision zero
+      integer :: n
+      double precision :: x(*) , mxvnor
+      double precision :: pom , den
+      integer :: i
+      double precision :: zero
       parameter (zero=0.0d0)
       den = zero
       do i = 1 , n
@@ -1829,11 +1727,9 @@
       mxvnor = den*sqrt(pom)
       end function mxvnor
 
-! subroutine mxvort               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! determination of an elementary orthogonal matrix for plane rotation.
 !
 ! parameters :
@@ -1845,12 +1741,12 @@
 !  ro  cl  off-diagonal element of the elementary orthogonal matrix.
 !  io  ier  information on the transformation. ier=0-general plane
 !         rotation. ier=1-permutation. ier=2-transformation suppressed.
-!
+
       subroutine mxvort(xk,xl,ck,cl,ier)
       implicit none
-      double precision ck , cl , xk , xl
-      integer ier
-      double precision den , pom
+      double precision :: ck , cl , xk , xl
+      integer :: ier
+      double precision :: den , pom
       if ( xl==0.0d0 ) then
          ier = 2
       elseif ( xk==0.0d0 ) then
@@ -1876,11 +1772,9 @@
       endif
       end subroutine mxvort
 
-! subroutine mxvrot               all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! plane rotation is applied to two values.
 !
 ! parameters :
@@ -1890,12 +1784,12 @@
 !  ri  cl  off-diagonal element of the elementary orthogonal matrix.
 !  ii  ier  information on the transformation. ier=0-general plane
 !         rotation. ier=1-permutation. ier=2-transformation suppressed.
-!
+
       subroutine mxvrot(xk,xl,ck,cl,ier)
       implicit none
-      double precision ck , cl , xk , xl
-      integer ier
-      double precision yk , yl
+      double precision :: ck , cl , xk , xl
+      integer :: ier
+      double precision :: yk , yl
       if ( ier==0 ) then
          yk = xk
          yl = xl
@@ -1908,24 +1802,22 @@
       endif
       end subroutine mxvrot
 
-! subroutine mxvsav                all systems                91/12/01
-! portability : all systems
-! 91/12/01 lu : original version
+!***********************************************************************
+!> date: 91/12/01
 !
-! purpose :
 ! difference of two vectors returned in the substracted one.
 !
 ! parameters :
 !  ii  n  vector dimension.
 !  ri  x(n)  input vector.
 !  ru  y(n)  update vector where y:= x - y.
-!
+
       subroutine mxvsav(n,x,y)
       implicit none
-      integer n
-      double precision x(*) , y(*)
-      double precision temp
-      integer i
+      integer :: n
+      double precision :: x(*) , y(*)
+      double precision :: temp
+      integer :: i
       do i = 1 , n
          temp = y(i)
          y(i) = x(i) - y(i)
@@ -1933,11 +1825,9 @@
       enddo
       end subroutine mxvsav
 
-! subroutine mxvscl                all systems                88/12/01
-! portability : all systems
-! 88/12/01 lu : original version
+!***********************************************************************
+!> date: 88/12/01
 !
-! purpose :
 ! scaling of a vector.
 !
 ! parameters :
@@ -1945,46 +1835,42 @@
 !  ri  x(n)  input vector.
 !  ri  a  scaling factor.
 !  ro  y(n)  output vector where y:= a*x.
-!
+
       subroutine mxvscl(n,a,x,y)
       implicit none
-      double precision a
-      integer n
-      double precision x(*) , y(*)
-      integer i
+      double precision :: a
+      integer :: n
+      double precision :: x(*) , y(*)
+      integer :: i
       do i = 1 , n
          y(i) = a*x(i)
       enddo
       end subroutine mxvscl
 
-! subroutine mxvset                all systems                88/12/01
-! portability : all systems
-! 88/12/01 lu : original version
+!***********************************************************************
+!> date: 88/12/01
 !
-! purpose :
 ! a scalar is set to all the elements of a vector.
 !
 ! parameters :
 !  ii  n  vector dimension.
 !  ri  a  initial value.
 !  ro  x(n)  output vector such that x(i)=a for all i.
-!
+
       subroutine mxvset(n,a,x)
       implicit none
-      double precision a
-      integer n
-      double precision x(*)
-      integer i
+      double precision :: a
+      integer :: n
+      double precision :: x(*)
+      integer :: i
       do i = 1 , n
          x(i) = a
       enddo
       end subroutine mxvset
 
-! subroutine mxvsum                all systems                88/12/01
-! portability : all systems
-! 88/12/01 lu : original version
+!***********************************************************************
+!> date: 88/12/01
 !
-! purpose :
 ! sum of two vectors.
 !
 ! parameters :
@@ -1992,12 +1878,12 @@
 !  ri  x(n)  input vector.
 !  ri  y(n)  input vector.
 !  ro  z(n)  output vector where z:= x + y.
-!
+
       subroutine mxvsum(n,x,y,z)
       implicit none
-      integer n
-      double precision x(*) , y(*) , z(*)
-      integer i
+      integer :: n
+      double precision :: x(*) , y(*) , z(*)
+      integer :: i
       do i = 1 , n
          z(i) = x(i) + y(i)
       enddo
