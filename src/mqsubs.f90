@@ -7,11 +7,14 @@
 
    module matrix_routines
 
+      use kind_module, only: wp
+
       implicit none
 
       public
 
    contains
+!***********************************************************************
 
 !***********************************************************************
 !> date: 91/12/01
@@ -25,18 +28,19 @@
 
       integer :: n !! number of rows of the matrix a.
       integer :: m !! number of columns of the matrix a.
-      double precision :: a(*) !! a(n*m) rectangular matrix stored columnwise in the one-dimensional array.
-      double precision :: x(*) !! x(m)  input vector.
-      double precision :: y(*) !! y(n)  output vector equal to a*x.
+      real(wp) :: a(*) !! a(n*m) rectangular matrix stored columnwise
+                       !! in the one-dimensional array.
+      real(wp) :: x(*) !! x(m)  input vector.
+      real(wp) :: y(*) !! y(n)  output vector equal to a*x.
 
       integer :: j , k
 
-      call mxvset(n,0.0d0,y)
+      call mxvset(n,0.0_wp,y)
       k = 0
       do j = 1 , m
          call mxvdir(n,x(j),a(k+1),y,y)
          k = k + n
-      enddo
+      end do
       end subroutine mxdcmm
 
 !***********************************************************************
@@ -46,23 +50,25 @@
 ! positive definite matrix a+e using the factorization a+e=l*d*trans(l)
 ! obtained by the subroutine mxdpgf.
 !
-! parameters :
-!  ii  n order of the matrix a.
-!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
-!         subroutine mxdpgf.
-!  ru  x(n)  on input the right hand side of a system of linear
-!         equations. on output the solution of a system of linear
-!         equations.
-!  ii  job  option. if job=0 then x:=(a+e)**(-1)*x. if job>0 then
-!         x:=l**(-1)*x. if job<0 then x:=trans(l)**(-1)*x.
-!
 !### Method
 ! back substitution
 
       subroutine mxdpgb(n,a,x,job)
+
       implicit none
-      integer :: job , n
-      double precision :: a(*) , x(*)
+
+      integer :: job  !! option:
+                      !!
+                      !! * if job=0 then x:=(a+e)**(-1)*x.
+                      !! * if job>0 then x:=l**(-1)*x.
+                      !! * if job<0 then x:=trans(l)**(-1)*x.
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
+                                !! obtained by the subroutine mxdpgf.
+      real(wp) :: x(*)  !! x(n)  on input the right hand side of a
+                                !! system of linear equations. on output the
+                                !! solution of a system of linear equations.
+
       integer :: i , ii , ij , j
       if ( job>=0 ) then
 !
@@ -73,9 +79,9 @@
             do j = 1 , i - 1
                ij = ij + 1
                x(i) = x(i) - a(ij)*x(j)
-            enddo
+            end do
             ij = ij + 1
-         enddo
+         end do
       endif
       if ( job==0 ) then
 !
@@ -85,7 +91,7 @@
          do i = 1 , n
             ii = ii + i
             x(i) = x(i)/a(ii)
-         enddo
+         end do
       endif
       if ( job<=0 ) then
 !
@@ -97,9 +103,9 @@
             do j = i + 1 , n
                ij = ij + j - 1
                x(i) = x(i) - a(ij)*x(j)
-            enddo
+            end do
             ii = ii - i
-         enddo
+         end do
       endif
       end subroutine mxdpgb
 
@@ -110,47 +116,48 @@
 ! dense symmetric matrix a using the factorization a+e=l*d*trans(l)
 !         obtained by the subroutine mxdpgf.
 !
-! parameters :
-!  ii  n order of the matrix a.
-!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
-!         subroutine mxdpgf.
-!  ro  x(n)  computed direction of negative curvature (i.e.
-!         trans(x)*a*x<0) if it exists.
-!  ii  inf  information obtained in the factorization process. the
-!         direction of negative curvature exists only if inf>0.
-!
 !### Method
 ! p.e.gill, w.murray : newton type methods for unconstrained and
 ! linearly constrained optimization, math. programming 28 (1974)
 ! pp. 311-350.
 
       subroutine mxdpgd(n,a,x,inf)
+
       implicit none
-      integer :: n , inf
-      double precision :: a(n*(n+1)/2) , x(n)
+
+      integer :: n  !! order of the matrix a.
+      integer :: inf  !! information obtained in the factorization process. the
+                      !! direction of negative curvature exists only if inf>0.
+      real(wp) :: a(n*(n+1)/2)  !! factorization a+e=l*d*trans(l) obtained by the
+                                !! subroutine mxdpgf.
+      real(wp) :: x(n)  !! computed direction of negative curvature (i.e.
+                        !! trans(x)*a*x<0) if it exists.
+
       integer :: i , j , ii , ij
-      double precision :: zero , one
-      parameter (zero=0.0d0,one=1.0d0)
-!
+
+      real(wp),parameter :: zero = 0.0_wp
+      real(wp),parameter :: one = 1.0_wp
+
 !     right hand side formation
-!
+
       do i = 1 , n
          x(i) = zero
-      enddo
+      end do
       if ( inf<=0 ) return
       x(inf) = one
-!
+
 !     back substitution
-!
+
       ii = inf*(inf-1)/2
       do i = inf - 1 , 1 , -1
          ij = ii
          do j = i + 1 , inf
             ij = ij + j - 1
             x(i) = x(i) - a(ij)*x(j)
-         enddo
+         end do
          ii = ii - i
-      enddo
+      end do
+
       end subroutine mxdpgd
 
 !***********************************************************************
@@ -161,44 +168,43 @@
 ! l is a lower triangular matrix. if a is sufficiently positive
 ! definite then e=0.
 !
-! parameters :
-!  ii  n order of the matrix a.
-!  ru  a(n*(n+1)/2)  on input a given dense symmetric (usually positive
-!         definite) matrix a stored in the packed form. on output the
-!         computed factorization a+e=l*d*trans(l).
-!  io  inf  an information obtained in the factorization process. if
-!         inf=0 then a is sufficiently positive definite and e=0. if
-!         inf<0 then a is not sufficiently positive definite and e>0. if
-!         inf>0 then a is indefinite and inf is an index of the
-!         most negative diagonal element used in the factorization
-!         process.
-!  ru  alf  on input a desired tolerance for positive definiteness. on
-!         output the most negative diagonal element used in the
-!         factorization process (if inf>0).
-!  ro  tau  maximum diagonal element of the matrix e.
-!
 !### Method
-! p.e.gill, w.murray : newton type methods for unconstrained and
-! linearly constrained optimization, math. programming 28 (1974)
-! pp. 311-350.
+!  * p.e.gill, w.murray : newton type methods for unconstrained and
+!    linearly constrained optimization, math. programming 28 (1974)
+!    pp. 311-350.
 
       subroutine mxdpgf(n,a,inf,alf,tau)
+
       implicit none
-      double precision :: alf , tau
-      integer :: inf , n
-      double precision :: a(*)
-      double precision :: bet , del , gam , rho , sig , tol
+
+      real(wp) :: alf  !! on input a desired tolerance for positive definiteness. on
+                       !! output the most negative diagonal element used in the
+                       !! factorization process (if inf>0).
+      real(wp) :: tau  !! maximum diagonal element of the matrix e.
+      integer :: inf  !! an information obtained in the factorization process. if
+                      !! inf=0 then a is sufficiently positive definite and e=0. if
+                      !! inf<0 then a is not sufficiently positive definite and e>0. if
+                      !! inf>0 then a is indefinite and inf is an index of the
+                      !! most negative diagonal element used in the factorization
+                      !! process.
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2)  on input a given dense symmetric (usually positive
+                        !! definite) matrix a stored in the packed form. on output the
+                        !! computed factorization a+e=l*d*trans(l).
+
+      real(wp) :: bet , del , gam , rho , sig , tol
       integer :: i , ij , ik , j , k , kj , kk , l
+
       l = 0
       inf = 0
       tol = alf
 !
 !     estimation of the matrix norm
 !
-      alf = 0.0d0
-      bet = 0.0d0
-      gam = 0.0d0
-      tau = 0.0d0
+      alf = 0.0_wp
+      bet = 0.0_wp
+      gam = 0.0_wp
+      tau = 0.0_wp
       kk = 0
       do k = 1 , n
          kk = kk + k
@@ -207,11 +213,11 @@
          do j = k + 1 , n
             kj = kj + j - 1
             gam = max(gam,abs(a(kj)))
-         enddo
-      enddo
+         end do
+      end do
       bet = max(tol,bet,gam/n)
 !      del = tol*bet
-      del = tol*max(bet,1.0d0)
+      del = tol*max(bet,1.0_wp)
       kk = 0
       do k = 1 , n
          kk = kk + k
@@ -223,12 +229,12 @@
             alf = sig
             l = k
          endif
-         gam = 0.0d0
+         gam = 0.0_wp
          kj = kk
          do j = k + 1 , n
             kj = kj + j - 1
             gam = max(gam,abs(a(kj)))
-         enddo
+         end do
          gam = gam*gam
          rho = max(abs(sig),gam/bet,del)
          if ( tau<rho-sig ) then
@@ -250,9 +256,9 @@
                ik = ik + i - 1
                ij = ij + 1
                a(ij) = a(ij) - a(ik)*gam
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
       if ( l>0 .and. abs(alf)>del ) inf = l
       end subroutine mxdpgf
 
@@ -263,36 +269,38 @@
 ! of a dense symmetric positive definite matrix a+e using the
 ! factorization a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
 !
-! parameters :
-!  ii  n order of the matrix a.
-!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
-!         subroutine mxdpgf.
-!  ro  x(n)  estimated eigenvector.
-!  ro  alf  estimated eigenvalue.
-!  ii  job  option. if job=0 then only estimated eigenvalue is
-!         computed. is job>0 then both estimated eigenvalue and
-!         estimated eigenvector are computed by job iterations.
-!
 !### Method
-! a.k.cline, c.b.moler, g.w.stewart, j.h.wilkinson : an estimate
-! for the condition number of a matrix. siam j. numer. anal. 16
-! (1979) 368-373.
+!  * a.k.cline, c.b.moler, g.w.stewart, j.h.wilkinson : an estimate
+!    for the condition number of a matrix. siam j. numer. anal. 16
+!    (1979) 368-373.
 
       subroutine mxdpgn(n,a,x,alf,job)
+
       implicit none
-      integer :: n , job
-      double precision :: a(n*(n+1)/2) , x(n) , alf
-      double precision :: xp , xm , fp , fm !, mxvdot
+
+      integer :: n  !! order of the matrix a.
+      integer :: job  !! option:
+                      !!
+                      !! * if job=0 then only estimated eigenvalue is computed.
+                      !! * if job>0 then both estimated eigenvalue and
+                      !!   estimated eigenvector are computed by job iterations.
+      real(wp) :: a(n*(n+1)/2)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
+                                !! obtained by the subroutine mxdpgf.
+      real(wp) :: x(n)  !! estimated eigenvector.
+      real(wp) :: alf  !! estimated eigenvalue.
+
+      real(wp) :: xp , xm , fp , fm
       integer :: i , k , ik , kk
-      double precision :: zero , one
-      parameter (zero=0.0d0,one=1.0d0)
+
+      real(wp),parameter :: zero = 0.0_wp
+      real(wp),parameter :: one = 1.0_wp
 !
 !     computation of the vector v with possible maximum norm such
 !     that  l*d**(1/2)*v=u  where u has elements +1 or -1
 !
       do i = 1 , n
          x(i) = zero
-      enddo
+      end do
       kk = 0
       do k = 1 , n
          kk = kk + k
@@ -305,23 +313,23 @@
             ik = ik + i - 1
             fp = fp + abs(x(i)+a(ik)*xp)
             fm = fm + abs(x(i)+a(ik)*xm)
-         enddo
+         end do
          if ( fp>=fm ) then
             x(k) = xp
             ik = kk
             do i = k + 1 , n
                ik = ik + i - 1
                x(i) = x(i) + a(ik)*xp
-            enddo
+            end do
          else
             x(k) = xm
             ik = kk
             do i = k + 1 , n
                ik = ik + i - 1
                x(i) = x(i) + a(ik)*xm
-            enddo
+            end do
          endif
-      enddo
+      end do
 !
 !     computation of the vector x such that
 !     d**(1/2)*trans(l)*x=v
@@ -337,7 +345,7 @@
          else
             x(k) = x(k)/a(kk)
          endif
-      enddo
+      end do
       fp = dble(n)
       if ( job<=0 ) then
 !
@@ -354,10 +362,10 @@
          do i = k + 1 , n
             ik = ik + i - 1
             x(k) = x(k) - a(ik)*x(i)
-         enddo
+         end do
          fm = fm + x(k)*x(k)
          kk = kk - k
-      enddo
+      end do
       fm = sqrt(fm)
       if ( job<=1 ) then
 !
@@ -375,10 +383,10 @@
 !
             do i = 1 , n
                x(i) = x(i)/fm
-            enddo
+            end do
             call mxdpgb(n,a,x,0)
             fm = sqrt(mxvdot(n,x,x))
-         enddo
+         end do
          alf = one/fm
       endif
 !
@@ -386,35 +394,36 @@
 !
       do i = 1 , n
          x(i) = x(i)/fm
-      enddo
+      end do
       end subroutine mxdpgn
 
-! function mxdpgp                  all systems                91/12/01
+!***********************************************************************
+!> date: 91/12/01
 !
 ! computation of the number mxdpgp=trans(x)*d**(-1)*y where d is a
 ! diagonal matrix in the factorization a+e=l*d*trans(l) obtained by the
 ! subroutine mxdpgf.
-!
-! parameters :
-!  ii  n order of the matrix a.
-!  ri  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
-!         subroutine mxdpgf.
-!  ri  x(n)  input vector.
-!  ri  y(n)  input vector.
-!  rr  mxdpgp  computed number mxdpgp=trans(x)*d**(-1)*y.
-!
+
       function mxdpgp(n,a,x,y)
+
       implicit none
-      integer :: n
-      double precision :: a(*) , x(*) , y(*) , mxdpgp
-      double precision :: temp
+
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
+                        !! obtained by the subroutine mxdpgf.
+      real(wp) :: x(*)  !! input vector.
+      real(wp) :: y(*)  !! input vector.
+      real(wp) :: mxdpgp  !! computed number mxdpgp=trans(x)*d**(-1)*y.
+
+      real(wp) :: temp
       integer :: i , j
+
       j = 0
-      temp = 0.0d0
+      temp = 0.0_wp
       do i = 1 , n
          j = j + i
          temp = temp + x(i)*y(i)/a(j)
-      enddo
+      end do
       mxdpgp = temp
       end function mxdpgp
 
@@ -423,24 +432,24 @@
 !
 ! scaling of a dense symmetric positive definite matrix a+e using the
 ! factorization a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
-!
-! parameters :
-!  ii  n order of the matrix a.
-!  ru  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
-!         subroutine mxdpgf.
-!  ri  alf  scaling factor.
 
       subroutine mxdpgs(n,a,alf)
+
       implicit none
-      double precision :: alf
-      integer :: n
-      double precision :: a(*)
+
+      real(wp) :: alf  !! scaling factor.
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
+                        !! obtained by the subroutine mxdpgf.
+
       integer :: i , j
+
       j = 0
       do i = 1 , n
          j = j + i
          a(j) = a(j)*alf
-      enddo
+      end do
+
       end subroutine mxdpgs
 
 !***********************************************************************
@@ -451,27 +460,30 @@
 ! the correction is defined as a+e:=a+e+alf*x*trans(x) where alf is a
 ! given scaling factor and x is a given vector.
 !
-! parameters :
-!  ii  n order of the matrix a.
-!  ru  a(n*(n+1)/2) factorization a+e=l*d*trans(l) obtained by the
-!         subroutine mxdpgf.
-!  ri  alf  scaling factor in the correction term.
-!  ri  x(n)  vector in the correction term.
-!  ra  y(n) auxiliary vector.
-!
 !### Method
-! p.e.gill, w.murray, m.saunders: methods for computing and modifying
-! the ldv factors of a matrix, math. of comp. 29 (1974) pp. 1051-1077.
+!  * p.e.gill, w.murray, m.saunders: methods for computing and modifying
+!    the ldv factors of a matrix, math. of comp. 29 (1974) pp. 1051-1077.
 
       subroutine mxdpgu(n,a,alf,x,y)
+
       implicit none
-      double precision :: zero , one , four , con
-      parameter (zero=0.0d0,one=1.0d0,four=4.0d0,con=1.0d-8)
-      double precision :: alf , alfr
-      integer :: n
-      double precision :: a(*) , x(*) , y(*)
-      double precision :: b , d , p , r , t , to
+
+      real(wp) :: alf  !! scaling factor in the correction term.
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
+                        !! obtained by the subroutine mxdpgf.
+      real(wp) :: x(*)  !! vector in the correction term.
+      real(wp) :: y(*)  !! auxiliary vector.
+
+      real(wp) :: alfr
+      real(wp) :: b , d , p , r , t , to
       integer :: i , ii , ij , j
+
+      real(wp), parameter :: zero = 0.0_wp
+      real(wp), parameter :: one = 1.0_wp
+      real(wp), parameter :: four = 4.0_wp
+      real(wp), parameter :: con = 1.0e-8_wp
+
       if ( alf>=zero ) then
 !
 !     forward correction in case when the scaling factor is nonnegative
@@ -498,7 +510,7 @@
                   d = a(ij)
                   y(j) = y(j) - p*d
                   a(ij) = d + b*y(j)
-               enddo
+               end do
             else
 !
 !     a more complicate but numerically stable formula for unlimited
@@ -510,10 +522,10 @@
                   d = a(ij)
                   a(ij) = r*d + b*y(j)
                   y(j) = y(j) - p*d
-               enddo
+               end do
             endif
             to = t
-         enddo
+         end do
       else
 !
 !     backward correction in case when the scaling factor is negative
@@ -527,11 +539,11 @@
             do j = 1 , i - 1
                ij = ij + 1
                d = d - a(ij)*y(j)
-            enddo
+            end do
             y(i) = d
             ij = ij + 1
             to = to - d*d/a(ij)
-         enddo
+         end do
          if ( to<=zero ) to = con
          ii = n*(n+1)/2
          do i = n , 1 , -1
@@ -547,9 +559,9 @@
                d = a(ij)
                a(ij) = d + b*y(j)
                y(j) = y(j) + p*d
-            enddo
+            end do
             ii = ii - i
-         enddo
+         end do
       endif
       end subroutine mxdpgu
 
@@ -559,23 +571,26 @@
 ! solution of a system of linear equations with a dense symmetric
 ! positive definite matrix a using the factorization a=trans(r)*r.
 !
-! parameters :
-!  ii  n order of the matrix a.
-!  ri  a(n*(n+1)/2) factorization a=trans(r)*r.
-!  ru  x(n)  on input the right hand side of a system of linear
-!         equations. on output the solution of a system of linear
-!         equations.
-!  ii  job  option. if job=0 then x:=a**(-1)*x. if job>0 then
-!         x:=trans(r)**(-1)*x. if job<0 then x:=r**(-1)*x.
-!
 !### Method
 ! back substitution
 
       subroutine mxdprb(n,a,x,job)
+
       implicit none
-      integer :: job , n
-      double precision :: a(*) , x(*)
+
+      integer :: job    !! option:
+                        !!
+                        !! * if job=0 then x:=a**(-1)*x.
+                        !! * if job>0 then x:=trans(r)**(-1)*x.
+                        !! * if job<0 then x:=r**(-1)*x.
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a=trans(r)*r.
+      real(wp) :: x(*)  !! x(n)  on input the right hand side of a system of linear
+                        !! equations. on output the solution of a system of linear
+                        !! equations.
+
       integer :: i , ii , ij , j
+
       if ( job>=0 ) then
 !
 !     phase 1 : x:=trans(r)**(-1)*x
@@ -585,10 +600,10 @@
             do j = 1 , i - 1
                ij = ij + 1
                x(i) = x(i) - a(ij)*x(j)
-            enddo
+            end do
             ij = ij + 1
             x(i) = x(i)/a(ij)
-         enddo
+         end do
       endif
       if ( job<=0 ) then
 !
@@ -600,10 +615,10 @@
             do j = i + 1 , n
                ij = ij + j - 1
                x(i) = x(i) - a(ij)*x(j)
-            enddo
+            end do
             x(i) = x(i)/a(ii)
             ii = ii - i
-         enddo
+         end do
       endif
       end subroutine mxdprb
 
@@ -612,28 +627,28 @@
 !
 ! correction of a singular dense symmetric positive semidefinite matrix
 ! a decomposed as a=trans(r)*r.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  io  inf  an information obtained in the correction process. if
-!         inf=0 then a is sufficiently positive definite. if
-!         inf<0 then a is not sufficiently positive definite.
-!         process.
-!  ri  tol  desired tolerance for positive definiteness.
 
       subroutine mxdprc(n,a,inf,tol)
+
       implicit none
-      integer :: n , inf
-      double precision :: a(n*(n+1)/2) , tol
-      double precision :: tol1 , temp
+
+      integer :: n  !! order of the matrix a.
+      integer :: inf  !! an information obtained in the correction process:
+                      !!
+                      !! * if inf=0 then a is sufficiently positive definite.
+                      !! * if inf<0 then a is not sufficiently positive definite.
+      real(wp) :: a(n*(n+1)/2)  !! dense symmetric matrix stored in the packed form.
+      real(wp) :: tol  !! desired tolerance for positive definiteness.
+
+      real(wp) :: tol1 , temp
       integer :: l , i
+
       inf = 0
       tol1 = sqrt(tol)
       temp = tol1
       do i = 1 , n*(n+1)/2
          temp = max(temp,abs(a(i)))
-      enddo
+      end do
       temp = temp*tol1
       l = 0
       do i = 1 , n
@@ -642,7 +657,8 @@
             a(l) = sign(temp,a(l))
             inf = -1
          endif
-      enddo
+      end do
+
       end subroutine mxdprc
 
 !***********************************************************************
@@ -650,20 +666,23 @@
 !
 ! multiplication of a given vector x by a dense symmetric positive
 ! definite matrix a using the factorization a=trans(r)*r.
-!
-! parameters :
-!  ii  n order of the matrix a.
-!  ri  a(n*(n+1)/2) factorization a=trans(r)*r.
-!  ru  x(n)  on input the given vector. on output the result of
-!         multiplication.
-!  ii  job  option. if job=0 then x:=a*x. if job>0 then x:=r*x.
-!         if job<0 then x:=trans(r)*x.
 
       subroutine mxdprm(n,a,x,job)
+
       implicit none
-      integer :: n , job
-      double precision :: a(n*(n+1)/2) , x(n)
+
+      integer :: n  !! order of the matrix a.
+      integer :: job  !! option:
+                      !!
+                      !! * if job=0 then x:=a*x.
+                      !! * if job>0 then x:=r*x.
+                      !! * if job<0 then x:=trans(r)*x.
+      real(wp) :: a(n*(n+1)/2)  !! factorization a=trans(r)*r.
+      real(wp) :: x(n)  !! on input the given vector.
+                        !! on output the result of multiplication.
+
       integer :: i , j , ii , ij
+
       if ( job>=0 ) then
 !
 !     phase 1 : x:=r*x
@@ -676,8 +695,8 @@
             do j = i + 1 , n
                ij = ij + j - 1
                x(i) = x(i) + a(ij)*x(j)
-            enddo
-         enddo
+            end do
+         end do
       endif
       if ( job<=0 ) then
 !
@@ -689,9 +708,9 @@
             do j = i - 1 , 1 , -1
                ij = ij - 1
                x(i) = x(i) + a(ij)*x(j)
-            enddo
+            end do
             ij = ij - 1
-         enddo
+         end do
       endif
       end subroutine mxdprm
 
@@ -700,23 +719,26 @@
 !
 ! plane rotation is applied to a rowwise stored dense rectangular
 ! matrix a.
-!
-! parameters :
-!  ii  n  number of columns of the matrix a.
-!  ru  a(m*n)  rectangular matrix stored rowwise in the
-!         one-dimensional array.
-!  ii  k  first index of the plane rotation.
-!  ii  l  second index of the plane rotation.
-!  ri  ck  diagonal element of the elementary orthogonal matrix.
-!  ri  cl  off-diagonal element of the elementary orthogonal matrix.
-!  ii  ier  type of the plane rotation. ier=0-general plane rotation.
-!         ier=1-permutation. ier=2-transformation suppressed.
 
       subroutine mxdrgr(n,a,k,l,ck,cl,ier)
+
       implicit none
-      integer :: n , k , l , ier
-      double precision :: a(*) , ck , cl
+
+      integer :: n  !! number of columns of the matrix a.
+      integer :: k  !! first index of the plane rotation.
+      integer :: l  !! second index of the plane rotation.
+      integer :: ier  !! type of the plane rotation:
+                      !!
+                      !! * ier=0-general plane rotation.
+                      !! * ier=1-permutation.
+                      !! * ier=2-transformation suppressed.
+      real(wp) :: a(*)  !! a(m*n)  rectangular matrix stored rowwise in the
+                        !! one-dimensional array.
+      real(wp) :: ck  !! diagonal element of the elementary orthogonal matrix.
+      real(wp) :: cl  !! off-diagonal element of the elementary orthogonal matrix.
+
       integer :: i , ik , il
+
       if ( ier/=0 .and. ier/=1 ) return
       ik = (k-1)*n
       il = (l-1)*n
@@ -724,7 +746,8 @@
          ik = ik + 1
          il = il + 1
          call mxvrot(a(ik),a(il),ck,cl,ier)
-      enddo
+      end do
+
       end subroutine mxdrgr
 
 !***********************************************************************
@@ -732,32 +755,32 @@
 !
 ! multiplication of a rowwise stored dense rectangular matrix a by
 ! a vector x and addition of a scaled vector alf*y.
-!
-! parameters :
-!  ii  n  number of columns of the matrix a.
-!  ii  m  number of rows of the matrix a.
-!  ri  a(m*n)  rectangular matrix stored rowwise in the
-!         one-dimensional array.
-!  ri  x(n)  input vector.
-!  ri  alf  scaling factor.
-!  ri  y(m)  input vector.
-!  ro  z(m)  output vector equal to a*x+alf*y.
 
       subroutine mxdrmd(n,m,a,x,alf,y,z)
+
       implicit none
-      integer :: n , m
-      double precision :: a(m*n) , x(n) , alf , y(m) , z(m)
-      double precision :: temp
+
+      integer :: n  !! number of columns of the matrix a.
+      integer :: m  !! number of rows of the matrix a.
+      real(wp) :: a(m*n)  !! rectangular matrix stored rowwise in the one-dimensional array.
+      real(wp) :: x(n)  !! input vector.
+      real(wp) :: alf  !! scaling factor.
+      real(wp) :: y(m)  !! input vector.
+      real(wp) :: z(m)  !! output vector equal to a*x+alf*y.
+
+      real(wp) :: temp
       integer :: i , j , k
+
       k = 0
       do j = 1 , m
          temp = alf*y(j)
          do i = 1 , n
             temp = temp + a(k+i)*x(i)
-         enddo
+         end do
          z(j) = temp
          k = k + n
-      enddo
+      end do
+
       end subroutine mxdrmd
 
 !***********************************************************************
@@ -765,28 +788,29 @@
 !
 ! rowwise stored dense rectangular matrix a is set to be a part of the
 ! unit matrix.
-!
-! parameters :
-!  ii  n  number of columns of the matrix a.
-!  ii  m  number of rows of the matrix a.
-!  ro  a(m*n)  rectangular matrix stored rowwise in the one-dimensional
-!          array. this matrix is set to trans([i,0]).
 
       subroutine mxdrmi(n,m,a)
+
       implicit none
-      integer :: n , m
-      double precision :: a(m*n)
+
+      integer :: n  !! number of columns of the matrix a.
+      integer :: m  !! number of rows of the matrix a.
+      real(wp) :: a(m*n)  !! rectangular matrix stored rowwise in
+                          !! the one-dimensional array.
+                          !! this matrix is set to trans([i,0]).
+
       integer :: i , j , k
-      double precision :: zero , one
-      parameter (zero=0.0d0,one=1.0d0)
+      real(wp) :: zero , one
+      parameter (zero=0.0_wp,one=1.0_wp)
       k = 0
       do j = 1 , m
          do i = 1 , n
             a(i+k) = zero
             if ( i==j ) a(i+k) = one
-         enddo
+         end do
          k = k + n
-      enddo
+      end do
+
       end subroutine mxdrmi
 
 !***********************************************************************
@@ -794,30 +818,30 @@
 !
 ! multiplication of a rowwise stored dense rectangular matrix a by
 ! a vector x.
-!
-! parameters :
-!  ii  n  number of columns of the matrix a.
-!  ii  m  number of rows of the matrix a.
-!  ri  a(m*n)  rectangular matrix stored rowwise in the
-!         one-dimensional array.
-!  ri  x(n)  input vector.
-!  ro  y(m)  output vector equal to a*x.
 
       subroutine mxdrmm(n,m,a,x,y)
+
       implicit none
-      integer :: n , m
-      double precision :: a(*) , x(*) , y(*)
-      double precision :: temp
+
+      integer :: n  !! number of columns of the matrix a.
+      integer :: m  !! number of rows of the matrix a.
+      real(wp) :: a(*)  !! a(m*n)  rectangular matrix stored rowwise
+                        !! in the one-dimensional array.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(m)  output vector equal to a*x.
+
+      real(wp) :: temp
       integer :: i , j , k
+
       k = 0
       do j = 1 , m
-         temp = 0.0d0
+         temp = 0.0_wp
          do i = 1 , n
             temp = temp + a(k+i)*x(i)
-         enddo
+         end do
          y(j) = temp
          k = k + n
-      enddo
+      end do
       end subroutine mxdrmm
 
 !***********************************************************************
@@ -825,38 +849,39 @@
 !
 ! euclidean norm of a part of the i-th column of a rowwise stored dense
 ! rectangular matrix a is computed.
-!
-! parameters :
-!  ii  n  number of columns of the matrix a.
-!  ii  m  number of rows of the matrix a.
-!  ri  a(m*n)  rectangular matrix stored rowwise in the
-!         one-dimensional array.
-!  ii  i  index of the column whose norm is computed.
-!  ii  j  index of the first element from which the norm is computed.
 
       function mxdrmn(n,m,a,i,j)
+
       implicit none
-      integer :: n , m , i , j
-      double precision :: a(m*n) , mxdrmn
-      double precision :: pom , den
+
+      integer :: n  !! number of columns of the matrix a.
+      integer :: m  !! number of rows of the matrix a.
+      real(wp) :: a(m*n)  !! rectangular matrix stored rowwise in the one-dimensional array.
+      integer :: i  !! index of the column whose norm is computed.
+      integer :: j  !! index of the first element from which the norm is computed.
+      real(wp) :: mxdrmn
+
+      real(wp) :: pom , den
       integer :: k , l
-      double precision :: zero
-      parameter (zero=0.0d0)
+
+      real(wp),parameter :: zero = 0.0_wp
+
       den = zero
       l = (j-1)*n
       do k = j , m
          den = max(den,abs(a(l+i)))
          l = l + n
-      enddo
+      end do
       pom = zero
       if ( den>zero ) then
          l = (j-1)*n
          do k = j , m
             pom = pom + (a(l+i)/den)**2
             l = l + n
-         enddo
+         end do
       endif
       mxdrmn = den*sqrt(pom)
+
       end function mxdrmn
 
 !***********************************************************************
@@ -864,26 +889,27 @@
 !
 ! k-th column of a rowwise stored dense rectangular matrix a is copied
 ! to the vector x.
-!
-! parameters :
-!  ii  n  number of columns of the matrix a.
-!  ii  m  number of rows of the matrix a.
-!  ri  a(m*n)  rectangular matrix stored rowwise in the
-!         one-dimensional array.
-!  ro  x(m)  output vector such that x(j)=a(j,k) for all j.
-!  ii  k  index of the row being copied to the output vector.
 
       subroutine mxdrmv(n,m,a,x,k)
+
       implicit none
-      integer :: n , m , k
-      double precision :: a(*) , x(*)
+
+      integer :: n  !! number of columns of the matrix a.
+      integer :: m  !! number of rows of the matrix a.
+      real(wp) :: a(*)  !! a(m*n)  rectangular matrix stored rowwise
+                        !! in the one-dimensional array.
+      real(wp) :: x(*)  !! x(m)  output vector such that x(j)=a(j,k) for all j.
+      integer :: k  !! index of the row being copied to the output vector.
+
       integer :: i , j
+
       if ( k<1 .or. k>n ) return
       i = k
       do j = 1 , m
          x(j) = a(i)
          i = i + n
-      enddo
+      end do
+
       end subroutine mxdrmv
 
 !***********************************************************************
@@ -892,25 +918,25 @@
 ! qr decomposition of rowwise stored dense rectangular matrix q using
 ! householder transformations without pivoting.
 !
-! parameters :
-!  ii  n  number of columns of the matrix q.
-!  ii  m  number of rows of the matrix q.
-!  ru  q(m*n)  rectangular matrix stored rowwise in the
-!         one-dimensional array.
-!  ro  r(n*(n+1)/2)  upper triangular matrix stored in the packed form.
-!
 !### Method
-! p.a.bussinger, g.h.golub : linear least squares solution by
-! householder transformation. numer. math. 7 (1965) 269-276.
+!  * p.a.bussinger, g.h.golub : linear least squares solution by
+!    householder transformation. numer. math. 7 (1965) 269-276.
 
       subroutine mxdrqf(n,m,q,r)
+
       implicit none
-      integer :: n , m
-      double precision :: q(m*n) , r(n*(n+1)/2)
-      double precision :: alf , pom
+
+      integer :: n  !! number of columns of the matrix q.
+      integer :: m  !! number of rows of the matrix q.
+      real(wp) :: q(m*n)   !! rectangular matrix stored rowwise in the one-dimensional array.
+      real(wp) :: r(n*(n+1)/2)  !! upper triangular matrix stored in the packed form.
+
+      real(wp) :: alf , pom
       integer :: i , j , k , l , jp , kp , nm
-      double precision :: zero , one
-      parameter (zero=0.0d0,one=1.0d0)
+
+      real(wp),parameter :: zero=0.0_wp
+      real(wp),parameter :: one=1.0_wp
+
       nm = min(n,m)
 !
 !     qr decomposition
@@ -926,7 +952,7 @@
             r(l+j) = q(jp+k)
             q(jp+k) = zero
             jp = jp + n
-         enddo
+         end do
          if ( pom/=zero ) then
 !
 !     householder transformation
@@ -934,7 +960,7 @@
             do j = k , m
                q(jp+k) = q(jp+k)/pom
                jp = jp + n
-            enddo
+            end do
             q(kp+k) = q(kp+k) + one
             do i = k + 1 , n
                alf = zero
@@ -942,18 +968,18 @@
                do j = k , m
                   alf = alf + q(jp+k)*q(jp+i)
                   jp = jp + n
-               enddo
+               end do
                alf = alf/q(kp+k)
                jp = kp
                do j = k , m
                   q(jp+i) = q(jp+i) - alf*q(jp+k)
                   jp = jp + n
-               enddo
-            enddo
+               end do
+            end do
          endif
          l = l + k
          kp = kp + n
-      enddo
+      end do
 !
 !     explicit formulation of the orthogonal matrix
 !
@@ -967,22 +993,23 @@
                do j = k , m
                   alf = alf + q(jp+k)*q(jp+i)
                   jp = jp + n
-               enddo
+               end do
                alf = alf/q(kp+k)
                jp = kp
                do j = k , m
                   q(jp+i) = q(jp+i) - alf*q(jp+k)
                   jp = jp + n
-               enddo
-            enddo
+               end do
+            end do
             jp = kp
             do j = k , m
                q(jp+k) = -q(jp+k)
                jp = jp + n
-            enddo
+            end do
          endif
          q(kp+k) = q(kp+k) + one
-      enddo
+      end do
+
       end subroutine mxdrqf
 
 !***********************************************************************
@@ -991,32 +1018,36 @@
 ! update of a qr decomposition. this qr decomposition is updated
 ! by the rule q*r:=q*r+alf*x*trans(y).
 !
-! parameters :
-!  ii  n  number of columns of the matrix q.
-!  ii  m  number of rows of the matrix q.
-!  ru  q(m*n)  rectangular matrix stored rowwise in the
-!         one-dimensional array (part of the orthogonal matrix).
-!  ru  r(n*(n+1)/2)  upper triangular matrix stored in a packed form.
-!  ri  alf  scalar parameter.
-!  ri  x(m)  input vector.
-!  ri  y(n)  input vector.
-!  ra  z(n)  auxiliary vector.
-!  io  inf  information. if inf=0 then x lies in the column space of q.
-!         if inf=1 then x does not lie in the column space of q.
-!
 !### Method
-! j.w.daniel, w.b.gragg, l.kaufman, g.w.steward : reorthogonalization
-! and stable algorithms for updating the gram-schmidt qr factorization.
-! mathematics of computation 30 (1976) 772-795.
+!  * j.w.daniel, w.b.gragg, l.kaufman, g.w.steward : reorthogonalization
+!    and stable algorithms for updating the gram-schmidt qr factorization.
+!    mathematics of computation 30 (1976) 772-795.
 
       subroutine mxdrqu(n,m,q,r,alf,x,y,z,inf)
+
       implicit none
-      integer :: n , m , inf
-      double precision :: q(m*n) , r(n*(n+1)/2) , alf , x(m) , y(n) , z(n)
-      double precision :: ck , cl , zk , zl !, mxvnor
+
+      integer :: n             !! number of columns of the matrix q.
+      integer :: m             !! number of rows of the matrix q.
+      real(wp) :: q(m*n)       !! rectangular matrix stored rowwise in
+                               !! the one-dimensional array (part of the
+                               !! orthogonal matrix).
+      real(wp) :: r(n*(n+1)/2) !! upper triangular matrix stored in a
+                               !! packed form.
+      real(wp) :: alf          !! scalar parameter.
+      real(wp) :: x(m)         !! input vector.
+      real(wp) :: y(n)         !! input vector.
+      real(wp) :: z(n)         !! auxiliary vector.
+      integer :: inf           !! information. if inf=0 then x lies in
+                               !! the column space of q. if inf=1 then x
+                               !! does not lie in the column space of q.
+
+      real(wp) :: ck , cl , zk , zl
       integer :: j , k , l , kj , kk , ier
-      double precision :: one , con
-      parameter (one=1.0d0,con=1.0d-10)
+
+      real(wp),parameter :: one = 1.0_wp
+      real(wp),parameter :: con = 1.0e-10_wp
+
       inf = 0
       kk = n*(n+1)/2
 !
@@ -1041,7 +1072,7 @@
                do j = 1 , m
                   call mxvrot(q(kj),x(j),ck,cl,ier)
                   kj = kj + n
-               enddo
+               end do
             endif
          endif
       endif
@@ -1064,20 +1095,20 @@
             do j = l , n
                kj = kj + j - 1
                call mxvrot(r(kj),r(kj+1),ck,cl,ier)
-            enddo
+            end do
             kj = k
             do j = 1 , m
                call mxvrot(q(kj),q(kj+1),ck,cl,ier)
                kj = kj + n
-            enddo
+            end do
          endif
-      enddo
+      end do
       z(1) = alf*z(1)
       kj = 1
       do j = 1 , n
          r(kj) = r(kj) + z(1)*y(j)
          kj = kj + j
-      enddo
+      end do
 !
 !     application of plane rotations to the upper hessenberg matrix r1
 !     given above so that r2=trans(q2)*r1 where q2 is an orthogonal
@@ -1093,15 +1124,15 @@
             do j = l , n
                kj = kj + j - 1
                call mxvrot(r(kj),r(kj+1),ck,cl,ier)
-            enddo
+            end do
             kj = k
             do j = 1 , m
                call mxvrot(q(kj),q(kj+1),ck,cl,ier)
                kj = kj + n
-            enddo
+            end do
          endif
          kk = kk + l
-      enddo
+      end do
 !
 !     back transformation of the greater subproblem if inf=1.
 !
@@ -1112,7 +1143,7 @@
             do j = 1 , m
                call mxvrot(q(kj),x(j),ck,cl,ier)
                kj = kj + n
-            enddo
+            end do
          endif
       endif
       end subroutine mxdrqu
@@ -1122,22 +1153,23 @@
 !
 ! a dense symmetric matrix a is augmented by the scaled unit matrix
 ! such that a:=a+alf*i (i is the unit matrix of order n).
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  ri  alf  scaling factor.
 
       subroutine mxdsda(n,a,alf)
+
       implicit none
-      integer :: n
-      double precision :: a(*) , alf
+
+      integer :: n      !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix
+                        !! stored in the packed form.
+      real(wp) :: alf   !! scaling factor.
+
       integer :: i , j
+
       j = 0
       do i = 1 , n
          j = j + i
          a(j) = a(j) + alf
-      enddo
+      end do
       end subroutine mxdsda
 
 !***********************************************************************
@@ -1145,19 +1177,21 @@
 !
 ! determination of the minimum diagonal element of a dense symmetric
 ! matrix.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  io  inf  index of the minimum diagonal element of the matrix a.
-!  rr  mxdsdl  minimum diagonal element of the matrix a.
 
       function mxdsdl(n,a,inf)
+
       implicit none
-      integer :: n , inf
-      double precision :: a(n*(n+1)/2) , mxdsdl
-      double precision :: temp
+
+      integer :: n  !! order of the matrix a.
+      integer :: inf  !! index of the minimum diagonal element
+                      !! of the matrix a.
+      real(wp) :: a(n*(n+1)/2)   !! dense symmetric matrix stored
+                                 !! in the packed form.
+      real(wp) :: mxdsdl  !! minimum diagonal element of the matrix a.
+
+      real(wp) :: temp
       integer :: i , j
+
       j = 1
       inf = 1
       temp = a(1)
@@ -1167,74 +1201,78 @@
             inf = j
             temp = a(j)
          endif
-      enddo
+      end do
       mxdsdl = temp
+
       end function mxdsdl
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! dense symmetric matrix augmented by the scaled dense symmetric matrix.
-!
-! parameters :
-!  ii  n  order of the matrices.
-!  ri  alf  scaling factor.
-!  ri  a(n*(n+1)/2)  input matrix.
-!  ri  b(n*(n+1)/2)  input matrix.
-!  ro  c(n*(n+1)/2)  output matrix where c:=b+alf*a.
 
       subroutine mxdsma(n,alf,a,b,c)
+
       implicit none
-      integer :: n
-      double precision :: alf , a(n*(n+1)/2) , b(n*(n+1)/2) , c(n*(n+1)/2)
+
+      integer :: n  !! order of the matrices.
+      real(wp) :: alf  !! scaling factor.
+      real(wp) :: a(n*(n+1)/2)  !! input matrix.
+      real(wp) :: b(n*(n+1)/2)  !! input matrix.
+      real(wp) :: c(n*(n+1)/2)  !! output matrix where c:=b+alf*a.
+
       integer :: i
+
       do i = 1 , n*(n+1)/2
          c(i) = b(i) + alf*a(i)
-      enddo
+      end do
+
       end subroutine mxdsma
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! copying of a dense symmetric matrix.
-!
-! parameters :
-!  ii  n  order of the matrices a and b.
-!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  ro  b(n*(n+1)/2)  dense symmetric matrix stored in the packed form
-!         where b:=a.
 
       subroutine mxdsmc(n,a,b)
+
       implicit none
-      integer :: n
-      double precision :: a(n*(n+1)/2) , b(n*(n+1)/2)
+
+      integer :: n  !! order of the matrices a and b.
+      real(wp) :: a(n*(n+1)/2)  !! dense symmetric matrix stored in the packed form.
+      real(wp) :: b(n*(n+1)/2)  !! dense symmetric matrix stored in the packed form
+                                !! where b:=a.
+
       integer :: m , i
+
       m = n*(n+1)/2
       do i = 1 , m
          b(i) = a(i)
-      enddo
+      end do
+
       end subroutine mxdsmc
 
 !***********************************************************************
 !> date: 91/12/01
 !
 !  gershgorin bounds for eigenvalues of a dense symmetric matrix.
-!  amin .le. any eigenvalue of a .le. amax.
-!
-! parameters :
-!  ii  n  dimension of the matrix a.
-!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  ro  amin  lower bound for eigenvalues of a.
-!  ro  amax  upper bound for eigenvalues of a.
+!  amin <= any eigenvalue of a <= amax.
 
       subroutine mxdsmg(n,a,amin,amax)
+
       implicit none
-      integer :: n
-      double precision :: a(n*(n+1)/2) , amin , amax
-      double precision :: temp
+
+      integer :: n  !! dimension of the matrix a.
+      real(wp) :: a(n*(n+1)/2)  !! dense symmetric matrix stored
+                                !! in the packed form.
+      real(wp) :: amin  !! lower bound for eigenvalues of a.
+      real(wp) :: amax  !! upper bound for eigenvalues of a.
+
+      real(wp) :: temp
       integer :: i , j , k , l
-      double precision :: zero
-      parameter (zero=0.0d0)
+
+      real(wp),parameter :: zero = 0.0_wp
+
       amax = a(1)
       amin = a(1)
       k = 0
@@ -1244,16 +1282,17 @@
          do j = 1 , i - 1
             l = l + 1
             temp = temp + abs(a(l))
-         enddo
+         end do
          l = l + 1
          do j = i + 1 , n
             l = l + j - 1
             temp = temp + abs(a(l))
-         enddo
+         end do
          k = k + i
          amax = max(amax,a(k)+temp)
          amin = min(amin,a(k)-temp)
-      enddo
+      end do
+
       end subroutine mxdsmg
 
 !***********************************************************************
@@ -1261,82 +1300,85 @@
 !
 ! dense symmetric matrix a is set to the unit matrix with the same
 ! order.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ro  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form
-!         which is set to the unit matrix (i.e. a:=i).
 
       subroutine mxdsmi(n,a)
+
       implicit none
-      integer :: n
-      double precision :: a(*)
+
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix
+                        !! stored in the packed form which is set
+                        !! to the unit matrix (i.e. a:=i).
+
       integer :: i , m
+
       m = n*(n+1)/2
       do i = 1 , m
-         a(i) = 0.0d0
-      enddo
+         a(i) = 0.0_wp
+      end do
       m = 0
       do i = 1 , n
          m = m + i
-         a(m) = 1.0d0
-      enddo
+         a(m) = 1.0_wp
+      end do
+
       end subroutine mxdsmi
 
 !***********************************************************************
 !> date: 89/12/01
 !
 ! multiplication of a dense symmetric matrix a by a vector x.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  ri  x(n)  input vector.
-!  ro  y(n)  output vector equal to  a*x.
 
       subroutine mxdsmm(n,a,x,y)
+
       implicit none
-      integer :: n
-      double precision :: a(*) , x(*) , y(*)
-      double precision :: temp
+
+      integer :: n      !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  output vector equal to  a*x.
+
+      real(wp) :: temp
       integer :: i , j , k , l
+
       k = 0
       do i = 1 , n
-         temp = 0.0d0
+         temp = 0.0_wp
          l = k
          do j = 1 , i
             l = l + 1
             temp = temp + a(l)*x(j)
-         enddo
+         end do
          do j = i + 1 , n
             l = l + j - 1
             temp = temp + a(l)*x(j)
-         enddo
+         end do
          y(i) = temp
          k = k + i
-      enddo
+      end do
+
       end subroutine mxdsmm
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! value of a quadratic form with a dense symmetric matrix a.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  ri  x(n)  given vector.
-!  ri  y(n)  given vector.
-!  rr  mxdsmq  value of the quadratic form mxdsmq=trans(x)*a*y.
 
-      double precision function mxdsmq(n,a,x,y)
+      function mxdsmq(n,a,x,y)
+
       implicit none
-      double precision :: zero
-      parameter (zero=0.0d0)
-      integer :: n
-      double precision :: a(*) , x(*) , y(*)
-      double precision :: temp , temp1 , temp2
+
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
+      real(wp) :: x(*)  !! x(n)  given vector.
+      real(wp) :: y(*)  !! y(n)  given vector.
+      real(wp) :: mxdsmq  !! value of the quadratic form mxdsmq=trans(x)*a*y.
+
+      real(wp) :: temp , temp1 , temp2
       integer :: i , j , k
+
+      real(wp), parameter :: zero = 0.0_wp
+
       temp = zero
       k = 0
       do i = 1 , n
@@ -1346,11 +1388,12 @@
             k = k + 1
             temp1 = temp1 + a(k)*x(j)
             temp2 = temp2 + a(k)*y(j)
-         enddo
+         end do
          k = k + 1
          temp = temp + x(i)*(temp2+a(k)*y(i)) + y(i)*temp1
-      enddo
+      end do
       mxdsmq = temp
+
       end function mxdsmq
 
 !***********************************************************************
@@ -1358,24 +1401,27 @@
 !
 ! plane rotation is applied to a dense symmetric matrix a. the case
 ! k=l+1 is required.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ru  a(n*(n+1)/2) dense symmetric matrix stored in the packed form.
-!  ii  k  first index of plane rotation.
-!  ii  l  second index of plane rotation.
-!  ro  ck  diagonal element of the elementary orthogonal matrix.
-!  ro  cl  off-diagonal element of the elementary orthogonal matrix.
-!  io  ier  information on the transformation. ier<0-k or l out of
-!         range. ier=0-plane rotation. ier=1-permutation.
-!         ier=2-transformation suppressed.
 
       subroutine mxdsmr(n,a,k,l,ck,cl,ier)
+
       implicit none
-      integer :: n , k , l , ier
-      double precision :: a(*) , ck , cl
-      double precision :: akk , akl , all , ckk , ckl , cll
+
+      integer :: n  !! order of the matrix a.
+      integer :: k  !! first index of plane rotation.
+      integer :: l  !! second index of plane rotation.
+      integer :: ier  !! information on the transformation:
+                      !!
+                      !! * ier<0-k or l out of range.
+                      !! * ier=0-plane rotation.
+                      !! * ier=1-permutation.
+                      !! * ier=2-transformation suppressed.
+      real(wp) :: a(*)  !! a(n*(n+1)/2) dense symmetric matrix stored in the packed form.
+      real(wp) :: ck  !! diagonal element of the elementary orthogonal matrix.
+      real(wp) :: cl  !! off-diagonal element of the elementary orthogonal matrix.
+
+      real(wp) :: akk , akl , all , ckk , ckl , cll
       integer :: j , kj , lj , kk , kl , ll
+
       if ( ier/=0 .and. ier/=1 ) return
       if ( k/=l+1 ) then
          ier = -1
@@ -1391,7 +1437,7 @@
             kj = lj + 1
          endif
          if ( j/=k .and. j/=l ) call mxvrot(a(kj),a(lj),ck,cl,ier)
-      enddo
+      end do
       if ( ier==0 ) then
          ckk = ck**2
          ckl = ck*cl
@@ -1412,28 +1458,31 @@
          a(kk) = a(ll)
          a(ll) = akk
       endif
+
       end subroutine mxdsmr
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! scaling of a dense symmetric matrix.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form
-!         which is scaled by the value alf (i.e. a:=alf*a).
-!  ri  alf  scaling factor.
 
       subroutine mxdsms(n,a,alf)
+
       implicit none
-      integer :: n
-      double precision :: a(n*(n+1)/2) , alf
+
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(n*(n+1)/2)  !! dense symmetric matrix stored
+                                !! in the packed form which is scaled
+                                !! by the value alf (i.e. a:=alf*a).
+      real(wp) :: alf  !! scaling factor.
+
       integer :: i , m
+
       m = n*(n+1)/2
       do i = 1 , m
          a(i) = a(i)*alf
-      enddo
+      end do
+
       end subroutine mxdsms
 
 !***********************************************************************
@@ -1442,45 +1491,47 @@
 ! update of a dense symmetric matrix a. this update is defined as
 ! a:=a+alf*x*trans(x) where alf is a given scaling factor and x is
 ! a given vector.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ru  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  ri  alf  scaling factor in the correction term.
-!  ri  x(n)  vector in the correction term.
 
       subroutine mxdsmu(n,a,alf,x)
+
       implicit none
-      integer :: n
-      double precision :: a(n*(n+1)/2) , x(n) , alf
-      double precision :: temp
+
+      integer :: n  !! order of the matrix a.
+      real(wp) :: a(n*(n+1)/2)  !! dense symmetric matrix stored in the packed form.
+      real(wp) :: alf  !! scaling factor in the correction term.
+      real(wp) :: x(n)  !! vector in the correction term.
+
+      real(wp) :: temp
       integer :: i , j , k
+
       k = 0
       do i = 1 , n
          temp = alf*x(i)
          do j = 1 , i
             k = k + 1
             a(k) = a(k) + temp*x(j)
-         enddo
-      enddo
+         end do
+      end do
+
       end subroutine mxdsmu
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! k-th row of a dense symmetric matrix a is copied to the vector x.
-!
-! parameters :
-!  ii  n  order of the matrix a.
-!  ri  a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-!  ro  x(n)  output vector.
-!  ii  k  index of copied row.
 
       subroutine mxdsmv(n,a,x,k)
+
       implicit none
-      integer :: k , n
-      double precision :: a(*) , x(*)
+
+      integer :: k      !! index of copied row.
+      integer :: n      !! order of the matrix a.
+      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix
+                        !! stored in the packed form.
+      real(wp) :: x(*)  !! x(n)  output vector.
+
       integer :: i , l
+
       l = k*(k-1)/2
       do i = 1 , n
          if ( i<=k ) then
@@ -1489,240 +1540,250 @@
             l = l + i - 1
          endif
          x(i) = a(l)
-      enddo
+      end do
+
       end subroutine mxdsmv
 
 !***********************************************************************
 !> date: 88/12/01
 !
 ! copying of a vector.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  ro  y(n)  output vector where y:= x.
 
       subroutine mxvcop(n,x,y)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , y(*)
+
+      integer :: n  !! vector dimension.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  output vector where y:= x.
+
       integer :: i
+
       do i = 1 , n
          y(i) = x(i)
-      enddo
+      end do
+
       end subroutine mxvcop
 
 !***********************************************************************
 !> date: 88/12/01
 !
 ! vector difference.
-!
-! parameters :
-!  ri  x(n)  input vector.
-!  ri  y(n)  input vector.
-!  ro  z(n)  output vector where z:= x - y.
 
       subroutine mxvdif(n,x,y,z)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , y(*) , z(*)
+
+      integer :: n  !! vector dimension.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  input vector.
+      real(wp) :: z(*)  !! z(n)  output vector where z:= x - y.
+
       integer :: i
+
       do i = 1 , n
          z(i) = x(i) - y(i)
-      enddo
+      end do
+
       end subroutine mxvdif
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! vector augmented by the scaled vector.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  a  scaling factor.
-!  ri  x(n)  input vector.
-!  ri  y(n)  input vector.
-!  ro  z(n)  output vector where z:= y + a*x.
 
       subroutine mxvdir(n,a,x,y,z)
+
       implicit none
-      double precision :: a
-      integer :: n
-      double precision :: x(*) , y(*) , z(*)
+
+      integer :: n !! vector dimension.
+      real(wp) :: a !! scaling factor.
+      real(wp) :: x(*) !! x(n)  input vector.
+      real(wp) :: y(*) !! y(n)  input vector.
+      real(wp) :: z(*) !! z(n)  output vector where z:= y + a*x.
+
       integer :: i
+
       do i = 1 , n
          z(i) = y(i) + a*x(i)
-      enddo
+      end do
+
       end subroutine mxvdir
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! dot product of two vectors.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  ri  y(n)  input vector.
-!  rr  mxvdot  value of dot product mxvdot=trans(x)*y.
-!
+
       function mxvdot(n,x,y)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , y(*) , mxvdot
-      double precision :: temp
+
+      integer :: n  !!vector dimension.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  input vector.
+      real(wp) :: mxvdot  !! value of dot product mxvdot=trans(x)*y.
+
+      real(wp) :: temp
       integer :: i
-      temp = 0.0d0
+
+      temp = 0.0_wp
       do i = 1 , n
          temp = temp + x(i)*y(i)
-      enddo
+      end do
       mxvdot = temp
+
       end function mxvdot
 
 !***********************************************************************
 !> date: 90/12/01
 !
-! elements of the integer :: vector are replaced by their absolute values.
-!
-! parameters :
-!  ii  n dimension of the integer :: vector.
-!  iu  ix(n)  integer :: vector which is updated so that ix(i):=abs(ix(i))
-!         for all i.
+! elements of the integer vector are replaced by their absolute values.
 
       subroutine mxvina(n,ix)
+
       implicit none
-      integer :: n
-      integer :: ix(*)
+
+      integer :: n  !! dimension of the integer vector.
+      integer :: ix(*)  !! vector which is updated so that
+                        !! ix(i):=abs(ix(i)) for all i.
+
       integer :: i
+
       do i = 1 , n
          ix(i) = abs(ix(i))
          if ( ix(i)>10 ) ix(i) = ix(i) - 10
-      enddo
+      end do
+
       end subroutine mxvina
 
 !***********************************************************************
 !> date: 91/12/01
 !
-! change of the integer :: vector element for the constraint addition.
-!
-! parameters :
-!  iu  ix(n)  integer :: vector.
-!  ii  i  index of the changed element.
-!  ii job  change specification. is job.eq.0 then ix(i)=10-ix(i).
+! change of the integer vector element for the constraint addition.
 
       subroutine mxvind(ix,i,job)
+
       implicit none
-      integer :: ix(*) , i , job
+
+      integer :: ix(*)   !! ix(n)  integer vector.
+      integer :: i  !! index of the changed element.
+      integer :: job  !! change specification. is job.eq.0 then ix(i)=10-ix(i).
+
       if ( job==0 ) ix(i) = 10 - ix(i)
+
       end subroutine mxvind
 
 !***********************************************************************
 !> date: 90/12/01
 !
-! initiation of the integer :: vector.
-!
-! parameters :
-!  ii  n dimension of the integer :: vector.
-!  ii  ip  integer :: parameter.
-!  io  ix(n)  integer :: vector such that ix(i)=ip for all i.
+! initiation of the integer vector.
 
       subroutine mxvins(n,ip,ix)
+
       implicit none
-      integer :: n , ip , ix(n)
+
+      integer :: n  !! dimension of the integer vector.
+      integer :: ip  !! integer parameter.
+      integer :: ix(n)  !! integer vector such that ix(i)=ip for all i.
+
       integer :: i
+
       do i = 1 , n
          ix(i) = ip
-      enddo
+      end do
+
       end subroutine mxvins
 
 !***********************************************************************
 !> date: 91/12/01
 !
-! change of the integer :: vector element for the constraint addition.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  iu  ix(n)  integer :: vector.
-!  ii  i  index of the changed element.
-!  ii  job  change specification
+! change of the integer vector element for the constraint addition.
 
       subroutine mxvinv(ix,i,job)
+
       implicit none
-      integer :: i , job
-      integer :: ix(*)
+
+      integer :: i      !! index of the changed element.
+      integer :: job    !! change specification
+      integer :: ix(*)  !! ix(n)  integer vector.
+
       if ( (ix(i)==3 .or. ix(i)==5) .and. job<0 ) ix(i) = ix(i) + 1
       if ( (ix(i)==4 .or. ix(i)==6) .and. job>0 ) ix(i) = ix(i) - 1
       ix(i) = -ix(i)
+
       end subroutine mxvinv
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! l-infinity norm of a vector.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  rr  mxvmax  l-infinity norm of the vector x.
-!
+
       function mxvmax(n,x)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , mxvmax
+
+      integer :: n  !! vector dimension.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: mxvmax  !! l-infinity norm of the vector x.
+
       integer :: i
-      mxvmax = 0.0d0
+
+      mxvmax = 0.0_wp
       do i = 1 , n
          mxvmax = max(mxvmax,abs(x(i)))
-      enddo
+      end do
+
       end function mxvmax
 
 !***********************************************************************
 !> date: 88/12/01
 !
 ! change the signs of vector elements.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  ro  y(n)  output vector where y:= - x.
 
       subroutine mxvneg(n,x,y)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , y(*)
+
+      integer :: n  !! vector dimension.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  output vector where y:= - x.
+
       integer :: i
+
       do i = 1 , n
          y(i) = -x(i)
-      enddo
+      end do
+
       end subroutine mxvneg
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! euclidean norm of a vector.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  rr  mxvnor  euclidean norm of x.
-!
+
       function mxvnor(n,x)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , mxvnor
-      double precision :: pom , den
+
+      integer :: n        !! vector dimension.
+      real(wp) :: x(*)    !! x(n)  input vector.
+      real(wp) :: mxvnor  !! euclidean norm of x.
+
+      real(wp) :: pom , den
       integer :: i
-      double precision :: zero
-      parameter (zero=0.0d0)
+
+      real(wp),parameter :: zero = 0.0_wp
+
       den = zero
       do i = 1 , n
          den = max(den,abs(x(i)))
-      enddo
+      end do
       pom = zero
       if ( den>zero ) then
          do i = 1 , n
             pom = pom + (x(i)/den)**2
-         enddo
+         end do
       endif
       mxvnor = den*sqrt(pom)
       end function mxvnor
@@ -1743,53 +1804,60 @@
 !         rotation. ier=1-permutation. ier=2-transformation suppressed.
 
       subroutine mxvort(xk,xl,ck,cl,ier)
+
       implicit none
-      double precision :: ck , cl , xk , xl
+
+      real(wp) :: ck , cl , xk , xl
       integer :: ier
-      double precision :: den , pom
-      if ( xl==0.0d0 ) then
+      real(wp) :: den , pom
+
+      if ( xl==0.0_wp ) then
          ier = 2
-      elseif ( xk==0.0d0 ) then
+      elseif ( xk==0.0_wp ) then
          xk = xl
-         xl = 0.0d0
+         xl = 0.0_wp
          ier = 1
       else
          if ( abs(xk)>=abs(xl) ) then
             pom = xl/xk
-            den = sqrt(1.0d0+pom*pom)
-            ck = 1.0d0/den
+            den = sqrt(1.0_wp+pom*pom)
+            ck = 1.0_wp/den
             cl = pom/den
             xk = xk*den
          else
             pom = xk/xl
-            den = sqrt(1.0d0+pom*pom)
-            cl = 1.0d0/den
+            den = sqrt(1.0_wp+pom*pom)
+            cl = 1.0_wp/den
             ck = pom/den
             xk = xl*den
          endif
-         xl = 0.0d0
+         xl = 0.0_wp
          ier = 0
       endif
+
       end subroutine mxvort
 
 !***********************************************************************
 !> date: 91/12/01
 !
 ! plane rotation is applied to two values.
-!
-! parameters :
-!  ru  xk  first value for plane rotation.
-!  ru  xl  second value for plane rotation.
-!  ri  ck  diagonal element of the elementary orthogonal matrix.
-!  ri  cl  off-diagonal element of the elementary orthogonal matrix.
-!  ii  ier  information on the transformation. ier=0-general plane
-!         rotation. ier=1-permutation. ier=2-transformation suppressed.
 
       subroutine mxvrot(xk,xl,ck,cl,ier)
+
       implicit none
-      double precision :: ck , cl , xk , xl
-      integer :: ier
-      double precision :: yk , yl
+
+      real(wp) :: ck  !! diagonal element of the elementary orthogonal matrix.
+      real(wp) :: cl  !! off-diagonal element of the elementary orthogonal matrix.
+      real(wp) :: xk  !! first value for plane rotation.
+      real(wp) :: xl  !! second value for plane rotation.
+      integer :: ier  !! information on the transformation:
+                      !!
+                      !! * ier=0-general plane rotation.
+                      !! * ier=1-permutation.
+                      !! * ier=2-transformation suppressed.
+
+      real(wp) :: yk , yl
+
       if ( ier==0 ) then
          yk = xk
          yl = xl
@@ -1800,93 +1868,95 @@
          xk = xl
          xl = yk
       endif
+
       end subroutine mxvrot
 
 !***********************************************************************
 !> date: 91/12/01
 !
-! difference of two vectors returned in the substracted one.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  ru  y(n)  update vector where y:= x - y.
+! difference of two vectors returned in the subtracted one.
 
       subroutine mxvsav(n,x,y)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , y(*)
-      double precision :: temp
+
+      integer :: n  !! vector dimension.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  update vector where y:= x - y.
+
+      real(wp) :: temp
       integer :: i
+
       do i = 1 , n
          temp = y(i)
          y(i) = x(i) - y(i)
          x(i) = temp
-      enddo
+      end do
+
       end subroutine mxvsav
 
 !***********************************************************************
 !> date: 88/12/01
 !
 ! scaling of a vector.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  ri  a  scaling factor.
-!  ro  y(n)  output vector where y:= a*x.
 
       subroutine mxvscl(n,a,x,y)
+
       implicit none
-      double precision :: a
-      integer :: n
-      double precision :: x(*) , y(*)
+
+      integer :: n  !! vector dimension.
+      real(wp) :: a  !! scaling factor.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  output vector where y:= a*x.
+
       integer :: i
+
       do i = 1 , n
          y(i) = a*x(i)
-      enddo
+      end do
+
       end subroutine mxvscl
 
 !***********************************************************************
 !> date: 88/12/01
 !
 ! a scalar is set to all the elements of a vector.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  a  initial value.
-!  ro  x(n)  output vector such that x(i)=a for all i.
 
       subroutine mxvset(n,a,x)
+
       implicit none
-      double precision :: a
-      integer :: n
-      double precision :: x(*)
+
+      real(wp) :: a  !! initial value.
+      integer :: n  !! vector dimension.
+      real(wp) :: x(*)  !! x(n)  output vector such that x(i)=a for all i.
+
       integer :: i
       do i = 1 , n
          x(i) = a
-      enddo
+      end do
+
       end subroutine mxvset
 
 !***********************************************************************
 !> date: 88/12/01
 !
 ! sum of two vectors.
-!
-! parameters :
-!  ii  n  vector dimension.
-!  ri  x(n)  input vector.
-!  ri  y(n)  input vector.
-!  ro  z(n)  output vector where z:= x + y.
 
       subroutine mxvsum(n,x,y,z)
+
       implicit none
-      integer :: n
-      double precision :: x(*) , y(*) , z(*)
+
+      integer :: n  !! vector dimension.
+      real(wp) :: x(*)  !! x(n)  input vector.
+      real(wp) :: y(*)  !! y(n)  input vector.
+      real(wp) :: z(*)  !! z(n)  output vector where z:= x + y.
+
       integer :: i
+
       do i = 1 , n
          z(i) = x(i) + y(i)
-      enddo
+      end do
+
       end subroutine mxvsum
 
     end module matrix_routines

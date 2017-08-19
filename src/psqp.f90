@@ -5,6 +5,7 @@
     module psqp_module
 
     use matrix_routines
+    use kind_module, only: wp
 
     implicit none
 
@@ -29,12 +30,12 @@
         integer :: mode = 0
         integer :: mes1 = 0
         integer :: mes2 = 0
-        double precision :: rl = 0.0d0
-        double precision :: fl = 0.0d0
-        double precision :: ru = 0.0d0
-        double precision :: fu = 0.0d0
-        double precision :: ri = 0.0d0
-        double precision :: fi = 0.0d0
+        real(wp) :: rl = 0.0_wp
+        real(wp) :: fl = 0.0_wp
+        real(wp) :: ru = 0.0_wp
+        real(wp) :: fu = 0.0_wp
+        real(wp) :: ri = 0.0_wp
+        real(wp) :: fi = 0.0_wp
 
         procedure(obj_func) ,pointer :: obj  => null() !! objective function
         procedure(dobj_func),pointer :: dobj => null() !! gradient of the objective function
@@ -63,9 +64,9 @@
             import
             implicit none
             class(psqp_class),intent(inout) :: me
-            integer          :: nf    !! the number of variables
-            double precision :: x(nf) !! a vector of variables
-            double precision :: ff    !! the value of the objective function
+            integer  :: nf    !! the number of variables
+            real(wp) :: x(nf) !! a vector of variables
+            real(wp) :: ff    !! the value of the objective function
         end subroutine obj_func
 
         subroutine dobj_func(me,nf,x,gf)
@@ -73,9 +74,9 @@
             import
             implicit none
             class(psqp_class),intent(inout) :: me
-            integer          :: nf     !! the number of variables
-            double precision :: x(nf)  !! a vector of variables
-            double precision :: gf(nf) !! the gradient of the objective function
+            integer  :: nf     !! the number of variables
+            real(wp) :: x(nf)  !! a vector of variables
+            real(wp) :: gf(nf) !! the gradient of the objective function
         end subroutine dobj_func
 
         subroutine con_func(me,nf,kc,x,fc)
@@ -83,10 +84,10 @@
             import
             implicit none
             class(psqp_class),intent(inout) :: me
-            integer          :: nf      !! the number of variables
-            integer          :: kc      !! the index of the constraint function
-            double precision :: x(nf)   !! a vector of variables
-            double precision :: fc      !! the value of the constraint function
+            integer  :: nf      !! the number of variables
+            integer  :: kc      !! the index of the constraint function
+            real(wp) :: x(nf)   !! a vector of variables
+            real(wp) :: fc      !! the value of the constraint function
         end subroutine con_func
 
         subroutine dcon_func(me,nf,kc,x,gc)
@@ -94,10 +95,10 @@
             import
             implicit none
             class(psqp_class),intent(inout) :: me
-            integer          :: nf     !! the number of variables
-            integer          :: kc     !! the index of the constraint function
-            double precision :: x(nf)  !! a vector of variables and
-            double precision :: gc(nf) !! the gradient of the constraint function
+            integer  :: nf     !! the number of variables
+            integer  :: kc     !! the index of the constraint function
+            real(wp) :: x(nf)  !! a vector of variables and
+            real(wp) :: gc(nf) !! the gradient of the constraint function
         end subroutine dcon_func
 
     end interface
@@ -117,9 +118,9 @@
 
       class(psqp_class),intent(inout) :: me
 
-      double precision :: f     !! value of the objective function.
-      double precision :: cmax  !! maximum constraint violation.
-      double precision :: gmax  !! maximum partial derivative of the lagrangian function.
+      real(wp) :: f     !! value of the objective function.
+      real(wp) :: cmax  !! maximum constraint violation.
+      real(wp) :: gmax  !! maximum partial derivative of the lagrangian function.
       integer :: iprnt  !! print specification:
                         !!
                         !! * iprnt=0      - no print.
@@ -140,19 +141,19 @@
                                    !! nb>0-simple bounds accepted.
       integer,intent(in) :: nc     !! number of linear constraints.
       integer,intent(in) :: nf     !! number of variables
-      double precision :: cf(*)    !! vector containing values of the constraint functions.
-      double precision :: cl(*)    !! vector containing lower bounds for constraint functions.
-      double precision :: cu(*)    !! vector containing upper bounds for constraint functions.
-      double precision :: rpar(5)  !! real parameters:
+      real(wp) :: cf(*)    !! vector containing values of the constraint functions.
+      real(wp) :: cl(*)    !! vector containing lower bounds for constraint functions.
+      real(wp) :: cu(*)    !! vector containing upper bounds for constraint functions.
+      real(wp) :: rpar(5)  !! real parameters:
                                    !!
                                    !! * rpar(1)  maximum stepsize.
                                    !! * rpar(2)  tolerance for change of variables.
                                    !! * rpar(3)  tolerance for constraint violations.
                                    !! * rpar(4)  tolerance for the gradient of the lagrangian function.
                                    !! * rpar(5)  penalty coefficient.
-      double precision :: x(*)    !! vector of variables.
-      double precision :: xl(*)   !! vector containing lower bounds for variables.
-      double precision :: xu(*)   !! vector containing upper bounds for variables.
+      real(wp) :: x(*)    !! vector of variables.
+      real(wp) :: xl(*)   !! vector containing lower bounds for variables.
+      real(wp) :: xu(*)   !! vector containing upper bounds for variables.
       integer :: ic(*)  !! vector containing types of constraints:
                         !!
                         !! * ic(kc) = 0 -- constraint cf(kc) is not used.
@@ -187,7 +188,7 @@
 
       integer :: lcfd,lcfo,lcg,lcp,lcr,lcz,lg,lgc,lgf,lgo,lh,lia,ls,lxo
       integer,dimension(:),allocatable :: ia
-      double precision,dimension(:),allocatable :: ra
+      real(wp),dimension(:),allocatable :: ra
 
       ! set the functions:
       me%obj  => obj
@@ -309,16 +310,16 @@
 
       class(psqp_class),intent(inout) :: me
 
-      double precision f , cmax , gmax , rpf , tolc , told , tolg ,     &
+      real(wp) f , cmax , gmax , rpf , tolc , told , tolg ,     &
                        tols , tolx , xmax
       integer iprnt , iterm , met , met1 , mec , mes , mfv , mit , nb , &
               nc , nf
-      double precision cf(*) , cfd(*) , cfo(*) , cg(*) , cl(*) , cp(*) ,&
+      real(wp) cf(*) , cfd(*) , cfo(*) , cg(*) , cl(*) , cp(*) ,&
                        cr(*) , cz(*) , cu(*) , g(*) , gc(*) , gf(*) ,   &
                        go(*) , h(*) , s(*) , x(*) , xl(*) , xo(*) ,     &
                        xu(*)
       integer ic(*) , ica(*) , ix(*)
-      double precision alf1 , alf2 , cmaxo , dmax , eps7 , eps9 , eta0 ,&
+      real(wp) alf1 , alf2 , cmaxo , dmax , eps7 , eps9 , eta0 ,&
                        eta2 , eta9 , fmax , fmin , fo , gnorm , p , po ,&
                        r , rmax , rmin , ro , snorm , tolb , tolf ,     &
                        umax , rp , fp , pp , ff , fc
@@ -358,25 +359,25 @@
       iters = 2
       kters = 5
       idecf = 1
-      eta0 = 1.0d-15
-      eta2 = 1.0d-15
-      eta9 = 1.0d60
-      eps7 = 1.0d-15
-      eps9 = 1.0d-8
-      alf1 = 1.0d-10
-      alf2 = 1.0d10
-      fmax = 1.0d60
+      eta0 = 1.0e-15_wp
+      eta2 = 1.0e-15_wp
+      eta9 = 1.0e60_wp
+      eps7 = 1.0e-15_wp
+      eps9 = 1.0e-8_wp
+      alf1 = 1.0e-10_wp
+      alf2 = 1.0e10_wp
+      fmax = 1.0e60_wp
       fmin = -fmax
       tolb = -fmax
       dmax = eta9
-      tolf = 1.0d-16
-      if ( xmax<=0.0d0 ) xmax = 1.0d+16
-      if ( tolx<=0.0d0 ) tolx = 1.0d-16
-      if ( tolg<=0.0d0 ) tolg = 1.0d-6
-      if ( tolc<=0.0d0 ) tolc = 1.0d-6
-      told = 1.0d-8
-      tols = 1.0d-4
-      if ( rpf<=0.0d0 ) rpf = 1.0d-4
+      tolf = 1.0e-16_wp
+      if ( xmax<=0.0_wp ) xmax = 1.0e+16_wp
+      if ( tolx<=0.0_wp ) tolx = 1.0e-16_wp
+      if ( tolg<=0.0_wp ) tolg = 1.0e-6_wp
+      if ( tolc<=0.0_wp ) tolc = 1.0e-6_wp
+      told = 1.0e-8_wp
+      tols = 1.0e-4_wp
+      if ( rpf<=0.0_wp ) rpf = 1.0e-4_wp
       if ( met<=0 ) met = 1
       met1 = 2
       if ( mec<=0 ) mec = 2
@@ -386,7 +387,7 @@
       kd = 1
       ld = -1
       kit = 0
-      call mxvset(nc,0.0d0,cp)
+      call mxvset(nc,0.0_wp,cp)
 !
 !     initial operations with simple bounds
 !
@@ -519,8 +520,8 @@
 !
          p = mxvdot(nf,g,s)
          irest = 1
-         if ( snorm<=0.0d0 ) then
-         elseif ( p+told*gnorm*snorm<=0.0d0 ) then
+         if ( snorm<=0.0_wp ) then
+         elseif ( p+told*gnorm*snorm<=0.0_wp ) then
             irest = 0
          endif
          if ( irest/=0 ) goto 200
@@ -537,7 +538,7 @@
 !
 !     preparation of line search
 !
-         ro = 0.0d0
+         ro = 0.0_wp
          fo = f
          po = p
          cmaxo = cmax
@@ -557,7 +558,7 @@
 !     decision after unsuccessful line search
 !
             if ( iters<=0 ) then
-               r = 0.0d0
+               r = 0.0_wp
                f = fo
                p = po
                call mxvcop(nf,xo,x)
@@ -588,7 +589,7 @@
 !     variable metric update
 !
             call pudbg1(n,h,g,s,xo,go,r,po,me%nit,kit,iterh,met,met1,mec)
-!      if (mer.gt.0.and.iterh.gt.0) irest=1
+!      if (mer>0.and.iterh>0) irest=1
 !
 !     end of the iteration
 !
@@ -640,14 +641,14 @@
       implicit none
 
       class(psqp_class),intent(inout) :: me
-      double precision fc , cmax
+      real(wp) fc , cmax
       integer kd , ld , nc , nf
-      double precision cf(*) , cg(*) , cl(*) , cu(*) , gc(*) , x(*)
+      real(wp) cf(*) , cg(*) , cl(*) , cu(*) , gc(*) , x(*)
       integer ic(*)
-      double precision pom , temp
+      real(wp) pom , temp
       integer kc
       if ( kd<=ld ) return
-      if ( ld<0 ) cmax = 0.0d0
+      if ( ld<0 ) cmax = 0.0_wp
       do kc = 1 , nc
          if ( kd>=0 ) then
             if ( ld>=0 ) then
@@ -658,13 +659,13 @@
                cf(kc) = fc
             endif
             if ( ic(kc)>0 ) then
-               pom = 0.0d0
+               pom = 0.0_wp
                temp = cf(kc)
                if ( ic(kc)==1 .or. ic(kc)>=3 ) &
                     pom = min(pom,temp-cl(kc))
                if ( ic(kc)==2 .or. ic(kc)>=3 ) &
                     pom = min(pom,cu(kc)-temp)
-               if ( pom<0.0d0 ) cmax = max(cmax,-pom)
+               if ( pom<0.0_wp ) cmax = max(cmax,-pom)
             endif
  20         if ( kd>=1 ) then
                if ( ld>=1 ) then
@@ -700,9 +701,9 @@
       implicit none
 
       class(psqp_class),intent(inout) :: me
-      double precision f , ff
+      real(wp) f , ff
       integer iext , kd , ld , nf
-      double precision gf(*) , g(*) , x(*)
+      real(wp) gf(*) , g(*) , x(*)
 
       if ( kd<=ld ) return
       if ( ld<0 ) then
@@ -751,8 +752,8 @@
       subroutine pladb0(nf,n,ica,cg,cr,cz,s,eps7,gmax,umax,inew,nadd,ier)
       implicit none
       integer nf , n , ica(*) , inew , nadd , ier
-      double precision cg(*) , cr(*) , cz(*) , s(*) , eps7 , gmax , umax
-      double precision ck , cl
+      real(wp) cg(*) , cr(*) , cz(*) , s(*) , eps7 , gmax , umax
+      real(wp) ck , cl
       integer k , l , n1
       call pladr0(nf,n,ica,cg,cr,s,eps7,gmax,umax,inew,nadd,ier)
       if ( ier/=0 ) return
@@ -807,9 +808,9 @@
                         nadd,ier)
       implicit none
       integer nf , n , ica(*) , idecf , inew , nadd , ier
-      double precision cg(*) , cr(*) , cz(*) , h(*) , s(*) , eps7 ,     &
+      real(wp) cg(*) , cr(*) , cz(*) , h(*) , s(*) , eps7 ,     &
                        gmax , umax
-      double precision ck , cl
+      real(wp) ck , cl
       integer i , j , k , l , n1
       if ( idecf/=0 .and. idecf/=9 ) then
          ier = -2
@@ -833,8 +834,8 @@
          enddo
          if ( idecf==9 ) then
             l = n*(n+1)/2
-            if ( h(l+n1)/=0.0d0 ) then
-               cl = 1.0d0/h(l+n1)
+            if ( h(l+n1)/=0.0_wp ) then
+               cl = 1.0_wp/h(l+n1)
                k = 0
                do i = 1 , n
                   ck = cl*h(l+i)
@@ -874,7 +875,7 @@
       subroutine pladr0(nf,n,ica,cg,cr,s,eps7,gmax,umax,inew,nadd,ier)
       implicit none
       integer nf , n , ica(*) , inew , nadd , ier
-      double precision cg(*) , cr(*) , s(*) , eps7 , gmax , umax
+      real(wp) cg(*) , cr(*) , s(*) , eps7 , gmax , umax
       integer nca , ncr , i , j , k , l
       ier = 0
       if ( n<=0 ) ier = 2
@@ -896,13 +897,13 @@
          enddo
       else
          k = -inew
-         gmax = 1.0d0
+         gmax = 1.0_wp
          do j = 1 , nca
             l = ica(j)
             if ( l>0 ) then
                cr(ncr+j) = cg((l-1)*nf+k)*gmax
             else
-               cr(ncr+j) = 0.0d0
+               cr(ncr+j) = 0.0_wp
             endif
          enddo
       endif
@@ -993,11 +994,11 @@
 
       integer nf , nc , ix(*) , ic(*) , ica(*) , mfp , kbf , kbc ,      &
               idecf , n , iterq
-      double precision x(*) , xl(*) , xu(*) , cf(*) , cfd(*) , cl(*) ,  &
+      real(wp) x(*) , xl(*) , xu(*) , cf(*) , cfd(*) , cl(*) ,  &
                        cu(*) , cg(*) , cr(*) , cz(*) , g(*) , go(*) ,   &
                        h(*) , s(*) , eta2 , eta9 , eps7 , eps9 , umax , &
                        gmax
-      double precision con , temp , step , step1 , step2 , dmax , par , &
+      real(wp) con , temp , step , step1 , step2 , dmax , par , &
                        snorm
       integer nca , ncr , i , j , k , iold , jold , inew , jnew , knew ,&
               inf , ier , krem , kc , nred
@@ -1024,7 +1025,7 @@
       jold = 0
       jnew = 0
       iterq = 0
-      dmax = 0.0d0
+      dmax = 0.0_wp
       if ( mfp/=3 ) then
          n = nf
          nca = 0
@@ -1056,7 +1057,7 @@
 !     check of feasibility
 !
          inew = 0
-         par = 0.0d0
+         par = 0.0_wp
          call plminn(nf,nc,cf,cfd,ic,cl,cu,cg,s,eps9,par,kbc,inew,knew)
          call plmins(nf,ix,x,xl,xu,s,kbf,inew,knew,eps9,par)
          if ( inew==0 ) then
@@ -1067,7 +1068,7 @@
             iterq = 2
             return
          else
-            snorm = 0.0d0
+            snorm = 0.0_wp
          endif
  150     ier = 0
 !
@@ -1098,8 +1099,8 @@
                k = ix(i)
             endif
             if ( k<=-5 ) then
-            elseif ( (k==-1 .or. k==-3.) .and. g(j)<=0.0d0 ) then
-            elseif ( .not.((k==-2 .or. k==-4.) .and. g(j)>=0.0d0) ) then
+            elseif ( (k==-1 .or. k==-3.) .and. g(j)<=0.0_wp ) then
+            elseif ( .not.((k==-2 .or. k==-4.) .and. g(j)>=0.0_wp) ) then
                temp = cz(j)/g(j)
                if ( step2>temp ) then
                   iold = j
@@ -1223,7 +1224,7 @@
                         nadd,ier,job)
       implicit none
       integer nf , n , ica(*) , idecf , inew , nadd , ier , job
-      double precision cg(*) , cr(*) , h(*) , s(*) , g(*) , eps7 ,      &
+      real(wp) cg(*) , cr(*) , h(*) , s(*) , g(*) , eps7 ,      &
                        gmax , umax
       integer nca , ncr , jcg , j , k , l
 
@@ -1246,8 +1247,8 @@
       else
          k = -inew
          if ( idecf==1 ) then
-            call mxvset(nf,0.0d0,s)
-            s(k) = 1.0d0
+            call mxvset(nf,0.0_wp,s)
+            s(k) = 1.0_wp
             call mxdpgb(nf,h,s,0)
          else
             call mxdsmv(nf,h,s,k)
@@ -1265,7 +1266,7 @@
       enddo
       if ( n==0 ) then
          call mxdprb(nca,cr,g,1)
-         umax = 0.0d0
+         umax = 0.0_wp
          ier = 2
          return
       elseif ( nca==0 ) then
@@ -1319,9 +1320,9 @@
                         knew)
       implicit none
       integer nf , nc , ic(*) , kbc , inew , knew
-      double precision cf(*) , cfd(*) , cl(*) , cu(*) , cg(*) , s(*) ,  &
+      real(wp) cf(*) , cfd(*) , cl(*) , cu(*) , cg(*) , s(*) ,  &
                        eps9 , par
-      double precision temp , pom !, mxvdot
+      real(wp) temp , pom !, mxvdot
       integer jcg , kc
       if ( kbc>0 ) then
          jcg = 1
@@ -1332,7 +1333,7 @@
                temp = cf(kc) + temp
                if ( ic(kc)==1 .or. ic(kc)>=3 ) then
                   pom = temp - cl(kc)
-                  if ( pom<min(par,-eps9*max(abs(cl(kc)),1.0d0)) ) then
+                  if ( pom<min(par,-eps9*max(abs(cl(kc)),1.0_wp)) ) then
                      inew = kc
                      knew = 1
                      par = pom
@@ -1340,7 +1341,7 @@
                endif
                if ( ic(kc)==2 .or. ic(kc)>=3 ) then
                   pom = cu(kc) - temp
-                  if ( pom<min(par,-eps9*max(abs(cu(kc)),1.0d0)) ) then
+                  if ( pom<min(par,-eps9*max(abs(cu(kc)),1.0_wp)) ) then
                      inew = kc
                      knew = -1
                      par = pom
@@ -1373,16 +1374,16 @@
 !
       subroutine plmins(nf,ix,xo,xl,xu,s,kbf,inew,knew,eps9,par)
       implicit none
-      double precision eps9 , par
+      real(wp) eps9 , par
       integer inew , kbf , knew , nf
-      double precision s(*) , xl(*) , xo(*) , xu(*)
+      real(wp) s(*) , xl(*) , xo(*) , xu(*)
       integer ix(*)
-      double precision pom , temp
+      real(wp) pom , temp
       integer i
       if ( kbf>0 ) then
          do i = 1 , nf
             if ( ix(i)>0 ) then
-               temp = 1.0d0
+               temp = 1.0_wp
                if ( ix(i)==1 .or. ix(i)>=3 ) then
                   pom = xo(i) + s(i)*temp - xl(i)
                   if ( pom<min(par,-eps9*max(abs(xl(i)),temp)) ) then
@@ -1421,9 +1422,9 @@
       subroutine plnews(x,ix,xl,xu,eps9,i,inew)
       implicit none
       integer ix(*) , i , inew
-      double precision x(*) , xl(*) , xu(*) , eps9
-      double precision temp
-      temp = 1.0d0
+      real(wp) x(*) , xl(*) , xu(*) , eps9
+      real(wp) temp
+      temp = 1.0_wp
       if ( ix(i)<=0 ) then
       elseif ( ix(i)==1 ) then
          if ( x(i)<=xl(i)+eps9*max(abs(xl(i)),temp) ) then
@@ -1465,23 +1466,23 @@
       subroutine plredl(nc,cf,ic,cl,cu,kbc)
       implicit none
       integer nc , ic(nc) , kbc , k
-      double precision cf(*) , cl(*) , cu(*)
-      double precision temp
+      real(wp) cf(*) , cl(*) , cu(*)
+      real(wp) temp
       integer kc
       if ( kbc>0 ) then
          do kc = 1 , nc
             k = ic(kc)
             if ( abs(k)==1 .or. abs(k)==3 .or. abs(k)==4 ) then
                temp = (cf(kc)-cl(kc))
-               if ( temp<0 ) cf(kc) = cl(kc) + 0.1d0*temp
+               if ( temp<0 ) cf(kc) = cl(kc) + 0.1_wp*temp
             endif
             if ( abs(k)==2 .or. abs(k)==3 .or. abs(k)==4 ) then
                temp = (cf(kc)-cu(kc))
-               if ( temp>0 ) cf(kc) = cu(kc) + 0.1d0*temp
+               if ( temp>0 ) cf(kc) = cu(kc) + 0.1_wp*temp
             endif
             if ( abs(k)==5 .or. abs(k)==6 ) then
                temp = (cf(kc)-cl(kc))
-               cf(kc) = cl(kc) + 0.1d0*temp
+               cf(kc) = cl(kc) + 0.1_wp*temp
             endif
          enddo
       endif
@@ -1513,7 +1514,7 @@
       class(psqp_class),intent(inout) :: me
 
       integer ier , iold , krem , n , nc , nf
-      double precision ar(*) , s(*)
+      real(wp) ar(*) , s(*)
       integer ia(*) , iaa(*) , ic(*) , ix(*)
       integer l
 
@@ -1552,16 +1553,16 @@
       subroutine plrmr0(nf,ica,cr,g,n,iold,krem,ier)
       implicit none
       integer ier , iold , krem , n , nf
-      double precision cr(*) , g(*)
+      real(wp) cr(*) , g(*)
       integer ica(*)
-      double precision ck , cl
+      real(wp) ck , cl
       integer i , j , k , kc , l , nca
       nca = nf - n
       if ( iold<nca ) then
          k = iold*(iold-1)/2
          kc = ica(iold)
          call mxvcop(iold,cr(k+1),g)
-         call mxvset(nca-iold,0.0d0,g(iold+1))
+         call mxvset(nca-iold,0.0_wp,g(iold+1))
          k = k + iold
          do i = iold + 1 , nca
             k = k + i
@@ -1605,7 +1606,7 @@
       subroutine plsetc(nf,nc,x,xo,cf,ic,cg,s)
       implicit none
       integer nf , nc , ic(*)
-      double precision x(*) , xo(*) , cf(*) , cg(*) , s(*)
+      real(wp) x(*) , xo(*) , cf(*) , cg(*) , s(*)
       integer jcg , kc
 
       call mxvdif(nf,x,xo,s)
@@ -1633,17 +1634,17 @@
       subroutine plsetg(nf,nc,ic,cg,g,inew)
       implicit none
       integer nf , nc , ic(*) , inew
-      double precision cg(*) , g(*)
+      real(wp) cg(*) , g(*)
       integer kc
-      call mxvset(nf,0.0d0,g)
+      call mxvset(nf,0.0_wp,g)
       inew = 0
       do kc = 1 , nc
          if ( ic(kc)>=-10 ) then
          elseif ( ic(kc)==-11 .or. ic(kc)==-13 .or. ic(kc)==-15 ) then
-            call mxvdir(nf,-1.0d0,cg((kc-1)*nf+1),g,g)
+            call mxvdir(nf,-1.0_wp,cg((kc-1)*nf+1),g,g)
             inew = 1
          elseif ( ic(kc)==-12 .or. ic(kc)==-14 .or. ic(kc)==-16 ) then
-            call mxvdir(nf,1.0d0,cg((kc-1)*nf+1),g,g)
+            call mxvdir(nf,1.0_wp,cg((kc-1)*nf+1),g,g)
             inew = 1
          endif
       enddo
@@ -1671,11 +1672,11 @@
       subroutine pltlag(nf,n,nc,ix,ia,iaa,az,ic,eps7,umax,iold)
       implicit none
       integer nf , n , nc , ix(*) , ia(*) , iaa(*) , ic(*) , iold
-      double precision az(*) , eps7 , umax
-      double precision temp
+      real(wp) az(*) , eps7 , umax
+      real(wp) temp
       integer naa , j , k , l
       iold = 0
-      umax = 0.0d0
+      umax = 0.0_wp
       naa = nf - n
       do j = 1 , naa
          temp = az(j)
@@ -1690,8 +1691,8 @@
             k = ix(l)
          endif
          if ( k<=-5 ) then
-         elseif ( (k==-1 .or. k==-3) .and. umax+temp>=0.0d0 ) then
-         elseif ( .not.((k==-2 .or. k==-4) .and. umax-temp>=0.0d0) )    &
+         elseif ( (k==-1 .or. k==-3) .and. umax+temp>=0.0_wp ) then
+         elseif ( .not.((k==-2 .or. k==-4) .and. umax-temp>=0.0_wp) )    &
                   then
             iold = j
             umax = abs(temp)
@@ -1732,11 +1733,11 @@
                         iold)
       implicit none
       integer nf , n , nc , ix(*) , ic(*) , ica(*) , iold
-      double precision cg(*) , cr(*) , cz(*) , g(*) , gn(*) , eps7 ,    &
+      real(wp) cg(*) , cr(*) , cz(*) , g(*) , gn(*) , eps7 ,    &
                        gmax , umax
       integer nca , ncz
 
-      gmax = 0.0d0
+      gmax = 0.0_wp
       if ( n>0 ) then
          call mxdrmm(nf,n,cz,g,gn)
          gmax = mxvmax(n,gn)
@@ -1748,11 +1749,11 @@
          call mxdprb(nca,cr,cz(ncz+1),0)
          call pltlag(nf,n,nc,ix,ic,ica,cz(ncz+1),ic,eps7,umax,iold)
          if ( umax<=eps7 ) iold = 0
-         call mxvset(n,0.0d0,gn)
-         gmax = 0.0d0
+         call mxvset(n,0.0_wp,gn)
+         gmax = 0.0_wp
       else
          iold = 0
-         umax = 0.0d0
+         umax = 0.0_wp
       endif
       end subroutine pltrbg
 
@@ -1777,7 +1778,7 @@
       subroutine plvlag(nf,n,nc,iaa,ag,cg,g,gn)
       implicit none
       integer nf , n , nc , iaa(*)
-      double precision ag(*) , cg(*) , g(*) , gn(*)
+      real(wp) ag(*) , cg(*) , g(*) , gn(*)
       integer naa , j , l
 
       naa = nf - n
@@ -1822,14 +1823,19 @@
 !
       subroutine pnint1(rl,ru,fl,fu,pl,pu,r,mode,mtyp,merr)
       implicit none
-      double precision rl , ru , fl , fu , pl , pu , r
+      real(wp) rl , ru , fl , fu , pl , pu , r
       integer mode , mtyp , merr , ntyp
-      double precision a , b , c , d , dis , den
-      double precision c1l , c1u , c2l , c2u , c3l
-      parameter (c1l=1.1d0,c1u=1.0d3,c2l=1.0d-2,c2u=0.9d0,c3l=0.1d0)
+      real(wp) a , b , c , d , dis , den
+
+      real(wp),parameter :: c1l = 1.1_wp
+      real(wp),parameter :: c1u = 1000.0_wp
+      real(wp),parameter :: c2l = 1.0e-2_wp
+      real(wp),parameter :: c2u = 0.9_wp
+      real(wp),parameter :: c3l = 0.1_wp
+
       merr = 0
       if ( mode<=0 ) return
-      if ( pl>=0.0d0 ) then
+      if ( pl>=0.0_wp ) then
          merr = 2
          return
       elseif ( ru<=rl ) then
@@ -1842,10 +1848,10 @@
 !     bisection
 !
             if ( mode==1 ) then
-               r = 4.0d0*ru
+               r = 4.0_wp*ru
                return
             else
-               r = 0.5d0*(rl+ru)
+               r = 0.5_wp*(rl+ru)
                return
             endif
          elseif ( ntyp==mtyp ) then
@@ -1857,33 +1863,33 @@
 !     quadratic extrapolation or interpolation with one directional
 !     derivative
 !
-            den = 2.0d0*(1.0d0-a)
+            den = 2.0_wp*(1.0_wp-a)
          elseif ( ntyp==3 ) then
 !
 !     quadratic extrapolation or interpolation with two directional
 !     derivatives
 !
-            den = 1.0d0 - b
+            den = 1.0_wp - b
          elseif ( ntyp==4 ) then
 !
 !     cubic extrapolation or interpolation
 !
-            c = b - 2.0d0*a + 1.0d0
-            d = b - 3.0d0*a + 2.0d0
-            dis = d*d - 3.0d0*c
-            if ( dis<0.0d0 ) goto 100
+            c = b - 2.0_wp*a + 1.0_wp
+            d = b - 3.0_wp*a + 2.0_wp
+            dis = d*d - 3.0_wp*c
+            if ( dis<0.0_wp ) goto 100
             den = d + sqrt(dis)
          elseif ( ntyp==5 ) then
 !
 !     conic extrapolation or interpolation
 !
             dis = a*a - b
-            if ( dis<0.0d0 ) goto 100
+            if ( dis<0.0_wp ) goto 100
             den = a + sqrt(dis)
-            if ( den<=0.0d0 ) goto 100
-            den = 1.0d0 - b*(1.0d0/den)**3
+            if ( den<=0.0_wp ) goto 100
+            den = 1.0_wp - b*(1.0_wp/den)**3
          endif
-         if ( mode==1 .and. den>0.0d0 .and. den<1.0d0 ) then
+         if ( mode==1 .and. den>0.0_wp .and. den<1.0_wp ) then
 !
 !     extrapolation accepted
 !
@@ -1891,12 +1897,12 @@
             r = max(r,c1l*ru)
             r = min(r,c1u*ru)
             return
-         elseif ( mode==2 .and. den>1.0d0 ) then
+         elseif ( mode==2 .and. den>1.0_wp ) then
 !
 !     interpolation accepted
 !
             r = rl + (ru-rl)/den
-            if ( rl==0.0d0 ) then
+            if ( rl==0.0_wp ) then
                r = max(r,rl+c2l*(ru-rl))
             else
                r = max(r,rl+c3l*(ru-rl))
@@ -1934,16 +1940,26 @@
 ! extrapolation or interpolation with standard model functions.
 !
       subroutine pnint3(ro,rl,ru,ri,fo,fl,fu,fi,po,r,mode,mtyp,merr)
+
       implicit none
-      double precision zero , half , one , two , three , c1l , c1u ,    &
-                       c2l , c2u , c3l
-      parameter (zero=0.0d0,half=0.5d0,one=1.0d0,two=2.0d0,three=3.0d0, &
-                 c1l=1.1d0,c1u=1.0d3,c2l=1.0d-2,c2u=0.9d0,c3l=1.0d-1)
-      double precision fi , fl , fo , fu , po , r , ri , rl , ro , ru
-      integer merr , mode , mtyp
-      double precision ai , al , au , den , dis
-      integer ntyp
-      logical l1 , l2
+
+      real(wp),parameter :: zero = 0.0_wp
+      real(wp),parameter :: half = 0.5_wp
+      real(wp),parameter :: one = 1.0_wp
+      real(wp),parameter :: two = 2.0_wp
+      real(wp),parameter :: three = 3.0_wp
+      real(wp),parameter :: c1l = 1.1_wp
+      real(wp),parameter :: c1u = 1000.0_wp
+      real(wp),parameter :: c2l = 1.0e-2_wp
+      real(wp),parameter :: c2u = 0.9_wp
+      real(wp),parameter :: c3l = 1.0e-1_wp
+
+      real(wp) :: fi , fl , fo , fu , po , r , ri , rl , ro , ru
+      integer :: merr , mode , mtyp
+      real(wp) :: ai , al , au , den , dis
+      integer :: ntyp
+      logical :: l1 , l2
+
       merr = 0
       if ( mode<=0 ) return
       if ( po>=zero ) then
@@ -2049,13 +2065,13 @@
       subroutine pp0af8(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
       implicit none
       integer nf , n , nc , ic(*) , ica(*)
-      double precision cf(*) , cl(*) , cu(*) , cz(*) , rpf , fc , f
-      double precision pom , temp
+      real(wp) cf(*) , cl(*) , cu(*) , cz(*) , rpf , fc , f
+      real(wp) pom , temp
       integer j , kc
-      fc = 0.0d0
+      fc = 0.0_wp
       do kc = 1 , nc
          if ( ic(kc)>0 ) then
-            pom = 0.0d0
+            pom = 0.0_wp
             temp = cf(kc)
             if ( ic(kc)==1 .or. ic(kc)>=3 ) pom = min(pom,temp-cl(kc))
             if ( ic(kc)==2 .or. ic(kc)>=3 ) pom = min(pom,cu(kc)-temp)
@@ -2065,7 +2081,7 @@
       do j = 1 , nf - n
          kc = ica(j)
          if ( kc>0 ) then
-            pom = 0.0d0
+            pom = 0.0_wp
             temp = cf(kc)
             if ( ic(kc)==1 .or. ic(kc)==3 .or. ic(kc)==5 )              &
                  pom = min(pom,temp-cl(kc))
@@ -2093,17 +2109,17 @@
       subroutine ppset2(nf,n,nc,ica,cz,cp)
       implicit none
       integer nf , n , nc , ica(*)
-      double precision cz(*) , cp(*)
-      double precision temp
+      real(wp) cz(*) , cp(*)
+      real(wp) temp
       integer j , l , kc
       do kc = 1 , nc
-         cp(kc) = 0.5d0*cp(kc)
+         cp(kc) = 0.5_wp*cp(kc)
       enddo
       do j = 1 , nf - n
          l = ica(j)
          if ( l>0 ) then
             temp = abs(cz(j))
-            cp(l) = max(temp,cp(l)+0.5d0*temp)
+            cp(l) = max(temp,cp(l)+0.5_wp*temp)
          endif
       enddo
       end subroutine ppset2
@@ -2174,26 +2190,26 @@
 
       integer kd , ld , nit , kit , nred , mred , maxst , iest , inits ,&
               iters , kters , mes , isys
-      double precision r , ro , rp , f , fo , fp , po , pp , fmin , &
+      real(wp) r , ro , rp , f , fo , fp , po , pp , fmin , &
                        fmax , rmin , rmax , tols
-      double precision rtemp
+      real(wp) rtemp
       integer merr , init1
       logical l1 , l2 , l3 , l4 , l6 , l7
 
-      double precision,parameter :: tol = 1.0d-4
+      real(wp),parameter :: tol = 1.0d-4
 
       if ( isys/=1 ) then
 !      go to (1,3) isys+1
          me%mes1 = 2
          me%mes2 = 2
          iters = 0
-         if ( po>=0.0d0 ) then
-            r = 0.0d0
+         if ( po>=0.0_wp ) then
+            r = 0.0_wp
             iters = -2
             isys = 0
             return
          endif
-         if ( rmax<=0.0d0 ) then
+         if ( rmax<=0.0_wp ) then
             iters = 0
             isys = 0
             return
@@ -2206,31 +2222,31 @@
          elseif ( iest==0 ) then
             rtemp = f - fp
          else
-            rtemp = max(f-fp,1.0d1*(fmin-f))
+            rtemp = max(f-fp,10.0_wp*(fmin-f))
          endif
          init1 = abs(inits)
-         rp = 0.0d0
+         rp = 0.0_wp
          fp = fo
          pp = po
          if ( init1==0 ) then
          elseif ( init1==1 .or. inits>=1 .and. iest==0 ) then
-            r = 1.0d0
+            r = 1.0_wp
          elseif ( init1==2 ) then
-            r = min(1.0d0,4.0d0*rtemp/po)
+            r = min(1.0_wp,4.0_wp*rtemp/po)
          elseif ( init1==3 ) then
-            r = min(1.0d0,2.0d0*rtemp/po)
+            r = min(1.0_wp,2.0_wp*rtemp/po)
          elseif ( init1==4 ) then
-            r = 2.0d0*rtemp/po
+            r = 2.0_wp*rtemp/po
          endif
          rtemp = r
          r = max(r,rmin)
          r = min(r,rmax)
          me%mode = 0
-         me%rl = 0.0d0
+         me%rl = 0.0_wp
          me%fl = fo
-         me%ru = 0.0d0
+         me%ru = 0.0_wp
          me%fu = fo
-         me%ri = 0.0d0
+         me%ri = 0.0_wp
          me%fi = fo
       elseif ( iters/=0 ) then
          isys = 0
@@ -2243,8 +2259,8 @@
          else
             l1 = r<=rmin .and. nit/=kit
             l2 = r>=rmax
-            l3 = f - fo<=tols*r*po .or. f - fmin<=(fo-fmin)/1.0d1
-            l4 = f - fo>=(1.0d0-tols)*r*po .or. me%mes2==2 .and. me%mode==2
+            l3 = f - fo<=tols*r*po .or. f - fmin<=(fo-fmin)/10.0_wp
+            l4 = f - fo>=(1.0_wp-tols)*r*po .or. me%mes2==2 .and. me%mode==2
             l6 = me%ru - me%rl<=tol*me%ru .and. me%mode==2
             l7 = me%mes2<=2 .or. me%mode/=0
             maxst = 0
@@ -2379,11 +2395,13 @@
 ! bfgs variable metric method.
 !
       subroutine pudbg1(n,h,g,s,xo,go,r,po,nit,kit,iterh,met,met1,mec)
+
       implicit none
-      double precision po , r
+
+      real(wp) po , r
       integer iterh , kit , met , met1 , mec , n , nit
-      double precision g(*) , go(*) , h(*) , s(*) , xo(*)
-      double precision a , b , c , gam , par , den , dis
+      real(wp) g(*) , go(*) , h(*) , s(*) , xo(*)
+      real(wp) a , b , c , gam , par , den , dis
       logical l1 , l3
 
       l1 = met1>=3 .or. met1==2 .and. nit==kit
@@ -2392,12 +2410,12 @@
 !     determination of the parameters b, c
 !
       b = mxvdot(n,xo,go)
-      a = 0.0d0
+      a = 0.0_wp
       if ( l1 ) then
          call mxvcop(n,go,s)
          call mxdpgb(n,h,s,1)
          a = mxdpgp(n,h,s,s)
-         if ( a<=0.0d0 ) then
+         if ( a<=0.0_wp ) then
             iterh = 1
             return
          endif
@@ -2405,7 +2423,7 @@
       call mxvdif(n,go,g,s)
       call mxvscl(n,r,s,s)
       c = -r*po
-      if ( c<=0.0d0 ) then
+      if ( c<=0.0_wp ) then
          iterh = 3
          return
       endif
@@ -2414,11 +2432,11 @@
 !
 !     powell's correction
 !
-            dis = (1.0d0-0.1d0)*c/(c-b)
+            dis = (1.0_wp-0.1_wp)*c/(c-b)
             call mxvdif(n,go,s,go)
             call mxvdir(n,dis,go,s,go)
             b = c + dis*(b-c)
-            if ( l1 ) a = c + 2.0d0*(1.0d0-dis)*(b-c) + dis*dis*(a-c)
+            if ( l1 ) a = c + 2.0_wp*(1.0_wp-dis)*(b-c) + dis*dis*(a-c)
          endif
       elseif ( b<=1.0d-4*c ) then
          iterh = 2
@@ -2430,18 +2448,18 @@
 !
          if ( met==1 ) then
             par = c/b
-         elseif ( a<=0.0d0 ) then
+         elseif ( a<=0.0_wp ) then
             par = c/b
          else
             par = sqrt(c/a)
          endif
          gam = par
          if ( met1>1 ) then
-            if ( nit/=kit ) l3 = gam<0.5d0 .or. gam>4.0d0
+            if ( nit/=kit ) l3 = gam<0.5_wp .or. gam>4.0_wp
          endif
       endif
       if ( l3 ) then
-         gam = 1.0d0
+         gam = 1.0_wp
          par = gam
       endif
       if ( met==1 ) then
@@ -2449,20 +2467,20 @@
 !     bfgs update
 !
          call mxdpgu(n,h,par/b,go,xo)
-         call mxdpgu(n,h,-1.0d0/c,s,xo)
+         call mxdpgu(n,h,-1.0_wp/c,s,xo)
       else
 !
 !     hoshino update
 !
          den = par*b + c
-         dis = 0.5d0*b
+         dis = 0.5_wp*b
          call mxvdir(n,par,go,s,s)
          call mxdpgu(n,h,par/dis,go,xo)
-         call mxdpgu(n,h,-1.0d0/den,s,xo)
+         call mxdpgu(n,h,-1.0_wp/den,s,xo)
       endif
       iterh = 0
-      if ( gam==1.0d0 ) return
-      call mxdpgs(n,h,1.0d0/gam)
+      if ( gam==1.0_wp ) return
+      call mxdpgs(n,h,1.0_wp/gam)
       end subroutine pudbg1
 
 !***********************************************************************
@@ -2495,20 +2513,20 @@
 !  ro  dmax  maximum relative difference of variables.
 !
 ! common data :
-!  ii  normf  scaling specification. normf=0-no scaling performed.
-!         normf=1-scaling factors are determined automatically.
-!         normf=2-scaling factors are supplied by user.
 !  ii  iters  termination indicator for steplength determination.
 !         iters=0 for zero step.
 
       subroutine pytrnd(nf,n,x,xo,ica,cg,cz,g,go,r,f,fo,p,po,cmax,cmaxo,&
                         dmax,kd,ld,iters)
+
       implicit none
+
       integer nf , n , kd , ld , iters
       integer ica(*)
-      double precision x(*) , xo(*) , cg(*) , cz(*) , g(*) , go(*) , r ,&
+      real(wp) x(*) , xo(*) , cg(*) , cz(*) , g(*) , go(*) , r ,&
                        f , fo , p , po , cmax , cmaxo , dmax
       integer i , j , l
+
       do j = 1 , nf - n
          l = ica(j)
          if ( l>0 ) then
@@ -2531,9 +2549,9 @@
          call mxvsav(nf,g,go)
          ld = kd
       endif
-      dmax = 0.0d0
+      dmax = 0.0_wp
       do i = 1 , nf
-         dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0d0))
+         dmax = max(dmax,abs(xo(i))/max(abs(x(i)),1.0_wp))
       enddo
       n = nf
       end subroutine pytrnd
