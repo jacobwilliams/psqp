@@ -1,20 +1,20 @@
 !***********************************************************************
-!     program tsqpn
-!
-!     test program for the subroutine pminu
+!>
+!  Test program for the subroutine [[psqpn]].
 
     program main
 
+      use kind_module, only: wp
       use psqp_module, only: psqp_class
 
       type(psqp_class) :: solver
 
-      integer          :: next,nfv,nit
-      double precision :: f,fmin,cmax,gmax
-      integer          :: i,ierr,iprnt,iterm,itime,nb,nc,nf
-      double precision :: cf(200),cl(200),cu(200),rpar(5),x(40),xl(40),xu(40)
-      integer          :: ic(200),ix(40),ipar(6)
-      integer          :: niter,nfval,nsucc
+      integer  :: next,nfv,nit
+      real(wp) :: f,fmin,cmax,gmax
+      integer  :: i,ierr,iprnt,iterm,itime,nb,nc,nf
+      real(wp) :: cf(200),cl(200),cu(200),rpar(5),x(40),xl(40),xu(40)
+      integer  :: ic(200),ix(40),ipar(6)
+      integer  :: niter,nfval,nsucc
 
       niter=0
       nfval=0
@@ -31,7 +31,7 @@
               ipar(i) = 0
           end do
           do i = 1,5
-              rpar(i) = 0.0d0
+              rpar(i) = 0.0_wp
           end do
           ipar(5)=2
           iprnt = 1
@@ -46,10 +46,8 @@
 
           call tind07(nf,nc,x,ix,xl,xu,ic,cl,cu,fmin,rpar(1),next,ierr)
           if (ierr==0) then
-            rpar(1)=0.0d0
-
+            rpar(1)=0.0_wp
             ! solution
-
             call solver%psqpn(nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,&
                               ipar,rpar,f,cmax,gmax,iprnt,iterm,&
                               obj,dobj,con,dcon)
@@ -114,22 +112,6 @@
       external         tcgu07
       call tcgu07(nf,kc,x,gc,next)
       end subroutine dcon
-
-      ! ! empty subroutines
-
-      ! subroutine fun(nf,ka,x,fa)
-      ! integer ka,nf
-      ! double precision fa,x(*)
-      ! ka=nf
-      ! fa=x(1)
-      ! end subroutine fun
-
-      ! subroutine dfun(nf,ka,x,ga)
-      ! integer ka,nf
-      ! double precision ga(*),x(*)
-      ! ka=nf
-      ! ga(1)=x(1)
-      ! end subroutine dfun
 
     end program main
 
