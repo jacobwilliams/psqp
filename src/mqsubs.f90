@@ -1792,23 +1792,23 @@
 !> date: 91/12/01
 !
 ! determination of an elementary orthogonal matrix for plane rotation.
-!
-! parameters :
-!  ru  xk  first value for plane rotation (xk is transformed to
-!         sqrt(xk**2+xl**2))
-!  ru  xl  second value for plane rotation (xl is transformed to
-!         zero)
-!  ro  ck  diagonal element of the elementary orthogonal matrix.
-!  ro  cl  off-diagonal element of the elementary orthogonal matrix.
-!  io  ier  information on the transformation. ier=0-general plane
-!         rotation. ier=1-permutation. ier=2-transformation suppressed.
 
       subroutine mxvort(xk,xl,ck,cl,ier)
 
       implicit none
 
-      real(wp) :: ck , cl , xk , xl
-      integer :: ier
+      real(wp) :: ck !! diagonal element of the elementary orthogonal matrix.
+      real(wp) :: cl !! off-diagonal element of the elementary orthogonal matrix.
+      real(wp) :: xk !! first value for plane rotation
+                     !! (xk is transformed to sqrt(xk**2+xl**2))
+      real(wp) :: xl !! second value for plane rotation
+                     !! (xl is transformed to zero)
+      integer :: ier !! information on the transformation.
+                     !!
+                     !! * ier=0-general plane rotation.
+                     !! * ier=1-permutation.
+                     !! * ier=2-transformation suppressed.
+
       real(wp) :: den , pom
 
       if ( xl==0.0_wp ) then

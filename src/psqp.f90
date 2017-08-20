@@ -139,31 +139,39 @@
                         !! * iprnt<0      - extended final results.
       integer,intent(out) :: iterm  !! variable that indicates the cause of termination.
                                     !!
-                                    !! * iterm=1  - if abs(x-xo) was less than or equal to tolx in mtesx (usually two) subsequent iterations.
-                                    !! * iterm=2  - if abs(f-fo) was less than or equal to tolf in mtesf (usually two) subsequent iterations.
+                                    !! * iterm=1  - if abs(x-xo) was less than or equal
+                                    !!   to tolx in mtesx (usually two) subsequent iterations.
+                                    !! * iterm=2  - if abs(f-fo) was less than or equal to
+                                    !!   tolf in mtesf (usually two) subsequent iterations.
                                     !! * iterm=3  - if f is less than or equal to tolb.
                                     !! * iterm=4  - if gmax is less than or equal to tolg.
-                                    !! * iterm=11 - if nit exceeded mit. iterm=12-if nfv exceeded mfv.
-                                    !! * iterm=13 - if nfg exceeded mfg. iterm<0-if the method failed.
-                                    !! * iterm=-6, then the termination criterion has not been satisfied, but the point obtained if usually acceptable.
-      integer,intent(in) :: nb     !! choice of simple bounds. nb=0-simple bounds suppressed.
-                                   !! nb>0-simple bounds accepted.
+                                    !! * iterm=11 - if nit exceeded mit. iterm=12-if nfv
+                                    !!   exceeded mfv.
+                                    !! * iterm=13 - if nfg exceeded mfg. iterm<0-if the
+                                    !!   method failed.
+                                    !! * iterm=-6, then the termination criterion has not
+                                    !!   been satisfied, but the point obtained if usually
+                                    !!   acceptable.
+      integer,intent(in) :: nb     !! choice of simple bounds.
+                                   !!
+                                   !! * nb=0-simple bounds suppressed.
+                                   !! * nb>0-simple bounds accepted.
       integer,intent(in) :: nc     !! number of linear constraints.
       integer,intent(in) :: nf     !! number of variables
-      real(wp) :: cf(*)    !! vector containing values of the constraint functions.
-      real(wp) :: cl(*)    !! vector containing lower bounds for constraint functions.
-      real(wp) :: cu(*)    !! vector containing upper bounds for constraint functions.
+      real(wp) :: cf(*)    !! cf(nc+1) vector containing values of the constraint functions.
+      real(wp) :: cl(*)    !! cl(nc) vector containing lower bounds for constraint functions.
+      real(wp) :: cu(*)    !! cu(nc) vector containing upper bounds for constraint functions.
       real(wp) :: rpar(5)  !! real parameters:
-                                   !!
-                                   !! * rpar(1)  maximum stepsize.
-                                   !! * rpar(2)  tolerance for change of variables.
-                                   !! * rpar(3)  tolerance for constraint violations.
-                                   !! * rpar(4)  tolerance for the gradient of the lagrangian function.
-                                   !! * rpar(5)  penalty coefficient.
-      real(wp) :: x(*)    !! vector of variables.
-      real(wp) :: xl(*)   !! vector containing lower bounds for variables.
-      real(wp) :: xu(*)   !! vector containing upper bounds for variables.
-      integer :: ic(*)  !! vector containing types of constraints:
+                           !!
+                           !! * rpar(1)  maximum stepsize.
+                           !! * rpar(2)  tolerance for change of variables.
+                           !! * rpar(3)  tolerance for constraint violations.
+                           !! * rpar(4)  tolerance for the gradient of the lagrangian function.
+                           !! * rpar(5)  penalty coefficient.
+      real(wp) :: x(*)    !! x(nf) vector of variables.
+      real(wp) :: xl(*)   !! xl(nf)vector containing lower bounds for variables.
+      real(wp) :: xu(*)   !! xu(nf) vector containing upper bounds for variables.
+      integer :: ic(*)  !! ic(nc) vector containing types of constraints:
                         !!
                         !! * ic(kc) = 0 -- constraint cf(kc) is not used.
                         !! * ic(kc) = 1 -- lower constraint cl(kc) <= cf(kc).
@@ -183,7 +191,7 @@
                             !!   curvature occurs.
                             !!   ipar(6)=1 - no correction.
                             !!   ipar(6)=2 - powell's correction.
-      integer,intent(in) :: ix(*)  !! vector containing types of bounds.
+      integer,intent(in) :: ix(*)  !! ix(nf) vector containing types of bounds.
                                    !!
                                    !! * ix(i) = 0 -- variable x(i) is unbounded.
                                    !! * ix(i) = 1 -- lower bound xl(i) <= x(i).
@@ -305,13 +313,15 @@
       real(wp) :: cl(*)     !! cl(nc)  vector containing lower bounds for constraint functions.
       real(wp) :: cu(*)     !! cu(nc)  vector containing upper bounds for constraint functions.
       real(wp) :: cp(*)     !!
-      real(wp) :: cr(*)     !! cr(nf*(nf+1)/2)  triangular decomposition of kernel of the orthogonal projection.
+      real(wp) :: cr(*)     !! cr(nf*(nf+1)/2)  triangular decomposition of kernel
+                            !! of the orthogonal projection.
       real(wp) :: cz(*)     !! cz(nf)  vector of lagrange multipliers.
       real(wp) :: g(*)      !! g(nf)  gradient of the objective function.
       real(wp) :: gc(*)     !! gc(nf)  gradient of the selected constraint function.
       real(wp) :: gf(*)     !! gf(nf)  gradient of the model function.
       real(wp) :: go(*)     !! go(nf)  gradients difference.
-      real(wp) :: h(*)      !! h(nf*(nf+1)/2)  triangular decomposition or inversion of the hessian matrix approximation.
+      real(wp) :: h(*)      !! h(nf*(nf+1)/2)  triangular decomposition or inversion of
+                            !! the hessian matrix approximation.
       real(wp) :: s(*)      !! s(nf)  direction vector.
       real(wp) :: x(*)      !! x(nf)  vector of variables.
       real(wp) :: xl(*)     !! xl(nf)  vector containing lower bounds for variables.
@@ -644,13 +654,13 @@
       integer  :: ld      !! degree of previously computed derivatives.
       integer  :: nc      !! number of constraints.
       integer  :: nf      !! number of variables.
-      real(wp) :: cf(*)   !! cf(nc)  vector containing values of constraint functions.
-      real(wp) :: cl(*)   !! cl(nc)  vector containing lower bounds for constraint functions.
-      real(wp) :: cu(*)   !! cu(nc)  vector containing upper bounds for constraint functions.
-      integer  :: ic(*)   !! ic(nc)  vector containing types of constraints.
-      real(wp) :: gc(nf)  !! gc(nf)  gradient of the selected constraint function.
-      real(wp) :: cg(*)   !! cg(nf*nc)  matrix whose columns are gradients of constraint functions.
-      real(wp) :: x(nf)   !! x(nf)  vector of variables.
+      real(wp) :: cf(*)   !! cf(nc) vector containing values of constraint functions.
+      real(wp) :: cl(*)   !! cl(nc) vector containing lower bounds for constraint functions.
+      real(wp) :: cu(*)   !! cu(nc) vector containing upper bounds for constraint functions.
+      integer  :: ic(*)   !! ic(nc) vector containing types of constraints.
+      real(wp) :: gc(nf)  !! gc(nf) gradient of the selected constraint function.
+      real(wp) :: cg(*)   !! cg(nf*nc) matrix whose columns are gradients of constraint functions.
+      real(wp) :: x(nf)   !! x(nf) vector of variables.
 
       real(wp) :: pom , temp
       integer :: kc
@@ -998,7 +1008,8 @@
       real(wp) :: cz(*) !! cz(nf)  vector of lagrange multipliers.
       real(wp) :: g(*)  !! g(nf)  gradient of the lagrangian function.
       real(wp) :: go(*) !! go(nf)  saved gradient of the objective function.
-      real(wp) :: h(*)  !! h(nf*(nf+1)/2)  triangular decomposition or inversion of the hessian matrix approximation.
+      real(wp) :: h(*)  !! h(nf*(nf+1)/2)  triangular decomposition or inversion
+                        !! of the hessian matrix approximation.
       real(wp) :: s(*)  !! s(nf)  direction vector.
       real(wp) :: eta2  !! tolerance for positive definiteness of the hessian matrix.
       real(wp) :: eta9  !! maximum for real numbers.
@@ -1797,7 +1808,8 @@
       integer :: nc      !! number of linearized constraints.
       integer :: iaa(*)  !! iaa(nf+1)  vector containing indices of active functions.
       real(wp) :: ag(*)  !! ag(nf*na)  vector containing scaling parameters.
-      real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals of the linear constraints.
+      real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals
+                         !! of the linear constraints.
       real(wp) :: g(*)   !! g(nf)  gradient of the objective function.
       real(wp) :: gn(*)  !! gn(nf+1)  output vector.
 
@@ -1842,11 +1854,11 @@
     integer :: mode  !! mode of line search.
     integer :: mtyp  !! method selection.
                      !!
-                     !! * mtyp=1-bisection.
-                     !! * mtyp=2-quadratic interpolation (with one directional derivative).
-                     !! * mtyp=3-quadratic interpolation (with two directional derivatives).
-                     !! * mtyp=4-cubic interpolation.
-                     !! * mtyp=5-conic interpolation.
+                     !! * mtyp=1 - bisection.
+                     !! * mtyp=2 - quadratic interpolation (with one directional derivative).
+                     !! * mtyp=3 - quadratic interpolation (with two directional derivatives).
+                     !! * mtyp=4 - cubic interpolation.
+                     !! * mtyp=5 - conic interpolation.
     integer :: merr  !! error indicator. merr=0 for normal return.
 
     integer :: ntyp
@@ -2145,54 +2157,6 @@
 !
 !  extended line search without directional derivatives.
 !
-! parameters :
-!  ro  r  value of the stepsize parameter.
-!  ro  ro  initial value of the stepsize parameter.
-!  ro  rp  previous value of the stepsize parameter.
-!  ro  f  value of the objective function.
-!  ri  fo  initial value of the objective function.
-!  ro  fp  previous value of the objective function.
-!  ri  po  initial value of the directional derivative.
-!  ro  pp  previous value of the directional derivative.
-!  ri  fmin  lower bound for value of the objective function.
-!  ri  fmax  upper bound for value of the objective function.
-!  ri  rmin  minimum value of the stepsize parameter
-!  ri  rmax  maximum value of the stepsize parameter
-!  ri  tols  termination tolerance for line search (in test on the
-!         change of the function value).
-!  ii  kd  degree of required dervatives.
-!  io  ld  degree of previously computed derivatives.
-!  ii  nit  actual number of iterations.
-!  ii  kit  number of the iteration after last restart.
-!  io  nred  actual number of extrapolations or interpolations.
-!  ii  mred  maximum number of extrapolations or interpolations.
-!  io  maxst  maximum stepsize indicator. maxst=0 or maxst=1 if maximum
-!         stepsize was not or was reached.
-!  ii  iest  lower bound specification. iest=0 or iest=1 if lower bound
-!         is not or is given.
-!  ii  inits  choice of the initial stepsize. inits=0-initial stepsize
-!         is specified in the calling program. inits=1-unit initial
-!         stepsize. inits=2-combined unit and quadratically estimated
-!         initial stepsize. inits=3-quadratically estimated initial
-!         stepsize.
-!  io  iters  termination indicator. iters=0-zero step. iters=1-perfect
-!         line search. iters=2 goldstein stepsize. iters=3-curry
-!         stepsize. iters=4-extended curry stepsize.
-!         iters=5-armijo stepsize. iters=6-first stepsize.
-!         iters=7-maximum stepsize. iters=8-unbounded function.
-!         iters=-1-mred reached. iters=-2-positive directional
-!         derivative. iters=-3-error in interpolation.
-!  ii  kters  termination selection. kters=1-perfect line search.
-!         kters=2-goldstein stepsize. kters=3-curry stepsize.
-!         kters=4-extended curry stepsize. kters=5-armijo stepsize.
-!         kters=6-first stepsize.
-!  ii  mes  method selection. mes=1-bisection. mes=2-quadratic
-!         interpolation (with one directional derivative).
-!         mes=3-quadratic interpolation (with two directional
-!         derivatives). mes=4-cubic interpolation. mes=5-conic
-!         interpolation.
-!  iu  isys  control parameter.
-!
 !### Method
 ! safeguarded extrapolation and interpolation with extended termination
 ! criteria.
@@ -2204,13 +2168,70 @@
 
       class(psqp_class),intent(inout) :: me
 
-      integer kd , ld , nit , kit , nred , mred , maxst , iest , inits ,&
-              iters , kters , mes , isys
-      real(wp) r , ro , rp , f , fo , fp , po , pp , fmin , &
-                       fmax , rmin , rmax , tols
-      real(wp) rtemp
-      integer merr , init1
-      logical l1 , l2 , l3 , l4 , l6 , l7
+      integer :: kd     !! degree of required dervatives.
+      integer :: ld     !! degree of previously computed derivatives.
+      integer :: nit    !! actual number of iterations.
+      integer :: kit    !! number of the iteration after last restart.
+      integer :: nred   !! actual number of extrapolations or interpolations.
+      integer :: mred   !! maximum number of extrapolations or interpolations.
+      integer :: maxst  !! maximum stepsize indicator. maxst=0 or maxst=1
+                        !! if maximum stepsize was not or was reached.
+      integer :: iest   !! lower bound specification. iest=0 or iest=1
+                        !! if lower bound is not or is given.
+      integer :: inits  !! choice of the initial stepsize.
+                        !!
+                        !! * inits=0 - initial stepsize is specified in the calling program.
+                        !! * inits=1 - unit initial stepsize.
+                        !! * inits=2 - combined unit and quadratically estimated initial stepsize.
+                        !! * inits=3 - quadratically estimated initial stepsize.
+      integer :: iters  !! termination indicator.
+                        !!
+                        !! * iters=0 - zero step.
+                        !! * iters=1 - perfect line search.
+                        !! * iters=2   goldstein stepsize.
+                        !! * iters=3 - curry stepsize.
+                        !! * iters=4 - extended curry stepsize.
+                        !! * iters=5 - armijo stepsize.
+                        !! * iters=6 - first stepsize.
+                        !! * iters=7 - maximum stepsize.
+                        !! * iters=8 - unbounded function.
+                        !! * iters=-1 - mred reached.
+                        !! * iters=-2 - positive directional derivative.
+                        !! * iters=-3 - error in interpolation.
+      integer :: kters  !! termination selection.
+                        !!
+                        !! * kters=1 - perfect line search.
+                        !! * kters=2 - goldstein stepsize.
+                        !! * kters=3 - curry stepsize.
+                        !! * kters=4 - extended curry stepsize.
+                        !! * kters=5 - armijo stepsize.
+                        !! * kters=6 - first stepsize.
+      integer :: mes    !! method selection.
+                        !!
+                        !! * mes=1 - bisection.
+                        !! * mes=2 - quadratic interpolation (with one directional derivative).
+                        !! * mes=3 - quadratic interpolation (with two directional derivatives).
+                        !! * mes=4 - cubic interpolation.
+                        !! * mes=5 - conic interpolation.
+      integer :: isys   !! control parameter.
+      real(wp) :: r     !! value of the stepsize parameter.
+      real(wp) :: ro    !! initial value of the stepsize parameter.
+      real(wp) :: rp    !! previous value of the stepsize parameter.
+      real(wp) :: f     !! value of the objective function.
+      real(wp) :: fo    !! initial value of the objective function.
+      real(wp) :: fp    !! previous value of the objective function.
+      real(wp) :: po    !! initial value of the directional derivative.
+      real(wp) :: pp    !! previous value of the directional derivative.
+      real(wp) :: fmin  !! lower bound for value of the objective function.
+      real(wp) :: fmax  !! upper bound for value of the objective function.
+      real(wp) :: rmin  !! minimum value of the stepsize parameter
+      real(wp) :: rmax  !! maximum value of the stepsize parameter
+      real(wp) :: tols  !! termination tolerance for line search
+                        !! (in test on the change of the function value).
+
+      real(wp) :: rtemp
+      integer :: merr , init1
+      logical :: l1 , l2 , l3 , l4 , l6 , l7
 
       real(wp),parameter :: tol = 1.0d-4
 
