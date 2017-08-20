@@ -1,6 +1,13 @@
 !***********************************************************************
 !>
-!  module for psqp
+!  PSQP: SQP variable metric method for general
+!  nonlinear programming problems.
+!
+!### History
+!  * Original Fortran 77 code by Ladislav Luksan
+!    http://www.cs.cas.cz/~luksan/subroutines.html
+!  * Jacob Williams, Aug 2007,
+!    Significant refactoring to modern Fortran.
 
     module psqp_module
 
@@ -12,6 +19,8 @@
     private
 
     type,public :: psqp_class
+
+        !! The main class to use.
 
         private
 
