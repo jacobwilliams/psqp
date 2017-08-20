@@ -931,7 +931,6 @@
       end if
       if ( umax<=eps7*gmax ) then
          ier = 1
-         return
       else
          n = n - 1
          nca = nca + 1
@@ -1829,116 +1828,105 @@
 !### Method
 ! extrapolation or interpolation with standard model functions.
 
-      subroutine pnint1(rl,ru,fl,fu,pl,pu,r,mode,mtyp,merr)
+    subroutine pnint1(rl,ru,fl,fu,pl,pu,r,mode,mtyp,merr)
 
-      implicit none
+    implicit none
 
-      real(wp) :: rl   !! lower value of the stepsize parameter.
-      real(wp) :: ru   !! upper value of the stepsize parameter.
-      real(wp) :: fl   !! value of the objective function for r=rl.
-      real(wp) :: fu   !! value of the objective function for r=ru.
-      real(wp) :: pl   !! directional derivative for r=rl.
-      real(wp) :: pu   !! directional derivative for r=ru.
-      real(wp) :: r    !! value of the stepsize parameter obtained.
-      integer :: mode  !! mode of line search.
-      integer :: mtyp  !! method selection.
-                       !!
-                       !! * mtyp=1-bisection.
-                       !! * mtyp=2-quadratic interpolation (with one directional derivative).
-                       !! * mtyp=3-quadratic interpolation (with two directional derivatives).
-                       !! * mtyp=4-cubic interpolation.
-                       !! * mtyp=5-conic interpolation.
-      integer :: merr  !! error indicator. merr=0 for normal return.
+    real(wp) :: rl   !! lower value of the stepsize parameter.
+    real(wp) :: ru   !! upper value of the stepsize parameter.
+    real(wp) :: fl   !! value of the objective function for r=rl.
+    real(wp) :: fu   !! value of the objective function for r=ru.
+    real(wp) :: pl   !! directional derivative for r=rl.
+    real(wp) :: pu   !! directional derivative for r=ru.
+    real(wp) :: r    !! value of the stepsize parameter obtained.
+    integer :: mode  !! mode of line search.
+    integer :: mtyp  !! method selection.
+                     !!
+                     !! * mtyp=1-bisection.
+                     !! * mtyp=2-quadratic interpolation (with one directional derivative).
+                     !! * mtyp=3-quadratic interpolation (with two directional derivatives).
+                     !! * mtyp=4-cubic interpolation.
+                     !! * mtyp=5-conic interpolation.
+    integer :: merr  !! error indicator. merr=0 for normal return.
 
-      integer :: ntyp
-      real(wp) :: a , b , c , d , dis , den
+    integer :: ntyp
+    real(wp) :: a , b , c , d , dis , den
 
-      real(wp),parameter :: c1l = 1.1_wp
-      real(wp),parameter :: c1u = 1000.0_wp
-      real(wp),parameter :: c2l = 1.0e-2_wp
-      real(wp),parameter :: c2u = 0.9_wp
-      real(wp),parameter :: c3l = 0.1_wp
+    real(wp),parameter :: c1l = 1.1_wp
+    real(wp),parameter :: c1u = 1000.0_wp
+    real(wp),parameter :: c2l = 1.0e-2_wp
+    real(wp),parameter :: c2u = 0.9_wp
+    real(wp),parameter :: c3l = 0.1_wp
 
-      merr = 0
-      if ( mode<=0 ) return
-      if ( pl>=0.0_wp ) then
-         merr = 2
-         return
-      elseif ( ru<=rl ) then
-         merr = 3
-         return
-      end if
-      do ntyp = mtyp , 1 , -1
-         if ( ntyp==1 ) then
-!
-!     bisection
-!
+    merr = 0
+    if ( mode<=0 ) return
+    if ( pl>=0.0_wp ) then
+        merr = 2
+        return
+    elseif ( ru<=rl ) then
+        merr = 3
+        return
+    end if
+
+    do ntyp = mtyp , 1 , -1
+
+        if ( ntyp==1 ) then
+            ! bisection
             if ( mode==1 ) then
-               r = 4.0_wp*ru
-               return
+                r = 4.0_wp*ru
+                return
             else
-               r = 0.5_wp*(rl+ru)
-               return
+                r = 0.5_wp*(rl+ru)
+                return
             end if
-         elseif ( ntyp==mtyp ) then
+        elseif ( ntyp==mtyp ) then
             a = (fu-fl)/(pl*(ru-rl))
             b = pu/pl
-         end if
-         if ( ntyp==2 ) then
-!
-!     quadratic extrapolation or interpolation with one directional
-!     derivative
-!
+        end if
+        if ( ntyp==2 ) then
+            ! quadratic extrapolation or interpolation
+            ! with one directional derivative
             den = 2.0_wp*(1.0_wp-a)
-         elseif ( ntyp==3 ) then
-!
-!     quadratic extrapolation or interpolation with two directional
-!     derivatives
-!
+        elseif ( ntyp==3 ) then
+            ! quadratic extrapolation or interpolation
+            ! with two directional derivatives
             den = 1.0_wp - b
-         elseif ( ntyp==4 ) then
-!
-!     cubic extrapolation or interpolation
-!
+        elseif ( ntyp==4 ) then
+            ! cubic extrapolation or interpolation
             c = b - 2.0_wp*a + 1.0_wp
             d = b - 3.0_wp*a + 2.0_wp
             dis = d*d - 3.0_wp*c
-            if ( dis<0.0_wp ) goto 100
+            if ( dis<0.0_wp ) cycle
             den = d + sqrt(dis)
-         elseif ( ntyp==5 ) then
-!
-!     conic extrapolation or interpolation
-!
+        elseif ( ntyp==5 ) then
+            ! conic extrapolation or interpolation
             dis = a*a - b
-            if ( dis<0.0_wp ) goto 100
+            if ( dis<0.0_wp ) cycle
             den = a + sqrt(dis)
-            if ( den<=0.0_wp ) goto 100
+            if ( den<=0.0_wp ) cycle
             den = 1.0_wp - b*(1.0_wp/den)**3
-         end if
-         if ( mode==1 .and. den>0.0_wp .and. den<1.0_wp ) then
-!
-!     extrapolation accepted
-!
+        end if
+        if ( mode==1 .and. den>0.0_wp .and. den<1.0_wp ) then
+            ! extrapolation accepted
             r = rl + (ru-rl)/den
             r = max(r,c1l*ru)
             r = min(r,c1u*ru)
             return
-         elseif ( mode==2 .and. den>1.0_wp ) then
-!
-!     interpolation accepted
-!
+        elseif ( mode==2 .and. den>1.0_wp ) then
+            ! interpolation accepted
             r = rl + (ru-rl)/den
             if ( rl==0.0_wp ) then
-               r = max(r,rl+c2l*(ru-rl))
+                r = max(r,rl+c2l*(ru-rl))
             else
-               r = max(r,rl+c3l*(ru-rl))
+                r = max(r,rl+c3l*(ru-rl))
             end if
             r = min(r,rl+c2u*(ru-rl))
             return
-         end if
- 100  end do
+        end if
 
-      end subroutine pnint1
+    end do
+
+    end subroutine pnint1
 
 !***********************************************************************
 !> date: 91/12/01
