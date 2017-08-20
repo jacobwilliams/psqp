@@ -6,9 +6,11 @@
 
       use kind_module, only: wp
       use psqp_module, only: psqp_class
+      use tqsubs_module
+
+      implicit none
 
       type(psqp_class) :: solver
-
       integer  :: next,nfv,nit
       real(wp) :: f,fmin,cmax,gmax
       integer  :: i,ierr,iprnt,iterm,itime,nb,nc,nf
@@ -68,11 +70,9 @@
       !! user supplied subroutine (calculation of ff)
 
       class(psqp_class),intent(inout) :: me
-
-      double precision ff
-      integer          nf
-      double precision x(nf)
-      external         tffu07
+      real(wp) :: ff
+      integer  :: nf
+      real(wp) :: x(nf)
       call tffu07(nf,x,ff,next)
       end subroutine obj
 
@@ -81,10 +81,8 @@
       !! user supplied subroutine (calculation of gf)
 
       class(psqp_class),intent(inout) :: me
-
-      integer          nf
-      double precision gf(nf),x(nf)
-      external         tfgu07
+      integer  :: nf
+      real(wp) :: gf(nf),x(nf)
       call tfgu07(nf,x,gf,next)
       end subroutine dobj
 
@@ -93,11 +91,9 @@
       !! user supplied subroutine (calculation of fc)
 
       class(psqp_class),intent(inout) :: me
-
-      double precision fc
-      integer          kc,nf
-      double precision x(nf)
-      external         tcfu07
+      real(wp) :: fc
+      integer  :: kc,nf
+      real(wp) :: x(nf)
       call tcfu07(nf,kc,x,fc,next)
       end subroutine con
 
@@ -106,10 +102,8 @@
       !! user supplied subroutine (calculation of gc)
 
       class(psqp_class),intent(inout) :: me
-
-      integer          kc,nf
-      double precision gc(nf),x(nf)
-      external         tcgu07
+      integer  :: kc,nf
+      real(wp) :: gc(nf),x(nf)
       call tcgu07(nf,kc,x,gc,next)
       end subroutine dcon
 

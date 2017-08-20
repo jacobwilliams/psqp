@@ -1,32 +1,39 @@
-* subroutine tild03                all systems                92/11/01
-c portability : all systems
-c 92/11/01 lu : original version
-*
-* purpose :
-*  initial values of the variables for constrained minimization.
-*  linearly constrained and dense version.
-*
-* parameters :
-*  io  nf  number of variables.
-*  io  nc  number of constraints.
-*  ii  ncl  number of linear constraints.
-*  ro  x(nf)  vector of variables.
-*  io  ix(nf)  vector containing types of bounds.
-*  ro  xl(nf)  vector containing lower bounds for variables.
-*  ro  xu(nf)  vector containing upper bounds for variables.
-*  io  ic(nc)  vector containing types of constraints.
-*  ro  cl(nc)  vector containing lower bounds for constraint functions.
-*  ro  cu(nc)  vector containing upper bounds for constraint functions.
-*  ro  cg(nf*nc) matrix whose columns are normals of the linear
-*         constraints.
-*  ii  next  number of the test problem.
-*  io  ierr  error indicator.
-*
-      subroutine tild03(nf,nc,x,ix,xl,xu,ic,cl,cu,cg,fmin,xmax,next,
-     * ierr)
+
+   module tqsubs_module
+
+      implicit none
+
+   contains
+
+! subroutine tild03                all systems                92/11/01
+! portability : all systems
+! 92/11/01 lu : original version
+!
+! purpose :
+!  initial values of the variables for constrained minimization.
+!  linearly constrained and dense version.
+!
+! parameters :
+!  io  nf  number of variables.
+!  io  nc  number of constraints.
+!  ii  ncl  number of linear constraints.
+!  ro  x(nf)  vector of variables.
+!  io  ix(nf)  vector containing types of bounds.
+!  ro  xl(nf)  vector containing lower bounds for variables.
+!  ro  xu(nf)  vector containing upper bounds for variables.
+!  io  ic(nc)  vector containing types of constraints.
+!  ro  cl(nc)  vector containing lower bounds for constraint functions.
+!  ro  cu(nc)  vector containing upper bounds for constraint functions.
+!  ro  cg(nf*nc) matrix whose columns are normals of the linear
+!         constraints.
+!  ii  next  number of the test problem.
+!  io  ierr  error indicator.
+!
+      subroutine tild03(nf,nc,x,ix,xl,xu,ic,cl,cu,cg,fmin,xmax,next, &
+       ierr)
       integer nf,nc,ix(nf),ic(nc),next,iext,ierr
-      double precision x(nf),xl(nf),xu(nf),cl(nc),cu(nc),cg(nf*nc),
-     * fmin,xmax
+      double precision x(nf),xl(nf),xu(nf),cl(nc),cu(nc),cg(nf*nc), &
+       fmin,xmax
       integer i,j,ncl
       double precision y(235)
       common /empr03/ y
@@ -581,21 +588,22 @@ c 92/11/01 lu : original version
       cu(j)=cl(j)
   154 continue
       return
-      end
-* subroutine tffu03                all systems                92/11/01
-c portability : all systems
-c 92/11/01 lu : original v0ersion
-*
-* purpose :
-*  values of model functions for constrained minimization.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ri  x(n)  vector of variables.
-*  ro  f  value of the model function.
-*  ii  next  number of the test problem.
-*
+      end subroutine tild03
+
+! subroutine tffu03                all systems                92/11/01
+! portability : all systems
+! 92/11/01 lu : original v0ersion
+!
+! purpose :
+!  values of model functions for constrained minimization.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ri  x(n)  vector of variables.
+!  ro  f  value of the model function.
+!  ii  next  number of the test problem.
+!
       subroutine tffu03(n,x,f,next)
       integer n,next
       double precision x(n),f
@@ -613,24 +621,24 @@ c 92/11/01 lu : original v0ersion
    30 a=x(3)+3.0d-2
       b=a+x(2)
       c=b+x(1)
-      f=-32.174d0*(255.0d0*log(c/(b+9.0d-2*x(1)))+
-     10280.0d0*log(b/(a+7.0d-2*x(2)))+
-     10290.0d0*log(a/(3.0d-2+1.3d-1*x(3))))
+      f=-32.174d0*(255.0d0*log(c/(b+9.0d-2*x(1)))+&
+      0280.0d0*log(b/(a+7.0d-2*x(2)))+&
+      0290.0d0*log(a/(3.0d-2+1.3d-1*x(3))))
       return
    40 f=-x(1)*x(2)*x(3)
       return
    50 f=2.0d0-x(1)*x(2)*x(3)
       return
-   60 f=(x(1)+1.0d1*x(2))**2+5.0d0*(x(3)-x(4))**2+
-     &  (x(2)-2.0d0*x(3))**4+1.0d1*(x(1)-x(4))**4
+   60 f=(x(1)+1.0d1*x(2))**2+5.0d0*(x(3)-x(4))**2+ &
+        (x(2)-2.0d0*x(3))**4+1.0d1*(x(1)-x(4))**4
       return
-   70 f=(x(1)-x(2))**2+(x(3)-1.0d0)**2+(x(4)-1.0d0)**4+
-     &  (x(5)-1.0d0)**6
+   70 f=(x(1)-x(2))**2+(x(3)-1.0d0)**2+(x(4)-1.0d0)**4+ &
+        (x(5)-1.0d0)**6
       return
    80 f=(x(1)-x(2))**2+(x(2)-x(3))**2+(x(3)-x(4))**4+(x(4)-x(5))**2
       return
-   90 f=(x(1)-x(2))**2+(x(2)+x(3)-2.0d0)**2+
-     &   (x(4)-1.0d0)**2+(x(5)-1.0d0)**2
+   90 f=(x(1)-x(2))**2+(x(2)+x(3)-2.0d0)**2+ &
+         (x(4)-1.0d0)**2+(x(5)-1.0d0)**2
       return
   100 ev(1)=-15.0d0
       ev(2)=-27.0d0
@@ -676,10 +684,10 @@ c 92/11/01 lu : original v0ersion
   101 continue
       return
   110 hk=0.96d0*4.9d13
-      h=((x(1)-1.0d4)**2/6.4d7+(x(1)-1.0d4)*(x(2)-1.0d0)/2.0d4+
-     &  (x(2)-1.0d0)**2)*(x(3)-2.0d6)**2/hk+
-     &  (x(4)-10.0d0)**2/2.5d3+(x(5)-1.0d-3)**2/2.5d-3+
-     &  (x(6)-1.0d8)**2/2.5d17
+      h=((x(1)-1.0d4)**2/6.4d7+(x(1)-1.0d4)*(x(2)-1.0d0)/2.0d4+ &
+        (x(2)-1.0d0)**2)*(x(3)-2.0d6)**2/hk+ &
+        (x(4)-10.0d0)**2/2.5d3+(x(5)-1.0d-3)**2/2.5d-3+ &
+        (x(6)-1.0d8)**2/2.5d17
       f=-exp(-h/2.0d0)
       return
   120 f=x(1)+2.0d0*x(2)+4.0d0*x(5)+exp(x(1)*x(4))
@@ -689,8 +697,8 @@ c 92/11/01 lu : original v0ersion
       do 131 i=1,235
       a=x(1)/x(6)*exp(-(y(i)-x(3))**2/(2.0d0*x(6)**2))
       b=x(2)/x(7)*exp(-(y(i)-x(4))**2/(2.0d0*x(7)**2))
-      c=(1.0d0-x(2)-x(1))/x(8)*
-     &     exp(-(y(i)-x(5))**2/(2.0d0*x(8)**2))
+      c=(1.0d0-x(2)-x(1))/x(8)* &
+           exp(-(y(i)-x(5))**2/(2.0d0*x(8)**2))
       f=f-log((a+b+c)/sq)
   131 continue
       return
@@ -758,21 +766,22 @@ c 92/11/01 lu : original v0ersion
   155 continue
   154 continue
       return
-      end
-* subroutine tfgu03                all systems                92/11/01
-c portability : all systems
-c 92/11/01 lu : original version
-*
-* purpose :
-*  gradients of model functions for constrained minimization.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ri  x(n)  vector of variables.
-*  ro  g(n)  gradient of the model function.
-*  ii  next  number of the test problem.
-*
+      end subroutine tffu03
+
+! subroutine tfgu03                all systems                92/11/01
+! portability : all systems
+! 92/11/01 lu : original version
+!
+! purpose :
+!  gradients of model functions for constrained minimization.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ri  x(n)  vector of variables.
+!  ro  g(n)  gradient of the model function.
+!  ii  next  number of the test problem.
+!
       subroutine tfgu03(n,x,g,next)
       integer n,next
       double precision x(n),g(n)
@@ -800,10 +809,10 @@ c 92/11/01 lu : original version
       e=a+7.0d-2*x(2)
       f=b+9.0d-2*x(1)
       g(1)=-32.174d0*255.0d0*(f-9.0d-2*c)/(f*c)
-      g(2)=-32.174d0*(255.0d0*(f-c)/(f*c)+
-     10280.0d0*(e-7.0d-2*b)/(e*b))
-      g(3)=-32.174d0*(255.0d0*(f-c)/(f*c)+
-     &  280.0d0*(e-b)/(e*b)+290.0d0*(d-1.3d-1*a)/(d*a))
+      g(2)=-32.174d0*(255.0d0*(f-c)/(f*c)+&
+      0280.0d0*(e-7.0d-2*b)/(e*b))
+      g(3)=-32.174d0*(255.0d0*(f-c)/(f*c)+ &
+        280.0d0*(e-b)/(e*b)+290.0d0*(d-1.3d-1*a)/(d*a))
       return
    40 g(1)=-x(2)*x(3)
       g(2)=-x(1)*x(3)
@@ -892,18 +901,18 @@ c 92/11/01 lu : original version
   106 continue
       return
   110 hk=0.96d0*4.9d13
-      h=((x(1)-1.0d4)**2/6.4d7+(x(1)-1.0d4)*(x(2)-1.0d0)/2.0d4+
-     &  (x(2)-1.0d0)**2)*(x(3)-2.0d6)**2/hk+
-     &  (x(4)-10.0d0)**2/2.5d3+(x(5)-1.0d-3)**2/2.5d-3+
-     &  (x(6)-1.0d8)**2/2.5d17
+      h=((x(1)-1.0d4)**2/6.4d7+(x(1)-1.0d4)*(x(2)-1.0d0)/2.0d4+ &
+        (x(2)-1.0d0)**2)*(x(3)-2.0d6)**2/hk+ &
+        (x(4)-10.0d0)**2/2.5d3+(x(5)-1.0d-3)**2/2.5d-3+ &
+        (x(6)-1.0d8)**2/2.5d17
       d=exp(-h/2.0d0)/2.0d0
-      g(1)=d*(2.0d0*(x(1)-1.0d4)/6.4d7+(x(2)-1.0d0)/2.0d4)*
-     &     (x(3)-2.0d6)**2/hk
-      g(2)=d*((x(1)-1.0d4)/2.0d4+
-     &     2.0d0*(x(2)-1.0d0))*(x(3)-2.0d6)**2/hk
-      g(3)=d*((x(1)-1.0d4)**2/6.4d7+
-     &     (x(1)-1.0d4)*(x(2)-1.0d0)/2.0d4+
-     &     (x(2)-1.0d0)**2)*2.0d0*(x(3)-2.0d6)/hk
+      g(1)=d*(2.0d0*(x(1)-1.0d4)/6.4d7+(x(2)-1.0d0)/2.0d4)* &
+           (x(3)-2.0d6)**2/hk
+      g(2)=d*((x(1)-1.0d4)/2.0d4+ &
+           2.0d0*(x(2)-1.0d0))*(x(3)-2.0d6)**2/hk
+      g(3)=d*((x(1)-1.0d4)**2/6.4d7+ &
+           (x(1)-1.0d4)*(x(2)-1.0d0)/2.0d4+ &
+           (x(2)-1.0d0)**2)*2.0d0*(x(3)-2.0d6)/hk
       g(4)=d*2.0d0*(x(4)-10.0d0)/2.5d3
       g(5)=d*2.0d0*(x(5)-1.0d-3)/2.5d-3
       g(6)=d*2.0d0*(x(6)-1.0d8)/2.5d17
@@ -932,12 +941,12 @@ c 92/11/01 lu : original version
       g(3)=g(3)+hi*x(1)/x(6)*aexp*(y(i)-x(3))/(x(6)**2)
       g(4)=g(4)+hi*x(2)/x(7)*bexp*(y(i)-x(4))/(x(7)**2)
       g(5)=g(5)+hi*(1.0d0-x(2)-x(1))/x(8)*cexp*(y(i)-x(5))/(x(8)**2)
-      g(6)=g(6)+hi*((-x(1)/(x(6)**2))*aexp+
-     &   x(1)/x(6)*aexp*(y(i)-x(3))**2/(x(6)**3))
-      g(7)=g(7)+hi*((-x(2)/(x(7)**2))*bexp+
-     &   x(2)/x(7)*bexp*(y(i)-x(4))**2/(x(7)**3))
-      g(8)=g(8)+hi*((x(1)+x(2)-1.0d0)/(x(8)**2)*cexp+
-     &   (1.0d0-x(2)-x(1))/x(8)*cexp*(y(i)-x(5))**2/(x(8)**3))
+      g(6)=g(6)+hi*((-x(1)/(x(6)**2))*aexp+ &
+         x(1)/x(6)*aexp*(y(i)-x(3))**2/(x(6)**3))
+      g(7)=g(7)+hi*((-x(2)/(x(7)**2))*bexp+ &
+         x(2)/x(7)*bexp*(y(i)-x(4))**2/(x(7)**3))
+      g(8)=g(8)+hi*((x(1)+x(2)-1.0d0)/(x(8)**2)*cexp+ &
+         (1.0d0-x(2)-x(1))/x(8)*cexp*(y(i)-x(5))**2/(x(8)**3))
   132 continue
       return
   140 cv(1)=-6.089d0
@@ -1001,41 +1010,42 @@ c 92/11/01 lu : original version
   154 continue
       do 155 j=1,16
       do 156 i=1,16
-      g(j)=g(j)+
-     &  (aa(i,j)+aa(j,i))*(x(i)**2+x(i)+1.0d0)*(2.0d0*x(j)+1.0d0)
+      g(j)=g(j)+ &
+        (aa(i,j)+aa(j,i))*(x(i)**2+x(i)+1.0d0)*(2.0d0*x(j)+1.0d0)
   156 continue
   155 continue
       return
-      end
-*
-*     test subroutines for constrained optimization
-*
-* subroutine tind07             all systems                 90/12/01
-c portability : all systems
-c 90/12/01 lu : original version
-*
-* purpose :
-*  initial values of the variables for nonlinear programming.
-*  dense version.
-*
-* parameters :
-*  io  n  number of variables.
-*  io  nc  number of constraints.
-*  io  ncl number of linear constraints.
-*  ro  x(n)  vector of variables.
-*  io  ix(nf)  vector containing types of bounds.
-*  ro  xl(nf)  vector containing lower bounds for variables.
-*  ro  xu(nf)  vector containing upper bounds for variables.
-*  io  ic(nc)  types of constraints.
-*  ro  cl(nc)  lower bounds of constraints.
-*  ro  cu(nc)  upper bounds of constraints.
-*  ro  fmin  lower bound for value of the objective function.
-*  ro  xmax  maximum stepsize.
-*  io  next  number of the test problem.
-*  io  ierr  error indicator.
-*
-      subroutine tind07(n,nc,x,ix,xl,xu,ic,cl,cu,fmin,xmax,next,
-     * ierr)
+      end subroutine tfgu03
+
+!
+!     test subroutines for constrained optimization
+!
+! subroutine tind07             all systems                 90/12/01
+! portability : all systems
+! 90/12/01 lu : original version
+!
+! purpose :
+!  initial values of the variables for nonlinear programming.
+!  dense version.
+!
+! parameters :
+!  io  n  number of variables.
+!  io  nc  number of constraints.
+!  io  ncl number of linear constraints.
+!  ro  x(n)  vector of variables.
+!  io  ix(nf)  vector containing types of bounds.
+!  ro  xl(nf)  vector containing lower bounds for variables.
+!  ro  xu(nf)  vector containing upper bounds for variables.
+!  io  ic(nc)  types of constraints.
+!  ro  cl(nc)  lower bounds of constraints.
+!  ro  cu(nc)  upper bounds of constraints.
+!  ro  fmin  lower bound for value of the objective function.
+!  ro  xmax  maximum stepsize.
+!  io  next  number of the test problem.
+!  io  ierr  error indicator.
+!
+      subroutine tind07(n,nc,x,ix,xl,xu,ic,cl,cu,fmin,xmax,next, &
+       ierr)
       integer i,n,nc,ncl,ix(n),ic(nc),next,ierr
       double precision x(n),xl(n),xu(n),cl(nc),cu(nc),fmin,xmax
       double precision y(128)
@@ -1054,9 +1064,9 @@ c 90/12/01 lu : original version
       cl(i)=0.0d0
       cu(i)=0.0d0
     2 continue
-      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,
-     * 180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,
-     * 340) next
+      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170, &
+       180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330, &
+       340) next
    10 if(n.ge.2.and.nc.ge.1) then
       n=2
       nc=1
@@ -2046,22 +2056,23 @@ c 90/12/01 lu : original version
       ierr=1
       endif
       return
-      end
-* subroutine tcfu07             all systems                 91/12/01
-c portability : all systems
-c 91/12/01 lu : original version
-*
-* purpose :
-*  values of test functions for nonlinear approximation.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  kc  index of the constraint.
-*  ri  x(n)  vector of variables.
-*  ro  fc value of the constraint at the selected point.
-*  ii  next  number of the test problem.
-*
+      end subroutine tind07
+
+! subroutine tcfu07             all systems                 91/12/01
+! portability : all systems
+! 91/12/01 lu : original version
+!
+! purpose :
+!  values of test functions for nonlinear approximation.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  kc  index of the constraint.
+!  ri  x(n)  vector of variables.
+!  ro  fc value of the constraint at the selected point.
+!  ii  next  number of the test problem.
+!
       subroutine tcfu07(n,kc,x,fc,next)
       integer n,kc,next
       double precision x(n),fc
@@ -2069,9 +2080,9 @@ c 91/12/01 lu : original version
       integer i,j,k
       double precision y(128)
       common /empr07/ y
-      go to(10,20,30,40,50,60,70,80,90,100,10,91,130,140,150,160,170,
-     * 180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,
-     * 340),next
+      go to(10,20,30,40,50,60,70,80,90,100,10,91,130,140,150,160,170, &
+       180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330, &
+       340),next
    10 fc=x(1)**2+x(2)**2
       return
    20 fc=3.0d0*x(1)**2-2.0d0*x(1)*x(2)+x(2)**2
@@ -2175,27 +2186,27 @@ c 91/12/01 lu : original version
   193 fc=x(2)**2*x(4)+10.0d0*x(1)*x(5)
       return
   200 go to (201,202,203),kc
-  201 fc=85.334407d0+0.0056868d0*x(2)*x(5)+0.0006262d0*x(1)*x(4)-
-     * 0.0022053d0*x(3)*x(5)
+  201 fc=85.334407d0+0.0056868d0*x(2)*x(5)+0.0006262d0*x(1)*x(4)- &
+       0.0022053d0*x(3)*x(5)
       return
-  202 fc=80.51249d0+0.0071317d0*x(2)*x(5)+0.0029955d0*x(1)*x(2)+
-     * 0.0021813d0*x(3)**2
+  202 fc=80.51249d0+0.0071317d0*x(2)*x(5)+0.0029955d0*x(1)*x(2)+ &
+       0.0021813d0*x(3)**2
       return
-  203 fc=9.300961d0+0.0047026d0*x(3)*x(5)+0.0012547d0*x(1)*x(3)+
-     * 0.0019085d0*x(3)*x(4)
+  203 fc=9.300961d0+0.0047026d0*x(3)*x(5)+0.0012547d0*x(1)*x(3)+ &
+       0.0019085d0*x(3)*x(4)
       return
   210 go to (211,212,213),kc
-  211 fc=-145421.4020d0*x(1)+2931.15060d0*x(1)*x(2)-
-     * 40.4279320d0*x(1)*x(3)+5106.1920d0*x(1)*x(4)+
-     * 15711.36d0*x(1)*x(5)
+  211 fc=-145421.4020d0*x(1)+2931.15060d0*x(1)*x(2)- &
+       40.4279320d0*x(1)*x(3)+5106.1920d0*x(1)*x(4)+ &
+       15711.36d0*x(1)*x(5)
       return
-  212 fc=-155011.1084d0*x(1)+4360.53352d0*x(1)*x(2)+
-     * 12.9492344d0*x(1)*x(3)+10236.884d0*x(1)*x(4)+
-     * 13176.786d0*x(1)*x(5)
+  212 fc=-155011.1084d0*x(1)+4360.53352d0*x(1)*x(2)+ &
+       12.9492344d0*x(1)*x(3)+10236.884d0*x(1)*x(4)+ &
+       13176.786d0*x(1)*x(5)
       return
-  213 fc=-326669.5104d0*x(1)+7390.68412d0*x(1)*x(2)-
-     * 27.8986976d0*x(1)*x(3)+16643.076d0*x(1)*x(4)+
-     * 30988.146d0*x(1)*x(5)
+  213 fc=-326669.5104d0*x(1)+7390.68412d0*x(1)*x(2)- &
+       27.8986976d0*x(1)*x(3)+16643.076d0*x(1)*x(4)+ &
+       30988.146d0*x(1)*x(5)
       return
   220 continue
       x1=146.312d3
@@ -2206,8 +2217,8 @@ c 91/12/01 lu : original version
       y(20)=0.052d0*x(1)+78.0d0+0.002377d0*y(2)*x(1)
       y(3)=y(19)/y(20)
       y(4)=19.0d0*y(3)
-      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+
-     * 0.6376d0*y(4)+1.594d0*y(3)
+      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+ &
+       0.6376d0*y(4)+1.594d0*y(3)
       y(22)=100.0d0*x(2)
       y(23)=x(1)-y(3)-y(4)
       y(24)=0.95d0-y(21)/y(22)
@@ -2225,10 +2236,10 @@ c 91/12/01 lu : original version
       y(29)=0.995d0*y(10)+1998.0d0
       y(12)=y(27)*x(1)+y(28)/y(29)
       y(13)=y(29)-1.75d0*y(2)
-      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+
-     * x(5))
-      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)-
-     * 5095.0d0
+      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+ &
+       x(5))
+      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)- &
+       5095.0d0
       y(15)=y(13)/y(30)
       y(16)=148.0d3-331.0d3*y(15)+40.0d0*y(13)-61.0d0*y(15)*y(13)
       y(31)=2324.0d0*y(10)-2.874d7*y(2)
@@ -2256,77 +2267,77 @@ c 91/12/01 lu : original version
   240 go to (241,242),kc
   241 fc=0.001d0*x(1)*x(2)*x(3)*x(4)*x(5)*x(6)
       return
-  242 fc=0.00062d0*x(1)*x(4)*x(5)**2*(x(1)+x(2)+x(3))+
-     * 0.00058d0*x(2)*x(3)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
+  242 fc=0.00062d0*x(1)*x(4)*x(5)**2*(x(1)+x(2)+x(3))+ &
+       0.00058d0*x(2)*x(3)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
       return
   250 go to (251,252,253,254),kc
-  251 fc=17.1d0*x(1)+38.2d0*x(2)+204.2d0*x(3)+212.3d0*x(4)+
-     * 623.4d0*x(5)+1495.5d0*x(6)-169.0d0*x(1)*x(3)-
-     * 3580.0d0*x(3)*x(5)-3810.0d0*x(4)*x(5)-18500.0d0*x(4)*x(6)-
-     * 24300.0d0*x(5)*x(6)
+  251 fc=17.1d0*x(1)+38.2d0*x(2)+204.2d0*x(3)+212.3d0*x(4)+ &
+       623.4d0*x(5)+1495.5d0*x(6)-169.0d0*x(1)*x(3)- &
+       3580.0d0*x(3)*x(5)-3810.0d0*x(4)*x(5)-18500.0d0*x(4)*x(6)- &
+       24300.0d0*x(5)*x(6)
       return
-  252 fc=17.9d0*x(1)+36.8d0*x(2)+113.9d0*x(3)+169.7d0*x(4)+
-     * 337.8d0*x(5)+1385.2d0*x(6)-139.0d0*x(1)*x(3)-
-     * 2450.0d0*x(4)*x(5)-16600.0d0*x(4)*x(6)-17200.0d0*x(5)*x(6)
+  252 fc=17.9d0*x(1)+36.8d0*x(2)+113.9d0*x(3)+169.7d0*x(4)+ &
+       337.8d0*x(5)+1385.2d0*x(6)-139.0d0*x(1)*x(3)- &
+       2450.0d0*x(4)*x(5)-16600.0d0*x(4)*x(6)-17200.0d0*x(5)*x(6)
       return
-  253 fc=-273.0d0*x(2)-70.0d0*x(4)-819.0d0*x(5)+
-     * 26000.0d0*x(4)*x(5)
+  253 fc=-273.0d0*x(2)-70.0d0*x(4)-819.0d0*x(5)+ &
+       26000.0d0*x(4)*x(5)
       return
-  254 fc=159.9d0*x(1)-311.0d0*x(2)+587.0d0*x(4)+391.0d0*x(5)+
-     * 2198.0d0*x(6)-14000.0d0*x(1)*x(6)
+  254 fc=159.9d0*x(1)-311.0d0*x(2)+587.0d0*x(4)+391.0d0*x(5)+ &
+       2198.0d0*x(6)-14000.0d0*x(1)*x(6)
       return
   260 go to (261,262,263,264),kc
-  261 fc=2.0d0*x(1)**2+3.0d0*x(2)**4+x(3)+4.0d0*x(4)**2+
-     &5.0d0*x(5)
+  261 fc=2.0d0*x(1)**2+3.0d0*x(2)**4+x(3)+4.0d0*x(4)**2+ &
+      5.0d0*x(5)
       return
   262 fc=7.0d0*x(1)+3.0d0*x(2)+1.0d1*x(3)**2+x(4)-x(5)
       return
   263 fc=2.3d1*x(1)+x(2)**2+6.0d0*x(6)**2-8.0d0*x(7)
       return
-  264 fc=4.0d0*x(1)**2+x(2)**2-3.0d0*x(1)*x(2)+2.0d0*x(3)**2+
-     &5.0d0*x(6)-1.1d1*x(7)
+  264 fc=4.0d0*x(1)**2+x(2)**2-3.0d0*x(1)*x(2)+2.0d0*x(3)**2+ &
+      5.0d0*x(6)-1.1d1*x(7)
       return
   270 go to (271,272,273,274,275),kc
-  271 fc=0.5d0*x(1)**0.5d0*x(7)/(x(3)*x(6)**2)+
-     * 0.7d0*x(1)**3*x(2)*x(6)*x(7)**0.5d0/x(3)**2+
-     * 0.2d0*x(3)*x(6)**(2.0d0/3.0d0)*x(7)**0.25d0/
-     * (x(2)*x(4)**0.5d0)
+  271 fc=0.5d0*x(1)**0.5d0*x(7)/(x(3)*x(6)**2)+ &
+       0.7d0*x(1)**3*x(2)*x(6)*x(7)**0.5d0/x(3)**2+ &
+       0.2d0*x(3)*x(6)**(2.0d0/3.0d0)*x(7)**0.25d0/ &
+       (x(2)*x(4)**0.5d0)
       return
-  272 fc=1.3d0*x(2)*x(6)/(x(1)**0.5d0*x(3)*x(5))+
-     * 0.8d0*x(3)*x(6)**2/(x(4)*x(5))+
-     * 3.1d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/
-     * (x(1)*x(4)**2*x(5))
+  272 fc=1.3d0*x(2)*x(6)/(x(1)**0.5d0*x(3)*x(5))+ &
+       0.8d0*x(3)*x(6)**2/(x(4)*x(5))+ &
+       3.1d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/ &
+       (x(1)*x(4)**2*x(5))
       return
-  273 fc=2.0d0*x(1)*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0*x(6))+
-     * 0.1d0*x(2)*x(5)/(x(3)**0.5d0*x(6)*x(7)**0.5d0)+
-     * x(2)*x(3)**0.5d0*x(5)/x(1)+
-     * 0.65d0*x(3)*x(5)*x(7)/(x(2)**2*x(6))
+  273 fc=2.0d0*x(1)*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0*x(6))+ &
+       0.1d0*x(2)*x(5)/(x(3)**0.5d0*x(6)*x(7)**0.5d0)+ &
+       x(2)*x(3)**0.5d0*x(5)/x(1)+ &
+       0.65d0*x(3)*x(5)*x(7)/(x(2)**2*x(6))
       return
-  274 fc=0.2d0*x(2)*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/
-     * (x(1)**2*x(4))+
-     * 0.3d0*x(1)**0.5d0*x(2)**2*x(3)*x(4)**(1.0d0/3.0d0)*
-     * x(7)**0.25d0/x(5)**(2.0d0/3.0d0)+
-     * 0.4d0*x(3)*x(5)*x(7)**0.75d0/(x(1)**3*x(2)**2)+
-     * 0.5d0*x(4)*x(7)**0.5d0/x(3)**2
+  274 fc=0.2d0*x(2)*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/ &
+       (x(1)**2*x(4))+ &
+       0.3d0*x(1)**0.5d0*x(2)**2*x(3)*x(4)**(1.0d0/3.0d0)* &
+       x(7)**0.25d0/x(5)**(2.0d0/3.0d0)+ &
+       0.4d0*x(3)*x(5)*x(7)**0.75d0/(x(1)**3*x(2)**2)+ &
+       0.5d0*x(4)*x(7)**0.5d0/x(3)**2
       return
-  275 fc=10.0d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)+
-     * 15.0d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)+
-     * 20.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**2)+
-     * 25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
+  275 fc=10.0d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)+ &
+       15.0d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)+ &
+       20.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**2)+ &
+       25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
       return
   280 go to (281,282,283,284,285),kc
   281 fc=0.0588d0*x(5)*x(7)+0.1d0*x(1)
       return
   282 fc=0.0588d0*x(6)*x(8)+0.1d0*(x(1)+x(2))
       return
-  283 fc=4.0d0*x(3)/x(5)+2.0d0/(x(3)**0.71d0*x(5))+
-     * 0.0588d0*x(7)/x(3)**1.3d0
+  283 fc=4.0d0*x(3)/x(5)+2.0d0/(x(3)**0.71d0*x(5))+ &
+       0.0588d0*x(7)/x(3)**1.3d0
       return
-  284 fc=4.0d0*x(4)/x(6)+2.0d0/(x(4)**0.71d0*x(6))+
-     * 0.0588d0*x(8)/x(4)**1.3d0
+  284 fc=4.0d0*x(4)/x(6)+2.0d0/(x(4)**0.71d0*x(6))+ &
+       0.0588d0*x(8)/x(4)**1.3d0
       return
-  285 fc=0.4d0*(x(1)/x(7))**0.67d0+0.4d0*(x(2)/x(8))**0.67d0+
-     * 10.0d0-x(1)-x(2)
+  285 fc=0.4d0*(x(1)/x(7))**0.67d0+0.4d0*(x(2)/x(8))**0.67d0+ &
+       10.0d0-x(1)-x(2)
       return
   290 go to (291,292,293,294,295,296),kc
   291 fc=0.0025d0*(x(4)+x(6))
@@ -2369,29 +2380,29 @@ c 91/12/01 lu : original version
   113 fc=x(5)*x(9)
       return
   310 go to (311,312,313,314,315,316,317,318),kc
-  311 fc=3.0d0*(x(1)-2.0d0)**2+4.0d0*(x(2)-
-     &3.0d0)**2+2.0d0*x(3)**2-7.0d0*x(4)
+  311 fc=3.0d0*(x(1)-2.0d0)**2+4.0d0*(x(2)- &
+      3.0d0)**2+2.0d0*x(3)**2-7.0d0*x(4)
       return
-  312 fc=5.0d0*x(1)**2+8.0d0*x(2)+(x(3)-6.0d0)**2-
-     &2.0d0*x(4)
+  312 fc=5.0d0*x(1)**2+8.0d0*x(2)+(x(3)-6.0d0)**2- &
+      2.0d0*x(4)
       return
-  313 fc=0.5d0*(x(1)-8.0d0)**2+2.0d0*(x(2)-
-     &4.0d0)**2+3.0d0*x(5)**2-x(6)
+  313 fc=0.5d0*(x(1)-8.0d0)**2+2.0d0*(x(2)- &
+      4.0d0)**2+3.0d0*x(5)**2-x(6)
       return
-  314 fc=x(1)**2+2.0d0*(x(2)-2.0d0)**2-
-     &2.0d0*x(1)*x(2)+1.4d1*x(5)-6.0d0*x(6)
+  314 fc=x(1)**2+2.0d0*(x(2)-2.0d0)**2- &
+      2.0d0*x(1)*x(2)+1.4d1*x(5)-6.0d0*x(6)
       return
-  315 fc=4.0d0*x(1)+5.0d0*x(2)-3.0d0*x(7)+
-     &9.0d0*x(8)
+  315 fc=4.0d0*x(1)+5.0d0*x(2)-3.0d0*x(7)+ &
+      9.0d0*x(8)
       return
-  316 fc=1.0d1*x(1)-8.0d0*x(2)-1.7d1*x(7)+
-     &2.0d0*x(8)
+  316 fc=1.0d1*x(1)-8.0d0*x(2)-1.7d1*x(7)+ &
+      2.0d0*x(8)
       return
-  317 fc=6.0d0*x(2)-3.0d0*x(1)+1.2d1*(x(9)-
-     &8.0d0)**2-7.0d0*x(10)
+  317 fc=6.0d0*x(2)-3.0d0*x(1)+1.2d1*(x(9)- &
+      8.0d0)**2-7.0d0*x(10)
       return
-  318 fc=2.0d0*x(2)-8.0d0*x(1)+5.0d0*x(9)-
-     &2.0d0*x(10)
+  318 fc=2.0d0*x(2)-8.0d0*x(1)+5.0d0*x(9)- &
+      2.0d0*x(10)
       return
   320 fc=3.0d0*y(kc+85)*x(kc+10)**2
       k=(kc-1)*5
@@ -2411,17 +2422,17 @@ c 91/12/01 lu : original version
       go to (331,332,333,334,335,336,337,338),kc-5
   331 fc=(y(26)*x(6)+(y(27)*x(1)+y(28)*x(6))*x(12)/x(11))/x(7)
       return
-  332 fc=(y(29)*x(7)+(y(30)*x(7)+y(33)*x(1))*x(12)+y(31)*x(2)*x(13))/
-     * x(8)+y(32)*x(13)
+  332 fc=(y(29)*x(7)+(y(30)*x(7)+y(33)*x(1))*x(12)+y(31)*x(2)*x(13))/ &
+       x(8)+y(32)*x(13)
       return
-  333 fc=y(34)*x(8)+y(37)*x(9)+(y(35)*x(8)+y(38)*x(2))*x(13)+
-     * (y(36)*x(3)+y(39)*x(9))*x(14)
+  333 fc=y(34)*x(8)+y(37)*x(9)+(y(35)*x(8)+y(38)*x(2))*x(13)+ &
+       (y(36)*x(3)+y(39)*x(9))*x(14)
       return
-  334 fc=((y(40)*x(14)+y(43))*x(9)+(y(41)*x(4)+y(44)*x(8))*x(15)+
-     * y(42)*x(10))/(x(3)*x(14))
+  334 fc=((y(40)*x(14)+y(43))*x(9)+(y(41)*x(4)+y(44)*x(8))*x(15)+ &
+       y(42)*x(10))/(x(3)*x(14))
       return
-  335 fc=(y(45)*x(5)*x(16)+y(49)*x(10))/(x(4)*x(15))+
-     * y(46)*x(10)/x(4)+(y(47)+y(48)*x(16))/x(15)
+  335 fc=(y(45)*x(5)*x(16)+y(49)*x(10))/(x(4)*x(15))+ &
+       y(46)*x(10)/x(4)+(y(47)+y(48)*x(16))/x(15)
       return
   336 fc=(y(50)+y(52)*x(5)*x(16))/x(4)+y(51)*x(16)
       return
@@ -2441,16 +2452,16 @@ c 91/12/01 lu : original version
       fc=y(61)*x(8)/x(9)
       return
       endif
-  340 go to (311,312,313,314,315,316,317,318,341,342,343,344,345,346,
-     * 347,348,349),kc
+  340 go to (311,312,313,314,315,316,317,318,341,342,343,344,345,346, &
+       347,348,349),kc
   341 fc=x(1)+x(2)+4.0d0*x(11)-2.1d1*x(12)
       return
   342 fc=x(1)**2+1.5d1*x(11)-8.0d0*x(12)
       return
   343 fc=4.0d0*x(1)+9.0d0*x(2)+5.0d0*x(13)**2-9.0d0*x(14)
       return
-  344 fc=3.0d0*x(1)+4.0d0*x(2)+3.0d0*(x(13)-
-     &6.0d0)**2-1.4d1*x(14)
+  344 fc=3.0d0*x(1)+4.0d0*x(2)+3.0d0*(x(13)- &
+      6.0d0)**2-1.4d1*x(14)
       return
   345 fc=1.4d1*x(1)**2+3.5d1*x(15)-7.9d1*x(16)
       return
@@ -2462,22 +2473,23 @@ c 91/12/01 lu : original version
       return
   349 fc=7.0d0*x(1)**2+5.0d0*x(2)**2+x(19)**2-3.0d1*x(20)
       return
-      end
-* subroutine tcgu07             all systems                 90/12/01
-c portability : all systems
-c 90/12/01 lu : original version
-*
-* purpose :
-*  gradients of test functions for nonlinear programming.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  kc  index of the constraint.
-*  ri  x(n)  vector of variables.
-*  ro  gc gradient of the constraint function.
-*  ii  next  number of the test problem.
-*
+      end subroutine tcfu07
+
+! subroutine tcgu07             all systems                 90/12/01
+! portability : all systems
+! 90/12/01 lu : original version
+!
+! purpose :
+!  gradients of test functions for nonlinear programming.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  kc  index of the constraint.
+!  ri  x(n)  vector of variables.
+!  ro  gc gradient of the constraint function.
+!  ii  next  number of the test problem.
+!
       subroutine tcgu07(n,kc,x,gc,next)
       integer n,kc,next
       double precision x(n),gc(n)
@@ -2485,9 +2497,9 @@ c 90/12/01 lu : original version
       integer i,j,k
       double precision y(128)
       common /empr07/ y
-      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,
-     * 180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,
-     * 340),next
+      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170, &
+       180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330, &
+       340),next
    10 gc(1)=2.0d0*x(1)
       gc(2)=2.0d0*x(2)
       return
@@ -2572,8 +2584,8 @@ c 90/12/01 lu : original version
       y(17)=(1.0d0+y(8))/x(1)
       y(18)=y(9)/x(1)
       x1=0.01d0*x(1)*(112.0d0+13.167d0*x6-0.6667d0*x6**2)
-      y(1)=0.01d0*(112.0d0+13.167d0*x6-0.6667d0*x6**2)+
-     * 0.01d0*x(1)*(13.167*y(16)-1.3334d0*x6*y(16))
+      y(1)=0.01d0*(112.0d0+13.167d0*x6-0.6667d0*x6**2)+ &
+       0.01d0*x(1)*(13.167*y(16)-1.3334d0*x6*y(16))
       y(2)=0.01d0*x(1)*(13.167d0*y(17)-1.3334d0*x6*y(17))
       y(3)=0.01d0*x(1)*(13.167d0*y(18)-1.3334d0*x6*y(18))
       if (abs(x1-x2).gt.0.001d0) then
@@ -2604,8 +2616,8 @@ c 90/12/01 lu : original version
       x1=98000.0d0*x(3)/y(89)
       y(1)=-98000.0d0*x(3)*(y(4)*x7+x2*y(19))/y(90)
       y(2)=-98000.0d0*x(3)*(y(5)*x7+x2*y(20))/y(90)
-      y(3)=-98000.0d0*x(3)*(y(6)*x7+x2*y(21)+1000.0d0)/y(90)+
-     * 98000.0d0/y(89)
+      y(3)=-98000.0d0*x(3)*(y(6)*x7+x2*y(21)+1000.0d0)/y(90)+ &
+       98000.0d0/y(89)
       if (abs(x1-x4).gt.0.001d0) then
       x4=x1
       y(10)=y(1)
@@ -2724,22 +2736,22 @@ c 90/12/01 lu : original version
       gc(5)=0.0047026d0*x(3)
       return
   210 go to (211,212,213),kc
-  211 gc(1)=-145421.4020d0+2931.15060d0*x(2)-
-     * 40.4279320d0*x(3)+5106.1920d0*x(4)+15711.36d0*x(5)
+  211 gc(1)=-145421.4020d0+2931.15060d0*x(2)- &
+       40.4279320d0*x(3)+5106.1920d0*x(4)+15711.36d0*x(5)
       gc(2)=2931.15060d0*x(1)
       gc(3)=-40.4279320d0*x(1)
       gc(4)=5106.1920d0*x(1)
       gc(5)=15711.36d0*x(1)
       return
-  212 gc(1)=-155011.1084d0+4360.53352d0*x(2)+
-     * 12.9492344d0*x(3)+10236.884d0*x(4)+13176.786d0*x(5)
+  212 gc(1)=-155011.1084d0+4360.53352d0*x(2)+ &
+       12.9492344d0*x(3)+10236.884d0*x(4)+13176.786d0*x(5)
       gc(2)=4360.53352d0*x(1)
       gc(3)=12.9492344d0*x(1)
       gc(4)=10236.884d0*x(1)
       gc(5)=13176.786d0*x(1)
       return
-  213 gc(1)=-326669.5104d0+7390.68412d0*x(2)-
-     * 27.8986976d0*x(3)+16643.076d0*x(4)+30988.146d0*x(5)
+  213 gc(1)=-326669.5104d0+7390.68412d0*x(2)- &
+       27.8986976d0*x(3)+16643.076d0*x(4)+30988.146d0*x(5)
       gc(2)=7390.68412d0*x(1)
       gc(3)=-27.8986976d0*x(1)
       gc(4)=16643.076d0*x(1)
@@ -2761,8 +2773,8 @@ c 90/12/01 lu : original version
       y(20)=0.052d0*x(1)+78.0d0+0.002377d0*y(2)*x(1)
       y(3)=y(19)/y(20)
       y(4)=19.0d0*y(3)
-      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+
-     * 0.6376d0*y(4)+1.594d0*y(3)
+      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+ &
+       0.6376d0*y(4)+1.594d0*y(3)
       y(22)=100.0d0*x(2)
       y(23)=x(1)-y(3)-y(4)
       y(24)=0.95d0-y(21)/y(22)
@@ -2780,10 +2792,10 @@ c 90/12/01 lu : original version
       y(29)=0.995d0*y(10)+1998.0d0
       y(12)=y(27)*x(1)+y(28)/y(29)
       y(13)=y(29)-1.75d0*y(2)
-      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+
-     * x(5))
-      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)-
-     * 5095.0d0
+      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+ &
+       x(5))
+      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)- &
+       5095.0d0
       y(15)=y(13)/y(30)
       y(16)=148.0d3-331.0d3*y(15)+40.0d0*y(13)-61.0d0*y(15)*y(13)
       y(31)=2324.0d0*y(10)-2.874d7*y(2)
@@ -2802,11 +2814,11 @@ c 90/12/01 lu : original version
       y(43)=(y(39)*y(20)-y(19)*y(41))/y(20)**2
       y(44)=19.0d0*y(42)
       y(45)=19.0d0*y(43)
-      y(46)=0.04782d0*(1.0d0-y(42))+0.3912d0*(x(1)-y(3))*(1.0d0-
-     * y(42))/x(2)+0.6376d0*y(44)+1.594d0*y(42)
+      y(46)=0.04782d0*(1.0d0-y(42))+0.3912d0*(x(1)-y(3))*(1.0d0- &
+       y(42))/x(2)+0.6376d0*y(44)+1.594d0*y(42)
       y(47)=-0.1956d0*(x(1)-y(3))**2/x(2)**2
-      y(48)=-0.04782d0*y(43)-0.3912d0*(x(1)-y(3))*y(43)/x(2)+
-     * 0.6376d0*y(45)+1.594d0*y(43)
+      y(48)=-0.04782d0*y(43)-0.3912d0*(x(1)-y(3))*y(43)/x(2)+ &
+       0.6376d0*y(45)+1.594d0*y(43)
       y(49)=100.0d0
       y(50)=1.0d0-y(42)-y(44)
       y(51)=-y(43)-y(45)
@@ -2866,22 +2878,22 @@ c 90/12/01 lu : original version
       y(105)=-y(13)*y(100)/y(30)**2
       y(106)=(y(92)*y(30)-y(13)*y(101))/y(30)**2
       y(107)=-y(13)*y(102)/y(30)**2
-      y(108)=-3.31d5*y(103)+40.0d0*y(86)-61.0d0*(y(103)*y(13)+
-     * y(15)*y(86))
-      y(109)=-3.31d5*y(104)+40.0d0*y(87)-61.0d0*(y(104)*y(13)+
-     * y(15)*y(87))
+      y(108)=-3.31d5*y(103)+40.0d0*y(86)-61.0d0*(y(103)*y(13)+ &
+       y(15)*y(86))
+      y(109)=-3.31d5*y(104)+40.0d0*y(87)-61.0d0*(y(104)*y(13)+ &
+       y(15)*y(87))
       y(110)=-3.31d5*y(105)-61.0d0*y(105)*y(13)
-      y(111)=-3.31d5*y(106)+40.0d0*y(92)-61.0d0*(y(106)*y(13)+
-     * y(15)*y(92))
+      y(111)=-3.31d5*y(106)+40.0d0*y(92)-61.0d0*(y(106)*y(13)+ &
+       y(15)*y(92))
       y(112)=-3.31d5*y(107)-61.0d0*y(107)*y(13)
       y(113)=2.324d3*y(79)
       y(114)=2.324d3*y(80)
       y(115)=2.324d3*y(81)-2.874d7*y(37)
-      y(116)=-1.328d3*y(79)-531.0d0*y(82)+(y(113)*y(29)-y(31)*
-     * y(86))/y(29)**2
+      y(116)=-1.328d3*y(79)-531.0d0*y(82)+(y(113)*y(29)-y(31)* &
+       y(86))/y(29)**2
       y(117)=-1.328d3*y(80)+(y(114)*y(29)-y(31)*y(87))/y(29)**2
-      y(118)=-1.328d3*y(81)-531.0d0*y(83)+(y(115)*y(29)-y(31)*
-     * y(88))/y(29)**2
+      y(118)=-1.328d3*y(81)-531.0d0*y(83)+(y(115)*y(29)-y(31)* &
+       y(88))/y(29)**2
       y(119)=(y(86)*y(15)-y(13)*y(103))/y(15)**2-y(86)/0.52d0
       y(120)=(y(87)*y(15)-y(13)*y(104))/y(15)**2-y(87)/0.52d0
       y(121)=-y(13)*y(105)/y(15)**2
@@ -2900,8 +2912,8 @@ c 90/12/01 lu : original version
       gc(5)=0.0d0
       return
       endif
-      go to (503,504,505,506,507,508,509,510,511,512,513,514,515,516,
-     * 517,518,519,520,521),kc-2
+      go to (503,504,505,506,507,508,509,510,511,512,513,514,515,516, &
+       517,518,519,520,521),kc-2
   503 gc(1)=-3496.0d0*y(2)*y(86)/y(29)**2
       gc(2)=-3496.0d0*y(2)*y(87)/y(29)**2
       gc(3)=0.0d0
@@ -3039,16 +3051,16 @@ c 90/12/01 lu : original version
       gc(5)=0.001d0*x(1)*x(2)*x(3)*x(4)*x(6)
       gc(6)=0.001d0*x(1)*x(2)*x(3)*x(4)*x(5)
       return
-  242 gc(1)=0.00124d0*x(1)*x(4)*x(5)**2+
-     * 0.00062d0*x(4)*x(5)**2*(x(2)+x(3))+
-     * 0.00058d0*x(2)*x(3)*x(6)**2
-      gc(2)=0.00062d0*x(1)*x(4)*x(5)**2+
-     * 0.00116d0*1.57d0*x(2)*x(3)*x(6)**2+
-     * 0.00058d0*x(3)*x(6)**2*(x(1)+x(4))
-      gc(3)=0.00062d0*x(1)*x(4)*x(5)**2+
-     * 0.00058d0*x(2)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
-      gc(4)=0.00062d0*x(1)*x(5)**2*(x(1)+x(2)+x(3))+
-     * 0.00058d0*x(2)*x(3)*x(6)**2
+  242 gc(1)=0.00124d0*x(1)*x(4)*x(5)**2+ &
+       0.00062d0*x(4)*x(5)**2*(x(2)+x(3))+ &
+       0.00058d0*x(2)*x(3)*x(6)**2
+      gc(2)=0.00062d0*x(1)*x(4)*x(5)**2+ &
+       0.00116d0*1.57d0*x(2)*x(3)*x(6)**2+ &
+       0.00058d0*x(3)*x(6)**2*(x(1)+x(4))
+      gc(3)=0.00062d0*x(1)*x(4)*x(5)**2+ &
+       0.00058d0*x(2)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
+      gc(4)=0.00062d0*x(1)*x(5)**2*(x(1)+x(2)+x(3))+ &
+       0.00058d0*x(2)*x(3)*x(6)**2
       gc(5)=0.00124d0*x(1)*x(4)*x(5)*(x(1)+x(2)+x(3))
       gc(6)=0.00116d0*x(2)*x(3)*x(6)*(x(1)+1.57d0*x(2)+x(4))
       return
@@ -3072,7 +3084,7 @@ c 90/12/01 lu : original version
       gc(3)=0.0d0
       gc(4)=-70.0d0+26000.0d0*x(5)
       gc(5)=-819.0d0+26000.0d0*x(4)
-      gc(6)=0 0d0
+      gc(6)=0d0
       return
   254 gc(1)=159.9d0-14000.0d0*x(6)
       gc(2)=-311.0d0
@@ -3113,123 +3125,123 @@ c 90/12/01 lu : original version
       gc(7)=-1.1d1
       return
   270 go to (271,272,273,274,275),kc
-  271 gc(1)=0.25d0*x(7)/(x(1)**0.5d0*x(3)*x(6)**2)+
-     * 2.1d0*x(1)**2*x(2)*x(6)*x(7)**0.5d0/x(3)**2
-      gc(2)=0.7d0*x(1)**3*x(6)*x(7)**0.5d0/x(3)**2-
-     * 0.2d0*x(3)*x(6)**(2.0d0/3.0d0)*x(7)**(1.0d0/4.0d0)/
-     * (x(2)**2*x(4)**0.5d0)
-      gc(3)=-0.5d0*x(1)**0.5d0*x(7)/(x(3)*x(6))**2-
-     * 1.4d0*x(1)**3*x(2)*x(6)*x(7)**0.5d0/x(3)**3+
-     * 0.2d0*x(6)**(2.0d0/3.0d0)*x(7)**(1.0d0/4.0d0)/
-     * (x(2)*x(4)**0.5d0)
-      gc(4)=-0.1d0*x(3)*x(6)**(2.0d0/3.0d0)*
-     * x(7)**(1.0d0/4.0d0)/(x(2)*x(4)**1.5d0)
+  271 gc(1)=0.25d0*x(7)/(x(1)**0.5d0*x(3)*x(6)**2)+ &
+       2.1d0*x(1)**2*x(2)*x(6)*x(7)**0.5d0/x(3)**2
+      gc(2)=0.7d0*x(1)**3*x(6)*x(7)**0.5d0/x(3)**2- &
+       0.2d0*x(3)*x(6)**(2.0d0/3.0d0)*x(7)**(1.0d0/4.0d0)/ &
+       (x(2)**2*x(4)**0.5d0)
+      gc(3)=-0.5d0*x(1)**0.5d0*x(7)/(x(3)*x(6))**2- &
+       1.4d0*x(1)**3*x(2)*x(6)*x(7)**0.5d0/x(3)**3+ &
+       0.2d0*x(6)**(2.0d0/3.0d0)*x(7)**(1.0d0/4.0d0)/ &
+       (x(2)*x(4)**0.5d0)
+      gc(4)=-0.1d0*x(3)*x(6)**(2.0d0/3.0d0)* &
+       x(7)**(1.0d0/4.0d0)/(x(2)*x(4)**1.5d0)
       gc(5)=0.0d0
-      gc(6)=-1.0d0*x(1)**0.5d0*x(7)/(x(3)*x(6)**3)+
-     * 0.7d0*x(1)**3*x(2)*x(7)**0.5d0/x(3)**2+
-     * (0.4d0/3.0d0)*x(3)*x(7)**(1.0d0/4.0d0)/
-     * (x(2)*x(4)**0.5d0*x(6)**(1.0d0/3.0d0))
-      gc(7)=0.5d0*x(1)**0.5d0/(x(3)*x(6)**2)+
-     * 0.35d0*x(1)**3*x(2)*x(6)/(x(3)**2*x(7)**0.5d0)+
-     * 0.05d0*x(3)*x(6)**(2.0d0/3.0d0)/
-     * (x(2)*x(4)**0.5d0*x(7)**0.75d0)
+      gc(6)=-1.0d0*x(1)**0.5d0*x(7)/(x(3)*x(6)**3)+ &
+       0.7d0*x(1)**3*x(2)*x(7)**0.5d0/x(3)**2+ &
+       (0.4d0/3.0d0)*x(3)*x(7)**(1.0d0/4.0d0)/ &
+       (x(2)*x(4)**0.5d0*x(6)**(1.0d0/3.0d0))
+      gc(7)=0.5d0*x(1)**0.5d0/(x(3)*x(6)**2)+ &
+       0.35d0*x(1)**3*x(2)*x(6)/(x(3)**2*x(7)**0.5d0)+ &
+       0.05d0*x(3)*x(6)**(2.0d0/3.0d0)/ &
+       (x(2)*x(4)**0.5d0*x(7)**0.75d0)
       return
-  272 gc(1)=-0.65d0*x(2)*x(6)/(x(1)**1.5d0*x(3)*x(5))-
-     * 3.1d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/
-     * ((x(1)*x(4))**2*x(5))
-      gc(2)=1.3d0*x(6)/(x(1)**0.5d0*x(3)*x(5))+
-     * 1.55d0*x(6)**(1.0d0/3.0d0)/
-     * (x(1)*x(2)**0.5d0*x(4)**2*x(5))
-      gc(3)=-1.3d0*x(2)*x(6)/(x(1)**0.5d0*x(3)**2*x(5))+
-     * 0.8d0*x(6)**2/(x(4)*x(5))
-      gc(4)=-0.8d0*x(3)*x(6)**2/(x(4)**2*x(5))-
-     * 6.2d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/
-     * (x(1)*x(4)**3*x(5))
-      gc(5)=-1.3d0*x(2)*x(6)/(x(1)**0.5d0*x(3)*x(5)**2)-
-     * 0.8d0*x(3)*x(6)**2/(x(4)*x(5)**2)-
-     * 3.1d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/
-     * (x(1)*(x(4)*x(5))**2)
-      gc(6)=1.3d0*x(2)/(x(1)**0.5d0*x(3)*x(5))+
-     * 1.6d0*x(3)*x(6)/(x(4)*x(5))+
-     * (3.1d0/3.0d0)*x(2)**0.5d0/
-     * (x(1)*x(4)**2*x(5)*x(6)**(2.0d0/3.0d0))
+  272 gc(1)=-0.65d0*x(2)*x(6)/(x(1)**1.5d0*x(3)*x(5))- &
+       3.1d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/ &
+       ((x(1)*x(4))**2*x(5))
+      gc(2)=1.3d0*x(6)/(x(1)**0.5d0*x(3)*x(5))+ &
+       1.55d0*x(6)**(1.0d0/3.0d0)/ &
+       (x(1)*x(2)**0.5d0*x(4)**2*x(5))
+      gc(3)=-1.3d0*x(2)*x(6)/(x(1)**0.5d0*x(3)**2*x(5))+ &
+       0.8d0*x(6)**2/(x(4)*x(5))
+      gc(4)=-0.8d0*x(3)*x(6)**2/(x(4)**2*x(5))- &
+       6.2d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/ &
+       (x(1)*x(4)**3*x(5))
+      gc(5)=-1.3d0*x(2)*x(6)/(x(1)**0.5d0*x(3)*x(5)**2)- &
+       0.8d0*x(3)*x(6)**2/(x(4)*x(5)**2)- &
+       3.1d0*x(2)**0.5d0*x(6)**(1.0d0/3.0d0)/ &
+       (x(1)*(x(4)*x(5))**2)
+      gc(6)=1.3d0*x(2)/(x(1)**0.5d0*x(3)*x(5))+ &
+       1.6d0*x(3)*x(6)/(x(4)*x(5))+ &
+       (3.1d0/3.0d0)*x(2)**0.5d0/ &
+       (x(1)*x(4)**2*x(5)*x(6)**(2.0d0/3.0d0))
       gc(7)=0.0d0
       return
-  273 gc(1)=2.0d0*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0*x(6))-
-     * x(2)*x(3)**0.5d0*x(5)/x(1)**2
-      gc(2)=0.1d0*x(5)/(x(3)**0.5d0*x(6)*x(7)**0.5d0)+
-     * x(3)**0.5d0*x(5)/x(1)-
-     * 1.3d0*x(3)*x(5)*x(7)/(x(2)**3*x(6))
-      gc(3)=-3.0d0*x(1)*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**2.5d0*
-     * x(6))-0.05d0*x(2)*x(5)/(x(3)**1.5d0*x(6)*x(7)**0.5d0)+
-     * 0.5d0*x(2)*x(5)/(x(1)*x(3)**0.5d0)+
-     * 0.65d0*x(5)*x(7)/(x(2)**2*x(6))
+  273 gc(1)=2.0d0*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0*x(6))- &
+       x(2)*x(3)**0.5d0*x(5)/x(1)**2
+      gc(2)=0.1d0*x(5)/(x(3)**0.5d0*x(6)*x(7)**0.5d0)+ &
+       x(3)**0.5d0*x(5)/x(1)- &
+       1.3d0*x(3)*x(5)*x(7)/(x(2)**3*x(6))
+      gc(3)=-3.0d0*x(1)*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**2.5d0* &
+       x(6))-0.05d0*x(2)*x(5)/(x(3)**1.5d0*x(6)*x(7)**0.5d0)+ &
+       0.5d0*x(2)*x(5)/(x(1)*x(3)**0.5d0)+ &
+       0.65d0*x(5)*x(7)/(x(2)**2*x(6))
       gc(4)=0.0d0
-      gc(5)=2.0d0*x(1)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0*x(6))+
-     * 0.1d0*x(2)/(x(3)**0.5d0*x(6)*x(7)**0.5d0)+
-     * x(2)*x(3)**0.5d0/x(1)+
-     * 0.65d0*x(3)*x(7)/(x(2)**2*x(6))
-      gc(6)=-2.0d0*x(1)*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0*
-     * x(6)**2)-0.1d0*x(2)*x(5)/(x(3)**0.5d0*x(6)**2*x(7)**0.5d0)-
-     * 0.65d0*x(3)*x(5)*x(7)/(x(2)**2*x(6)**2)
-      gc(7)=(8.0d0/3.0d0)*x(1)*x(5)*x(7)**(1.0d0/3.0d0)/
-     * (x(3)**1.5d0*x(6))-0.05d0*x(2)*x(5)/(x(3)**0.5d0*x(6)*
-     * x(7)**1.5d0)+0.65d0*x(3)*x(5)/(x(2)**2*x(6))
+      gc(5)=2.0d0*x(1)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0*x(6))+ &
+       0.1d0*x(2)/(x(3)**0.5d0*x(6)*x(7)**0.5d0)+ &
+       x(2)*x(3)**0.5d0/x(1)+ &
+       0.65d0*x(3)*x(7)/(x(2)**2*x(6))
+      gc(6)=-2.0d0*x(1)*x(5)*x(7)**(4.0d0/3.0d0)/(x(3)**1.5d0* &
+       x(6)**2)-0.1d0*x(2)*x(5)/(x(3)**0.5d0*x(6)**2*x(7)**0.5d0)- &
+       0.65d0*x(3)*x(5)*x(7)/(x(2)**2*x(6)**2)
+      gc(7)=(8.0d0/3.0d0)*x(1)*x(5)*x(7)**(1.0d0/3.0d0)/ &
+       (x(3)**1.5d0*x(6))-0.05d0*x(2)*x(5)/(x(3)**0.5d0*x(6)* &
+       x(7)**1.5d0)+0.65d0*x(3)*x(5)/(x(2)**2*x(6))
       return
-  274 gc(1)=-0.4d0*x(2)*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/
-     * (x(1)**3*x(4))+
-     * 0.15d0*x(2)**2*x(3)*x(4)**(1.0d0/3.0d0)*
-     * x(7)**(1.0d0/4.0d0)/(x(1)**0.5d0*x(5)**(2.0d0/3.0d0))-
-     * 1.2d0*x(3)*x(5)*x(7)**(3.0d0/4.0d0)/(x(1)**4*x(2)**2)
-      gc(2)=0.2d0*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/
-     * (x(1)**2*x(4))+
-     * 0.6d0*x(1)**0.5d0*x(2)*x(3)*x(4)**(1.0d0/3.0d0)*
-     * x(7)**0.25d0/x(5)**(2.0d0/3.0d0)-
-     * 0.8d0*x(3)*x(5)*x(7)**0.75d0/(x(1)*x(2))**3
-      gc(3)=0.3d0*x(1)**0.5d0*x(2)**2*x(4)**(1.0d0/3.0d0)*
-     * x(7)**(1.0d0/4.0d0)/x(5)**(2.0d0/3.0d0)+
-     * 0.4d0*x(5)*x(7)**(3.0d0/4.0d0)/(x(1)**3*x(2)**2)-
-     * x(4)*x(7)**0.5d0/x(3)**3
-      gc(4)=-0.2d0*x(2)*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/
-     * (x(1)*x(4))**2+
-     * (0.3d0/3.0d0)*x(1)**0.5d0*x(2)**2*x(3)*
-     * x(7)**(1.0d0/4.0d0)/(x(4)**(2.0d0/3.0d0)*x(5)**
-     * (2.0d0/3.0d0))+0.5d0*x(7)**0.5d0/x(3)**2
-      gc(5)=0.1d0*x(2)*x(7)**(1.0d0/3.0d0)/
-     * (x(1)**2*x(4)*x(5)**0.5d0)-
-     * (0.6d0/3.0d0)*x(1)**0.5d0*x(2)**2*x(3)*x(4)**(1.0d0/
-     * 3.0d0)*x(7)**(1.0d0/4.0d0)/x(5)**(5.0d0/3.0d0)+
-     * 0.4d0*x(3)*x(7)**(3.0d0/4.0d0)/(x(1)**3*x(2)**2)
+  274 gc(1)=-0.4d0*x(2)*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/ &
+       (x(1)**3*x(4))+ &
+       0.15d0*x(2)**2*x(3)*x(4)**(1.0d0/3.0d0)* &
+       x(7)**(1.0d0/4.0d0)/(x(1)**0.5d0*x(5)**(2.0d0/3.0d0))- &
+       1.2d0*x(3)*x(5)*x(7)**(3.0d0/4.0d0)/(x(1)**4*x(2)**2)
+      gc(2)=0.2d0*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/ &
+       (x(1)**2*x(4))+ &
+       0.6d0*x(1)**0.5d0*x(2)*x(3)*x(4)**(1.0d0/3.0d0)* &
+       x(7)**0.25d0/x(5)**(2.0d0/3.0d0)- &
+       0.8d0*x(3)*x(5)*x(7)**0.75d0/(x(1)*x(2))**3
+      gc(3)=0.3d0*x(1)**0.5d0*x(2)**2*x(4)**(1.0d0/3.0d0)* &
+       x(7)**(1.0d0/4.0d0)/x(5)**(2.0d0/3.0d0)+ &
+       0.4d0*x(5)*x(7)**(3.0d0/4.0d0)/(x(1)**3*x(2)**2)- &
+       x(4)*x(7)**0.5d0/x(3)**3
+      gc(4)=-0.2d0*x(2)*x(5)**0.5d0*x(7)**(1.0d0/3.0d0)/ &
+       (x(1)*x(4))**2+ &
+       (0.3d0/3.0d0)*x(1)**0.5d0*x(2)**2*x(3)* &
+       x(7)**(1.0d0/4.0d0)/(x(4)**(2.0d0/3.0d0)*x(5)** &
+       (2.0d0/3.0d0))+0.5d0*x(7)**0.5d0/x(3)**2
+      gc(5)=0.1d0*x(2)*x(7)**(1.0d0/3.0d0)/ &
+       (x(1)**2*x(4)*x(5)**0.5d0)- &
+       (0.6d0/3.0d0)*x(1)**0.5d0*x(2)**2*x(3)*x(4)**(1.0d0/ &
+       3.0d0)*x(7)**(1.0d0/4.0d0)/x(5)**(5.0d0/3.0d0)+ &
+       0.4d0*x(3)*x(7)**(3.0d0/4.0d0)/(x(1)**3*x(2)**2)
       gc(6)=0.0d0
-      gc(7)=(0.2d0/3.0d0)*x(2)*x(5)**0.5d0/
-     * (x(1)**2*x(4)*x(7)**(2.0d0/3.0d0))+
-     * 0.075d0*x(1)**0.5d0*x(2)**2*x(3)*x(4)**(1.0d0/3.0d0)/
-     * (x(5)**(2.0d0/3.0d0)*x(7)**(3.0d0/4.0d0))+
-     * 0.3d0*x(3)*x(5)/(x(1)**3*x(2)**2*x(7)**(1.0d0/4.0d0))+
-     * 0.25d0*x(4)/(x(3)**2*x(7)**0.5d0)
+      gc(7)=(0.2d0/3.0d0)*x(2)*x(5)**0.5d0/ &
+       (x(1)**2*x(4)*x(7)**(2.0d0/3.0d0))+ &
+       0.075d0*x(1)**0.5d0*x(2)**2*x(3)*x(4)**(1.0d0/3.0d0)/ &
+       (x(5)**(2.0d0/3.0d0)*x(7)**(3.0d0/4.0d0))+ &
+       0.3d0*x(3)*x(5)/(x(1)**3*x(2)**2*x(7)**(1.0d0/4.0d0))+ &
+       0.25d0*x(4)/(x(3)**2*x(7)**0.5d0)
       return
-  275 gc(1)=10.0d0*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)-
-     * 15.0d0*x(3)*x(4)/((x(1)*x(2))**2*x(5)*x(7)**0.5d0)-
-     * 40.0d0*x(2)*x(6)/(x(1)**3*x(4)*x(5)**2)+
-     * 50.0d0*x(1)*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
-      gc(2)=-10.0d0*x(1)*x(4)**2/(x(2)**2*x(6)**3*x(7)**0.25d0)-
-     * 30.0d0*x(3)*x(4)/(x(1)*x(2)**3*x(5)*x(7)**0.5d0)+
-     * 20.0d0*x(6)/(x(1)**2*x(4)*x(5)**2)+
-     * 50.0d0*x(1)**2*x(2)*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
-      gc(3)=15.0d0*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)-
-     * 25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6))**2
-      gc(4)=20.0d0*x(1)*x(4)/(x(2)*x(6)**3*x(7)**0.25d0)+
-     * 15.0d0*x(3)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)-
-     * 20.0d0*x(2)*x(6)/(x(1)*x(4)*x(5))**2
-      gc(5)=-15.0d0*x(3)*x(4)/(x(1)*(x(2)*x(5))**2*x(7)**0.5d0)-
-     * 40.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**3)+
-     * 12.5d0*x(1)**2*x(2)**2*x(7)/(x(3)*x(5)**0.5d0*x(6)**2)
-      gc(6)=-30.0d0*x(1)*x(4)**2/(x(2)*x(6)**4*x(7)**0.25d0)+
-     * 20.0d0*x(2)/(x(1)**2*x(4)*x(5)**2)-
-     * 50.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**3)
-      gc(7)=-2.5d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**1.25d0)-
-     * 7.5d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**1.5d0)+
-     * 25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0/(x(3)*x(6)**2)
+  275 gc(1)=10.0d0*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)- &
+       15.0d0*x(3)*x(4)/((x(1)*x(2))**2*x(5)*x(7)**0.5d0)- &
+       40.0d0*x(2)*x(6)/(x(1)**3*x(4)*x(5)**2)+ &
+       50.0d0*x(1)*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
+      gc(2)=-10.0d0*x(1)*x(4)**2/(x(2)**2*x(6)**3*x(7)**0.25d0)- &
+       30.0d0*x(3)*x(4)/(x(1)*x(2)**3*x(5)*x(7)**0.5d0)+ &
+       20.0d0*x(6)/(x(1)**2*x(4)*x(5)**2)+ &
+       50.0d0*x(1)**2*x(2)*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
+      gc(3)=15.0d0*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)- &
+       25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6))**2
+      gc(4)=20.0d0*x(1)*x(4)/(x(2)*x(6)**3*x(7)**0.25d0)+ &
+       15.0d0*x(3)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)- &
+       20.0d0*x(2)*x(6)/(x(1)*x(4)*x(5))**2
+      gc(5)=-15.0d0*x(3)*x(4)/(x(1)*(x(2)*x(5))**2*x(7)**0.5d0)- &
+       40.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**3)+ &
+       12.5d0*x(1)**2*x(2)**2*x(7)/(x(3)*x(5)**0.5d0*x(6)**2)
+      gc(6)=-30.0d0*x(1)*x(4)**2/(x(2)*x(6)**4*x(7)**0.25d0)+ &
+       20.0d0*x(2)/(x(1)**2*x(4)*x(5)**2)- &
+       50.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**3)
+      gc(7)=-2.5d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**1.25d0)- &
+       7.5d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**1.5d0)+ &
+       25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0/(x(3)*x(6)**2)
       return
   280 gc(1)=0.0d0
       gc(2)=0.0d0
@@ -3249,13 +3261,13 @@ c 90/12/01 lu : original version
       gc(6)=0.0588d0*x(8)
       gc(8)=0.0588d0*x(6)
       return
-  283 gc(3)=4.0d0/x(5)-1.42d0/(x(3)**1.71d0*x(5))-
-     * 0.0588d0*1.3d0*x(7)/x(3)**2.3d0
+  283 gc(3)=4.0d0/x(5)-1.42d0/(x(3)**1.71d0*x(5))- &
+       0.0588d0*1.3d0*x(7)/x(3)**2.3d0
       gc(5)=-4.0d0*x(3)/x(5)**2-2.0d0/(x(3)**0.71d0*x(5)**2)
       gc(7)=0.0588d0/x(3)**1.3d0
       return
-  284 gc(4)=4.0d0/x(6)-1.42d0/(x(4)**1.71d0*x(6))-
-     * 0.0588d0*1.3d0*x(8)/x(4)**2.3d0
+  284 gc(4)=4.0d0/x(6)-1.42d0/(x(4)**1.71d0*x(6))- &
+       0.0588d0*1.3d0*x(8)/x(4)**2.3d0
       gc(6)=-4.0d0*x(4)/x(6)**2-2.0d0/(x(4)**0.71d0*x(6)**2)
       gc(8)=0.0588d0/x(4)**1.3d0
       return
@@ -3438,8 +3450,8 @@ c 90/12/01 lu : original version
   333 gc(1)=y(33)*x(12)/x(8)
       gc(2)=y(31)*x(13)/x(8)
       gc(7)=(y(29)+y(30)*x(12))/x(8)
-      gc(8)=-(y(29)*x(7)+(y(30)*x(7)+y(33)*x(1))*x(12)+
-     * y(31)*x(2)*x(13))/x(8)**2
+      gc(8)=-(y(29)*x(7)+(y(30)*x(7)+y(33)*x(1))*x(12)+ &
+       y(31)*x(2)*x(13))/x(8)**2
       gc(12)=(y(30)*x(7)+y(33)*x(1))/x(8)
       gc(13)=y(32)+y(31)*x(2)/x(8)
       return
@@ -3450,21 +3462,21 @@ c 90/12/01 lu : original version
       gc(13)=y(35)*x(8)+y(38)*x(2)
       gc(14)=y(36)*x(3)+y(39)*x(9)
       return
-  335 gc(3)=-((y(40)+y(43)/x(14))*x(9)+((y(41)*x(4)+y(44)*x(8))*x(15)+
-     * y(42)*x(10))/x(14))/x(3)**2
+  335 gc(3)=-((y(40)+y(43)/x(14))*x(9)+((y(41)*x(4)+y(44)*x(8))*x(15)+ &
+       y(42)*x(10))/x(14))/x(3)**2
       gc(4)=y(41)*x(15)/(x(3)*x(14))
       gc(8)=y(44)*x(15)/(x(3)*x(14))
       gc(9)=(y(40)+y(43)/x(14))/x(3)
       gc(10)=y(42)/(x(3)*x(14))
-      gc(14)=-((y(41)*x(4)+y(44)*x(8))*x(15)+y(42)*x(10)+
-     * y(43)*x(9))/(x(3)*x(14)**2)
+      gc(14)=-((y(41)*x(4)+y(44)*x(8))*x(15)+y(42)*x(10)+ &
+       y(43)*x(9))/(x(3)*x(14)**2)
       gc(15)=(y(41)*x(4)+y(44)*x(8))/(x(3)*x(14))
       return
   336 gc(4)=-((y(45)*x(5)*x(16)+y(49)*x(10))/x(15)+y(46)*x(10))/x(4)**2
       gc(5)=y(45)*x(16)/(x(4)*x(15))
       gc(10)=(y(46)+y(49)/x(15))/x(4)
-      gc(15)=-((y(45)*x(5)*x(16)+y(49)*x(10))/x(4)+y(47)+
-     * y(48)*x(16))/x(15)**2
+      gc(15)=-((y(45)*x(5)*x(16)+y(49)*x(10))/x(4)+y(47)+ &
+       y(48)*x(16))/x(15)**2
       gc(16)=(y(45)*x(5)/x(4)+y(48))/x(15)
       return
   337 gc(4)=-(y(50)+y(52)*x(5)*x(16))/x(4)**2
@@ -3512,8 +3524,8 @@ c 90/12/01 lu : original version
       gc(18)=0.0d0
       gc(19)=0.0d0
       gc(20)=0.0d0
-      go to (311,312,313,314,315,316,317,318,341,342,343,344,345,346,
-     * 347,348,349),kc
+      go to (311,312,313,314,315,316,317,318,341,342,343,344,345,346, &
+       347,348,349),kc
   341 gc(1)=1.0d0
       gc(2)=1.0d0
       gc(11)=4.0d0
@@ -3556,32 +3568,33 @@ c 90/12/01 lu : original version
       gc(19)=2.0d0*x(19)
       gc(20)=-3.0d1
       return
-      end
-* subroutine tffu07             all systems                 90/12/01
-c portability : all systems
-c 90/12/01 lu : original version
-*
-* purpose :
-*  values of test functions for nonlinear approximation.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ri  x(n)  vector of variables.
-*  ro  ff  value of the objective function.
-*  ii  next  number of the test problem.
-*
+      end subroutine tcgu07
+
+! subroutine tffu07             all systems                 90/12/01
+! portability : all systems
+! 90/12/01 lu : original version
+!
+! purpose :
+!  values of test functions for nonlinear approximation.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ri  x(n)  vector of variables.
+!  ro  ff  value of the objective function.
+!  ii  next  number of the test problem.
+!
       subroutine tffu07(n,x,ff,next)
       integer n,next
       double precision x(n),ff
-      double precision x1,x2,x3,x4,x5,x6,x7,x8,a,a1,a2,a3,a4,a5,a6,a7,
-     * a8,b,b1,b3,b4,b5,b6,c,p,q
+      double precision x1,x2,x3,x4,x5,x6,x7,x8,a,a1,a2,a3,a4,a5,a6,a7, &
+       a8,b,b1,b3,b4,b5,b6,c,p,q
       integer i,j,k
       double precision y(128)
       common /empr07/ y
-      go to(10,20,30,40,50,60,70,60,90,100,110,120,130,140,150,160,170,
-     * 180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,
-     * 340),next
+      go to(10,20,30,40,50,60,70,60,90,100,110,120,130,140,150,160,170, &
+       180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330, &
+       340),next
    10 ff=-x(1)-x(2)
       return
    20 ff=x(1)-x(2)
@@ -3603,14 +3616,14 @@ c 90/12/01 lu : original version
       return
    70 ff=(x(1)-10.0d0)**3+(x(2)-20.0d0)**3
       return
-   90 ff=-75.196d0+3.8112d0*x(1)+0.0020567d0*x(1)**3-
-     * 1.0345d-5*x(1)**4+6.8306d0*x(2)-0.030234d0*x(1)*x(2)+
-     * 1.28134d-3*x(2)*x(1)**2+2.266d-7*x(2)*x(1)**4-
-     * 0.25645d0*x(2)**2+0.0034604d0*x(2)**3-1.3514d-5*x(2)**4+
-     * 28.106d0/(x(2)+1.0d0)+5.2375d-6*(x(1)*x(2))**2+
-     *  6.3d-8*x(1)*(x(1)*x(2))**2-7.0d-10*(x(1)*x(2))**3-
-     * 3.405d-4*x(1)*x(2)**2+1.6638d-6*x(1)*x(2)**3+
-     *2.8673d0*exp(0.0005d0*x(1)*x(2))-3.5256d-5*x(2)*x(1)**3
+   90 ff=-75.196d0+3.8112d0*x(1)+0.0020567d0*x(1)**3- &
+       1.0345d-5*x(1)**4+6.8306d0*x(2)-0.030234d0*x(1)*x(2)+ &
+       1.28134d-3*x(2)*x(1)**2+2.266d-7*x(2)*x(1)**4- &
+       0.25645d0*x(2)**2+0.0034604d0*x(2)**3-1.3514d-5*x(2)**4+ &
+       28.106d0/(x(2)+1.0d0)+5.2375d-6*(x(1)*x(2))**2+ &
+        6.3d-8*x(1)*(x(1)*x(2))**2-7.0d-10*(x(1)*x(2))**3- &
+       3.405d-4*x(1)*x(2)**2+1.6638d-6*x(1)*x(2)**3+ &
+      2.8673d0*exp(0.0005d0*x(1)*x(2))-3.5256d-5*x(2)*x(1)**3
       return
   100 ff=-x(1)*x(2)*x(3)
       return
@@ -3618,8 +3631,8 @@ c 90/12/01 lu : original version
       return
   120 ff=9.0d0*x(1)**2+x(2)**2+9.0d0*x(3)**2
       return
-  130 ff=5.0d0*x(1)+5.0d4/x(1)+20.0d0*x(2)+72.0d3/x(2)+
-     * 10.0d0*x(3)+14.4d4/x(3)
+  130 ff=5.0d0*x(1)+5.0d4/x(1)+20.0d0*x(2)+72.0d3/x(2)+ &
+       10.0d0*x(3)+14.4d4/x(3)
       return
   140 ff=-x(1)
       return
@@ -3640,8 +3653,8 @@ c 90/12/01 lu : original version
       x4=x1
       go to 152
       endif
-      ff=-(0.063d0*x2*x5-5.04d0*x(1)-3.36d0*x3-0.035d0*x(2)-
-     * 10.0d0*x(3))
+      ff=-(0.063d0*x2*x5-5.04d0*x(1)-3.36d0*x3-0.035d0*x(2)- &
+       10.0d0*x(3))
       return
   160 ff=0.0d0
       b3=x(3)
@@ -3681,15 +3694,15 @@ c 90/12/01 lu : original version
       x8=x(4)+x(4)
       ff=x1+x2+x3+x3+x4-5.0d0*(x(1)+x(2))-2.1d1*x(3)+7.0d0*x(4)
       return
-  190 ff=10.0d0*x(1)*x(4)-6.0d0*x(3)*x(2)**2+x(2)*x(1)**3+
-     * 9.0d0*sin(x(5)-x(3))+x(2)**3*x(4)**2*x(5)**4
+  190 ff=10.0d0*x(1)*x(4)-6.0d0*x(3)*x(2)**2+x(2)*x(1)**3+ &
+       9.0d0*sin(x(5)-x(3))+x(2)**3*x(4)**2*x(5)**4
       return
-  200 ff=5.3578547d0*x(3)**2+0.8356891d0*x(1)*x(5)+
-     * 37.293239d0*x(1)-40792.141d0
+  200 ff=5.3578547d0*x(3)**2+0.8356891d0*x(1)*x(5)+ &
+       37.293239d0*x(1)-40792.141d0
       return
-  210 ff=24345.0d0+8720288.849d0*x(1)-150512.5253d0*x(1)*x(2)+
-     * 156.6950325d0*x(1)*x(3)-476470.3222d0*x(1)*x(4)-
-     * 729482.8271d0*x(1)*x(5)
+  210 ff=24345.0d0+8720288.849d0*x(1)-150512.5253d0*x(1)*x(2)+ &
+       156.6950325d0*x(1)*x(3)-476470.3222d0*x(1)*x(4)- &
+       729482.8271d0*x(1)*x(5)
       return
   220 a1=-5.843d-7
       a2=1.17d-4
@@ -3707,8 +3720,8 @@ c 90/12/01 lu : original version
       y(20)=0.052d0*x(1)+78.0d0+0.002377d0*y(2)*x(1)
       y(3)=y(19)/y(20)
       y(4)=19.0d0*y(3)
-      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+
-     * 0.6376d0*y(4)+1.594d0*y(3)
+      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+ &
+       0.6376d0*y(4)+1.594d0*y(3)
       y(22)=100.0d0*x(2)
       y(23)=x(1)-y(3)-y(4)
       y(24)=0.95d0-y(21)/y(22)
@@ -3726,10 +3739,10 @@ c 90/12/01 lu : original version
       y(29)=0.995d0*y(10)+1998.0d0
       y(12)=y(27)*x(1)+y(28)/y(29)
       y(13)=y(29)-1.75d0*y(2)
-      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+
-     * x(5))
-      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)-
-     * 5095.0d0
+      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+ &
+       x(5))
+      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)- &
+       5095.0d0
       y(15)=y(13)/y(30)
       y(16)=148.0d3-331.0d3*y(15)+40.0d0*y(13)-61.0d0*y(15)*y(13)
       y(31)=2324.0d0*y(10)-2.874d7*y(2)
@@ -3737,39 +3750,39 @@ c 90/12/01 lu : original version
       y(32)=y(13)/y(15)-y(13)/0.52d0
       y(33)=1.104d0-0.72d0*y(15)
       y(34)=y(9)+x(5)
-      ff=a1*y(17)+a2*y(14)+a3*y(13)+a4*y(16)+a5*y(12)+a6*y(5)+
-     * a7*y(32)/y(33)+a8*y(2)/y(29)+0.1365d0
+      ff=a1*y(17)+a2*y(14)+a3*y(13)+a4*y(16)+a5*y(12)+a6*y(5)+ &
+       a7*y(32)/y(33)+a8*y(2)/y(29)+0.1365d0
       return
   230 ff=(x(1)-x(4))**2+(x(2)-x(5))**2+(x(3)-x(6))**2
       return
-  240 ff=0.0204d0*x(1)*x(4)*(x(1)+x(2)+x(3))+0.0187d0*x(2)*x(3)*
-     * (x(1)+1.57d0*x(2)+x(4))+0.0607d0*x(1)*x(4)*x(5)**2*(x(1)+
-     * x(2)+x(3))+0.0437d0*x(2)*x(3)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
+  240 ff=0.0204d0*x(1)*x(4)*(x(1)+x(2)+x(3))+0.0187d0*x(2)*x(3)* &
+       (x(1)+1.57d0*x(2)+x(4))+0.0607d0*x(1)*x(4)*x(5)**2*(x(1)+ &
+       x(2)+x(3))+0.0437d0*x(2)*x(3)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
       return
-  250 ff=4.3d0*x(1)+31.8d0*x(2)+63.3d0*x(3)+15.8d0*x(4)+
-     * 68.5d0*x(5)+4.7d0*x(6)
+  250 ff=4.3d0*x(1)+31.8d0*x(2)+63.3d0*x(3)+15.8d0*x(4)+ &
+       68.5d0*x(5)+4.7d0*x(6)
       return
-  260 ff=(x(1)-1.0d1)**2+5.0d0*(x(2)-1.2d1)**2+x(3)**4+3.0d0*
-     &(x(4)-1.1d1)**2+1.0d1*x(5)**6+7.0d0*x(6)**2+x(7)**4-4.0d0*
-     &x(6)*x(7)-1.0d1*x(6)-8.0d0*x(7)
+  260 ff=(x(1)-1.0d1)**2+5.0d0*(x(2)-1.2d1)**2+x(3)**4+3.0d0* &
+      (x(4)-1.1d1)**2+1.0d1*x(5)**6+7.0d0*x(6)**2+x(7)**4-4.0d0* &
+      x(6)*x(7)-1.0d1*x(6)-8.0d0*x(7)
       return
-  270 ff=10.0d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)+
-     * 15.0d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)+
-     * 20.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**2)+
-     * 25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
+  270 ff=10.0d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)+ &
+       15.0d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)+ &
+       20.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**2)+ &
+       25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
       return
-  280 ff=0.4d0*(x(1)/x(7))**0.67d0+0.4d0*(x(2)/x(8))**0.67d0+
-     * 10.0d0-x(1)-x(2)
+  280 ff=0.4d0*(x(1)/x(7))**0.67d0+0.4d0*(x(2)/x(8))**0.67d0+ &
+       10.0d0-x(1)-x(2)
       return
   290 ff=x(1)+x(2)+x(3)
       return
-  300 ff=-0.5d0*(x(1)*x(4)-x(2)*x(3)+x(3)*x(9)-x(5)*x(9)+x(5)*x(8)-
-     * x(6)*x(7))
+  300 ff=-0.5d0*(x(1)*x(4)-x(2)*x(3)+x(3)*x(9)-x(5)*x(9)+x(5)*x(8)- &
+       x(6)*x(7))
       return
-  310 ff=x(1)**2+x(2)**2+x(1)*x(2)-1.4d1*x(1)-1.6d1*x(2)+
-     &(x(3)-1.0d1)**2+4.0d0*(x(4)-5.0d0)**2+(x(5)-3.0d0)**2+
-     &2.0d0*(x(6)-1.0d0)**2+5.0d0*x(7)**2+7.0d0*(x(8)-
-     &1.1d1)**2+2.0d0*(x(9)-1.0d1)**2+(x(10)-7.0d0)**2+4.5d1
+  310 ff=x(1)**2+x(2)**2+x(1)*x(2)-1.4d1*x(1)-1.6d1*x(2)+ &
+      (x(3)-1.0d1)**2+4.0d0*(x(4)-5.0d0)**2+(x(5)-3.0d0)**2+ &
+      2.0d0*(x(6)-1.0d0)**2+5.0d0*x(7)**2+7.0d0*(x(8)- &
+      1.1d1)**2+2.0d0*(x(9)-1.0d1)**2+(x(10)-7.0d0)**2+4.5d1
       return
   320 ff=0.0d0
       do 321 i=1,10
@@ -3791,41 +3804,42 @@ c 90/12/01 lu : original version
       ff=ff+y(i)*x(i+11)+y(i+5)*x(i)*x(i+11)
   331 continue
       return
-  340 ff=x(1)**2+x(2)**2+x(1)*x(2)-1.4d1*x(1)-1.6d1*x(2)+(x(3)-
-     &1.0d1)**2+4.0d0*(x(4)-5.0d0)**2+(x(5)-3.0d0)**2+2.0d0*
-     &(x(6)-1.0d0)**2+5.0d0*x(7)**2+7.0d0*(x(8)-1.1d1)**2+
-     &2.0d0*(x(9)-1.0d1)**2+(x(10)-7.0d0)**2+(x(11)-9.0d0)**2+
-     &1.0d1*(x(12)-1.0d0)**2+5.0d0*(x(13)-7.0d0)**2+4.0d0*
-     &(x(14)-1.4d1)**2+2.7d1*(x(15)-1.0d0)**2+x(16)**4+(x(17)-
-     &2.0d0)**2+1.3d1*(x(18)-2.0d0)**2+(x(19)-3.d0)**2+x(20)**2+
-     &9.5d1
+  340 ff=x(1)**2+x(2)**2+x(1)*x(2)-1.4d1*x(1)-1.6d1*x(2)+(x(3)- &
+      1.0d1)**2+4.0d0*(x(4)-5.0d0)**2+(x(5)-3.0d0)**2+2.0d0* &
+      (x(6)-1.0d0)**2+5.0d0*x(7)**2+7.0d0*(x(8)-1.1d1)**2+ &
+      2.0d0*(x(9)-1.0d1)**2+(x(10)-7.0d0)**2+(x(11)-9.0d0)**2+ &
+      1.0d1*(x(12)-1.0d0)**2+5.0d0*(x(13)-7.0d0)**2+4.0d0* &
+      (x(14)-1.4d1)**2+2.7d1*(x(15)-1.0d0)**2+x(16)**4+(x(17)- &
+      2.0d0)**2+1.3d1*(x(18)-2.0d0)**2+(x(19)-3.d0)**2+x(20)**2+ &
+      9.5d1
       return
-      end
-* subroutine tfgu07             all systems                 90/12/01
-c portability : all systems
-c 90/12/01 lu : original version
-*
-* purpose :
-*  gradients of test functions for nonlinear approximation.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ri  x(n)  vector of variables.
-*  ro  gf(n)  gradient of the objective function.
-*  ii  next  number of the test problem.
-*
+      end subroutine tffu07
+
+! subroutine tfgu07             all systems                 90/12/01
+! portability : all systems
+! 90/12/01 lu : original version
+!
+! purpose :
+!  gradients of test functions for nonlinear approximation.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ri  x(n)  vector of variables.
+!  ro  gf(n)  gradient of the objective function.
+!  ii  next  number of the test problem.
+!
       subroutine tfgu07(n,x,gf,next)
       integer n,next
       double precision x(n),gf(n)
-      double precision x1,x2,x3,x4,x5,x6,x7,x8,a,a1,a2,a3,a4,a5,a6,a7,
-     * a8,b,b1,b2,b3,b4,b5,b6,b7,c,p,q
+      double precision x1,x2,x3,x4,x5,x6,x7,x8,a,a1,a2,a3,a4,a5,a6,a7, &
+       a8,b,b1,b2,b3,b4,b5,b6,b7,c,p,q
       integer i,j,k
       double precision y(128)
       common /empr07/ y
-      go to(10,20,30,40,50,60,70,60,90,100,110,120,130,140,150,160,170,
-     * 180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,
-     * 340),next
+      go to(10,20,30,40,50,60,70,60,90,100,110,120,130,140,150,160,170, &
+       180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330, &
+       340),next
    10 gf(1)=-1.0d0
       gf(2)=-1.0d0
       return
@@ -3857,19 +3871,19 @@ c 90/12/01 lu : original version
    70 gf(1)=3.0d0*(x(1)-10.0d0)**2
       gf(2)=3.0d0*(x(2)-20.0d0)**2
       return
-   90 gf(1)=3.8112d0+0.0061701d0*x(1)**2-4.1380d-5*x(1)**3-
-     * 0.030234d0*x(2)+2.56268d-3*x(1)*x(2)+9.064d-7*x(2)*x(1)**3+
-     * 10.4750d-6*x(1)*x(2)**2+18.9d-8*(x(1)*x(2))**2-
-     * 21.0d-10*(x(1)*x(2))**2*x(2)-3.405d-4*x(2)**2+
-     * 1.6638d-6*x(2)**3-10.5768d-5*x(2)*x(1)**2+
-     * 2.8673d0*0.0005d0*exp(0.0005d0*x(1)*x(2))*x(2)
-      gf(2)=6.8306d0-0.030234d0*x(1)+1.28134d-3*x(1)**2+
-     * 2.266d-7*x(1)**4-0.51290d0*x(2)+0.0103812d0*x(2)**2-
-     * 5.4056d-5*x(2)**3-28.106d0/(x(2)+1.0d0)**2+
-     * 10.4750d-6*x(2)*x(1)**2+12.6d-8*x(2)*x(1)**3-
-     * 21.0d-10*x(1)*(x(1)*x(2))**2-6.810d-4*x(1)*x(2)+
-     * 4.9914d-6*x(1)*x(2)**2-3.5256d-5*x(1)**3+
-     * 2.8673d0*0.0005d0*exp(0.0005d0*x(1)*x(2))*x(1)
+   90 gf(1)=3.8112d0+0.0061701d0*x(1)**2-4.1380d-5*x(1)**3- &
+       0.030234d0*x(2)+2.56268d-3*x(1)*x(2)+9.064d-7*x(2)*x(1)**3+ &
+       10.4750d-6*x(1)*x(2)**2+18.9d-8*(x(1)*x(2))**2- &
+       21.0d-10*(x(1)*x(2))**2*x(2)-3.405d-4*x(2)**2+ &
+       1.6638d-6*x(2)**3-10.5768d-5*x(2)*x(1)**2+ &
+       2.8673d0*0.0005d0*exp(0.0005d0*x(1)*x(2))*x(2)
+      gf(2)=6.8306d0-0.030234d0*x(1)+1.28134d-3*x(1)**2+ &
+       2.266d-7*x(1)**4-0.51290d0*x(2)+0.0103812d0*x(2)**2- &
+       5.4056d-5*x(2)**3-28.106d0/(x(2)+1.0d0)**2+ &
+       10.4750d-6*x(2)*x(1)**2+12.6d-8*x(2)*x(1)**3- &
+       21.0d-10*x(1)*(x(1)*x(2))**2-6.810d-4*x(1)*x(2)+ &
+       4.9914d-6*x(1)*x(2)**2-3.5256d-5*x(1)**3+ &
+       2.8673d0*0.0005d0*exp(0.0005d0*x(1)*x(2))*x(1)
       return
   100 gf(1)=-x(2)*x(3)
       gf(2)=-x(1)*x(3)
@@ -3904,8 +3918,8 @@ c 90/12/01 lu : original version
       y(17)=(1.0d0+y(8))/x(1)
       y(18)=y(9)/x(1)
       x1=0.01d0*x(1)*(112.0d0+13.167d0*x6-0.6667d0*x6**2)
-      y(1)=0.01d0*(112.0d0+13.167d0*x6-0.6667d0*x6**2)+
-     * 0.01d0*x(1)*(13.167*y(16)-1.3334d0*x6*y(16))
+      y(1)=0.01d0*(112.0d0+13.167d0*x6-0.6667d0*x6**2)+ &
+       0.01d0*x(1)*(13.167*y(16)-1.3334d0*x6*y(16))
       y(2)=0.01d0*x(1)*(13.167d0*y(17)-1.3334d0*x6*y(17))
       y(3)=0.01d0*x(1)*(13.167d0*y(18)-1.3334d0*x6*y(18))
       if (abs(x1-x2).gt.0.001d0) then
@@ -3936,8 +3950,8 @@ c 90/12/01 lu : original version
       x1=98000.0d0*x(3)/y(89)
       y(1)=-98000.0d0*x(3)*(y(4)*x7+x2*y(19))/y(90)
       y(2)=-98000.0d0*x(3)*(y(5)*x7+x2*y(20))/y(90)
-      y(3)=-98000.0d0*x(3)*(y(6)*x7+x2*y(21)+1000.0d0)/y(90)+
-     * 98000.0d0/y(89)
+      y(3)=-98000.0d0*x(3)*(y(6)*x7+x2*y(21)+1000.0d0)/y(90)+ &
+       98000.0d0/y(89)
       if (abs(x1-x4).gt.0.001d0) then
       x4=x1
       y(10)=y(1)
@@ -4017,8 +4031,8 @@ c 90/12/01 lu : original version
       gf(4)=x8+7.0d0
       return
   190 gf(1)=10.0d0*x(4)+3.0d0*x(2)*x(1)**2
-      gf(2)=-12.0d0*x(2)*x(3)+x(1)**3+
-     * 3.0d0*(x(2)*x(4))**2*x(5)**4
+      gf(2)=-12.0d0*x(2)*x(3)+x(1)**3+ &
+       3.0d0*(x(2)*x(4))**2*x(5)**4
       gf(3)=-6.0d0*x(2)**2-9.0d0*cos(x(5)-x(3))
       gf(4)=10.0d0*x(1)+2.0d0*x(4)*x(2)**3*x(5)**4
       gf(5)=9.0d0*cos(x(5)-x(3))+4.0d0*x(2)**3*x(4)**2*x(5)**3
@@ -4029,8 +4043,8 @@ c 90/12/01 lu : original version
       gf(4)=0.0d0
       gf(5)=0.8356891d0*x(1)
       return
-  210 gf(1)= 8720288.849d0-150512.5253d0*x(2)+156.6950325d0*x(3)-
-     * 476470.3222d0*x(4)-729482.8271d0*x(5)
+  210 gf(1)= 8720288.849d0-150512.5253d0*x(2)+156.6950325d0*x(3)- &
+       476470.3222d0*x(4)-729482.8271d0*x(5)
       gf(2)=-150512.5253d0*x(1)
       gf(3)= 156.6950325d0*x(1)
       gf(4)=-476470.3222d0*x(1)
@@ -4052,8 +4066,8 @@ c 90/12/01 lu : original version
       y(20)=0.052d0*x(1)+78.0d0+0.002377d0*y(2)*x(1)
       y(3)=y(19)/y(20)
       y(4)=19.0d0*y(3)
-      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+
-     * 0.6376d0*y(4)+1.594d0*y(3)
+      y(21)=0.04782d0*(x(1)-y(3))+0.1956d0*(x(1)-y(3))**2/x(2)+ &
+       0.6376d0*y(4)+1.594d0*y(3)
       y(22)=100.0d0*x(2)
       y(23)=x(1)-y(3)-y(4)
       y(24)=0.95d0-y(21)/y(22)
@@ -4071,10 +4085,10 @@ c 90/12/01 lu : original version
       y(29)=0.995d0*y(10)+1998.0d0
       y(12)=y(27)*x(1)+y(28)/y(29)
       y(13)=y(29)-1.75d0*y(2)
-      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+
-     * x(5))
-      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)-
-     * 5095.0d0
+      y(14)=3623.0d0+64.4d0*x(2)+58.4d0*x(3)+x1/(y(9)+ &
+       x(5))
+      y(30)=0.995d0*y(10)+60.8d0*x(2)+48.0d0*x(4)-0.1121d0*y(14)- &
+       5095.0d0
       y(15)=y(13)/y(30)
       y(16)=148.0d3-331.0d3*y(15)+40.0d0*y(13)-61.0d0*y(15)*y(13)
       y(31)=2324.0d0*y(10)-2.874d7*y(2)
@@ -4093,11 +4107,11 @@ c 90/12/01 lu : original version
       y(43)=(y(39)*y(20)-y(19)*y(41))/y(20)**2
       y(44)=19.0d0*y(42)
       y(45)=19.0d0*y(43)
-      y(46)=0.04782d0*(1.0d0-y(42))+0.3912d0*(x(1)-y(3))*(1.0d0-
-     * y(42))/x(2)+0.6376d0*y(44)+1.594d0*y(42)
+      y(46)=0.04782d0*(1.0d0-y(42))+0.3912d0*(x(1)-y(3))*(1.0d0- &
+       y(42))/x(2)+0.6376d0*y(44)+1.594d0*y(42)
       y(47)=-0.1956d0*(x(1)-y(3))**2/x(2)**2
-      y(48)=-0.04782d0*y(43)-0.3912d0*(x(1)-y(3))*y(43)/x(2)+
-     * 0.6376d0*y(45)+1.594d0*y(43)
+      y(48)=-0.04782d0*y(43)-0.3912d0*(x(1)-y(3))*y(43)/x(2)+ &
+       0.6376d0*y(45)+1.594d0*y(43)
       y(49)=100.0d0
       y(50)=1.0d0-y(42)-y(44)
       y(51)=-y(43)-y(45)
@@ -4157,22 +4171,22 @@ c 90/12/01 lu : original version
       y(105)=-y(13)*y(100)/y(30)**2
       y(106)=(y(92)*y(30)-y(13)*y(101))/y(30)**2
       y(107)=-y(13)*y(102)/y(30)**2
-      y(108)=-3.31d5*y(103)+40.0d0*y(86)-61.0d0*(y(103)*y(13)+
-     * y(15)*y(86))
-      y(109)=-3.31d5*y(104)+40.0d0*y(87)-61.0d0*(y(104)*y(13)+
-     * y(15)*y(87))
+      y(108)=-3.31d5*y(103)+40.0d0*y(86)-61.0d0*(y(103)*y(13)+ &
+       y(15)*y(86))
+      y(109)=-3.31d5*y(104)+40.0d0*y(87)-61.0d0*(y(104)*y(13)+ &
+       y(15)*y(87))
       y(110)=-3.31d5*y(105)-61.0d0*y(105)*y(13)
-      y(111)=-3.31d5*y(106)+40.0d0*y(92)-61.0d0*(y(106)*y(13)+
-     * y(15)*y(92))
+      y(111)=-3.31d5*y(106)+40.0d0*y(92)-61.0d0*(y(106)*y(13)+ &
+       y(15)*y(92))
       y(112)=-3.31d5*y(107)-61.0d0*y(107)*y(13)
       y(113)=2.324d3*y(79)
       y(114)=2.324d3*y(80)
       y(115)=2.324d3*y(81)-2.874d7*y(37)
-      y(116)=-1.328d3*y(79)-531.0d0*y(82)+(y(113)*y(29)-y(31)*
-     * y(86))/y(29)**2
+      y(116)=-1.328d3*y(79)-531.0d0*y(82)+(y(113)*y(29)-y(31)* &
+       y(86))/y(29)**2
       y(117)=-1.328d3*y(80)+(y(114)*y(29)-y(31)*y(87))/y(29)**2
-      y(118)=-1.328d3*y(81)-531.0d0*y(83)+(y(115)*y(29)-y(31)*
-     * y(88))/y(29)**2
+      y(118)=-1.328d3*y(81)-531.0d0*y(83)+(y(115)*y(29)-y(31)* &
+       y(88))/y(29)**2
       y(119)=(y(86)*y(15)-y(13)*y(103))/y(15)**2-y(86)/0.52d0
       y(120)=(y(87)*y(15)-y(13)*y(104))/y(15)**2-y(87)/0.52d0
       y(121)=-y(13)*y(105)/y(15)**2
@@ -4183,14 +4197,14 @@ c 90/12/01 lu : original version
       y(126)=-0.72d0*y(105)
       y(127)=-0.72d0*y(106)
       y(128)=-0.72d0*y(107)
-      gf(1)=a1*y(116)+a2*y(93)+a3*y(86)+a4*y(108)+a5*y(89)+a6*y(55)+
-     * a7*(y(119)*y(33)-y(32)*y(124))/y(33)**2-a8*y(2)*y(86)/y(29)**2
-      gf(2)=a1*y(117)+a2*y(94)+a3*y(87)+a4*y(109)+a5*y(90)+a6*y(56)+
-     * a7*(y(120)*y(33)-y(32)*y(125))/y(33)**2-a8*y(2)*y(87)/y(29)**2
+      gf(1)=a1*y(116)+a2*y(93)+a3*y(86)+a4*y(108)+a5*y(89)+a6*y(55)+ &
+       a7*(y(119)*y(33)-y(32)*y(124))/y(33)**2-a8*y(2)*y(86)/y(29)**2
+      gf(2)=a1*y(117)+a2*y(94)+a3*y(87)+a4*y(109)+a5*y(90)+a6*y(56)+ &
+       a7*(y(120)*y(33)-y(32)*y(125))/y(33)**2-a8*y(2)*y(87)/y(29)**2
       gf(3)=a2*y(95)+a4*y(110)+a7*(y(121)*y(33)-y(32)*y(126))/y(33)**2
-      gf(4)=a1*y(118)+a2*y(96)+a3*y(92)+a4*y(111)+a5*y(91)+a6*y(57)+
-     * a7*(y(122)*y(33)-y(32)*y(127))/y(33)**2+a8*(y(37)*y(29)-y(2)*
-     * y(88))/y(29)**2
+      gf(4)=a1*y(118)+a2*y(96)+a3*y(92)+a4*y(111)+a5*y(91)+a6*y(57)+ &
+       a7*(y(122)*y(33)-y(32)*y(127))/y(33)**2+a8*(y(37)*y(29)-y(2)* &
+       y(88))/y(29)**2
       gf(5)=a2*y(97)+a4*y(112)+a7*(y(123)*y(33)-y(32)*y(128))/y(33)**2
       return
   230 gf(1)= 2.0d0*(x(1)-x(4))
@@ -4200,21 +4214,21 @@ c 90/12/01 lu : original version
       gf(5)=-2.0d0*(x(2)-x(5))
       gf(6)=-2.0d0*(x(3)-x(6))
       return
-  240 gf(1)=0.0408d0*x(1)*x(4)+0.0204d0*x(4)*(x(2)+x(3))+
-     * 0.0187d0*x(2)*x(3)+0.1214d0*x(1)*x(4)*x(5)**2+
-     * 0.0607d0*x(4)*x(5)**2*(x(2)+x(3))+0.0437d0*x(2)*x(3)*x(6)**2
-      gf(2)=0.0204d0*x(1)*x(4)+0.0374d0*1.57d0*x(2)*x(3)+
-     * 0.0187d0*x(3)*(x(1)+x(4))+0.0607d0*x(1)*x(4)*x(5)**2+
-     * 0.0874d0*1.57d0*x(2)*x(3)*x(6)**2+
-     * 0.0437d0*x(3)*x(6)**2*(x(1)+x(4))
-      gf(3)=0.0204d0*x(1)*x(4)+
-     * 0.0187d0*x(2)*(x(1)+1.57d0*x(2)+x(4))+
-     * 0.0607d0*x(1)*x(4)*x(5)**2+
-     * 0.0437d0*x(2)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
-      gf(4)=0.0204d0*x(1)*(x(1)+x(2)+x(3))+
-     * 0.0187d0*x(2)*x(3)+
-     * 0.0607d0*x(1)*x(5)**2*(x(1)+x(2)+x(3))+
-     * 0.0437d0*x(2)*x(3)*x(6)**2
+  240 gf(1)=0.0408d0*x(1)*x(4)+0.0204d0*x(4)*(x(2)+x(3))+ &
+       0.0187d0*x(2)*x(3)+0.1214d0*x(1)*x(4)*x(5)**2+ &
+       0.0607d0*x(4)*x(5)**2*(x(2)+x(3))+0.0437d0*x(2)*x(3)*x(6)**2
+      gf(2)=0.0204d0*x(1)*x(4)+0.0374d0*1.57d0*x(2)*x(3)+ &
+       0.0187d0*x(3)*(x(1)+x(4))+0.0607d0*x(1)*x(4)*x(5)**2+ &
+       0.0874d0*1.57d0*x(2)*x(3)*x(6)**2+ &
+       0.0437d0*x(3)*x(6)**2*(x(1)+x(4))
+      gf(3)=0.0204d0*x(1)*x(4)+ &
+       0.0187d0*x(2)*(x(1)+1.57d0*x(2)+x(4))+ &
+       0.0607d0*x(1)*x(4)*x(5)**2+ &
+       0.0437d0*x(2)*x(6)**2*(x(1)+1.57d0*x(2)+x(4))
+      gf(4)=0.0204d0*x(1)*(x(1)+x(2)+x(3))+ &
+       0.0187d0*x(2)*x(3)+ &
+       0.0607d0*x(1)*x(5)**2*(x(1)+x(2)+x(3))+ &
+       0.0437d0*x(2)*x(3)*x(6)**2
       gf(5)=0.1214d0*x(1)*x(4)*x(5)*(x(1)+x(2)+x(3))
       gf(6)=0.0874d0*x(2)*x(3)*x(6)*(x(1)+1.57d0*x(2)+x(4))
       return
@@ -4233,28 +4247,28 @@ c 90/12/01 lu : original version
       gf(6)=1.4d1*x(6)-4.0d0*x(7)-1.0d1
       gf(7)=4.0d0*x(7)**3-4.0d0*x(6)-8.0d0
       return
-  270 gf(1)=10.0d0*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)-
-     * 15.0d0*x(3)*x(4)/((x(1)*x(2))**2*x(5)*x(7)**0.5d0)-
-     * 40.0d0*x(2)*x(6)/(x(1)**3*x(4)*x(5)**2)+
-     * 50.0d0*x(1)*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
-      gf(2)=-10.0d0*x(1)*x(4)**2/(x(2)**2*x(6)**3*x(7)**0.25d0)-
-     * 30.0d0*x(3)*x(4)/(x(1)*x(2)**3*x(5)*x(7)**0.5d0)+
-     * 20.0d0*x(6)/(x(1)**2*x(4)*x(5)**2)+
-     * 50.0d0*x(1)**2*x(2)*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
-      gf(3)=15.0d0*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)-
-     * 25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6))**2
-      gf(4)=20.0d0*x(1)*x(4)/(x(2)*x(6)**3*x(7)**0.25d0)+
-     * 15.0d0*x(3)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)-
-     * 20.0d0*x(2)*x(6)/(x(1)*x(4)*x(5))**2
-      gf(5)=-15.0d0*x(3)*x(4)/(x(1)*(x(2)*x(5))**2*x(7)**0.5d0)-
-     * 40.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**3)+
-     * 12.5d0*x(1)**2*x(2)**2*x(7)/(x(3)*x(5)**0.5d0*x(6)**2)
-      gf(6)=-30.0d0*x(1)*x(4)**2/(x(2)*x(6)**4*x(7)**0.25d0)+
-     * 20.0d0*x(2)/(x(1)**2*x(4)*x(5)**2)-
-     * 50.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**3)
-      gf(7)=-2.5d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**1.25d0)-
-     * 7.5d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**1.5d0)+
-     * 25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0/(x(3)*x(6)**2)
+  270 gf(1)=10.0d0*x(4)**2/(x(2)*x(6)**3*x(7)**0.25d0)- &
+       15.0d0*x(3)*x(4)/((x(1)*x(2))**2*x(5)*x(7)**0.5d0)- &
+       40.0d0*x(2)*x(6)/(x(1)**3*x(4)*x(5)**2)+ &
+       50.0d0*x(1)*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
+      gf(2)=-10.0d0*x(1)*x(4)**2/(x(2)**2*x(6)**3*x(7)**0.25d0)- &
+       30.0d0*x(3)*x(4)/(x(1)*x(2)**3*x(5)*x(7)**0.5d0)+ &
+       20.0d0*x(6)/(x(1)**2*x(4)*x(5)**2)+ &
+       50.0d0*x(1)**2*x(2)*x(5)**0.5d0*x(7)/(x(3)*x(6)**2)
+      gf(3)=15.0d0*x(4)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)- &
+       25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6))**2
+      gf(4)=20.0d0*x(1)*x(4)/(x(2)*x(6)**3*x(7)**0.25d0)+ &
+       15.0d0*x(3)/(x(1)*x(2)**2*x(5)*x(7)**0.5d0)- &
+       20.0d0*x(2)*x(6)/(x(1)*x(4)*x(5))**2
+      gf(5)=-15.0d0*x(3)*x(4)/(x(1)*(x(2)*x(5))**2*x(7)**0.5d0)- &
+       40.0d0*x(2)*x(6)/(x(1)**2*x(4)*x(5)**3)+ &
+       12.5d0*x(1)**2*x(2)**2*x(7)/(x(3)*x(5)**0.5d0*x(6)**2)
+      gf(6)=-30.0d0*x(1)*x(4)**2/(x(2)*x(6)**4*x(7)**0.25d0)+ &
+       20.0d0*x(2)/(x(1)**2*x(4)*x(5)**2)- &
+       50.0d0*x(1)**2*x(2)**2*x(5)**0.5d0*x(7)/(x(3)*x(6)**3)
+      gf(7)=-2.5d0*x(1)*x(4)**2/(x(2)*x(6)**3*x(7)**1.25d0)- &
+       7.5d0*x(3)*x(4)/(x(1)*x(2)**2*x(5)*x(7)**1.5d0)+ &
+       25.0d0*x(1)**2*x(2)**2*x(5)**0.5d0/(x(3)*x(6)**2)
       return
   280 gf(1)=0.268d0*(x(7)/x(1))**0.33d0/x(7)-1.0d0
       gf(2)=0.268d0*(x(8)/x(2))**0.33d0/x(8)-1.0d0
@@ -4337,36 +4351,37 @@ c 90/12/01 lu : original version
       gf(19)=2.0d0*(x(19)-3.0d0)
       gf(20)=2.0d0*x(20)
       return
-      end
-* subroutine tiud15                all systems                00/12/01
-c portability : all systems
-c 92/12/01 ra : original version
-*
-* purpose :
-*  initial values of the variables and structure of the sparse hessian
-*  matrix for unconstrained minimization.
-*  sparse version with changed tests 7-10, 12.
-*  changed for the tests.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  nb  number of elements of the sparse matrix.
-*  ro  x(n)  vector of variables.
-*  ii  next  number of the test problem.
-*  io  ierr  error indicator.
-*
+      end subroutine tfgu07
+
+! subroutine tiud15                all systems                00/12/01
+! portability : all systems
+! 92/12/01 ra : original version
+!
+! purpose :
+!  initial values of the variables and structure of the sparse hessian
+!  matrix for unconstrained minimization.
+!  sparse version with changed tests 7-10, 12.
+!  changed for the tests.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  nb  number of elements of the sparse matrix.
+!  ro  x(n)  vector of variables.
+!  ii  next  number of the test problem.
+!  io  ierr  error indicator.
+!
       subroutine tiud15(n,nb,x,xmax,next,ierr)
       integer n,nb,next,ierr
       double precision x(n),xmax
       integer i
       double precision y(20)
       common /empr15/ y
-      real*8 eta9
+      double precision eta9
       parameter (eta9=1.0d60)
       xmax=1.0d3
       ierr=0
-      goto(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,
-     & 170,180,190,200,210,220,260,270),next
+      goto(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160, &
+       170,180,190,200,210,220,260,270),next
    10 if (n.lt.2) go to 999
       n=n-mod(n,2)
       do 11 i=1,n
@@ -4602,21 +4617,22 @@ c 92/12/01 ra : original version
       return
   999 ierr=1
       return
-      end
-* subroutine tafu15             all systems                92/12/01
-c portability : all systems
-c 92/12/01 ra : original version
-*
-* purpose :
-*  values of partial functions in the sum of squares.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  ka  index of the given partial function.
-*  ri  x(n)  vector of variables.
-*  ro  fa  value of the ka-th partial function at the point x.
-*  ii  next  number of the selected test problem.
-*
+      end subroutine tiud15
+
+! subroutine tafu15             all systems                92/12/01
+! portability : all systems
+! 92/12/01 ra : original version
+!
+! purpose :
+!  values of partial functions in the sum of squares.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  ka  index of the given partial function.
+!  ri  x(n)  vector of variables.
+!  ro  fa  value of the ka-th partial function at the point x.
+!  ii  next  number of the selected test problem.
+!
       subroutine tafu15(n,ka,x,fa,next)
       integer n,ka,next
       double precision x(*),fa
@@ -4624,8 +4640,8 @@ c 92/12/01 ra : original version
       integer i,j,k,l,m,ia,ib,ic
       double precision y(20)
       common /empr15/ y
-      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,
-     & 170,180,190,200,210,220),next
+      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160, &
+       170,180,190,200,210,220),next
    10 i=(ka+1)/2
       if (mod(ka,2).eq.1) then
       fa=1.0d1*(x(i)**2-x(i+1))
@@ -4731,8 +4747,8 @@ c 92/12/01 ra : original version
       else if (i.eq.n) then
       fa=8.0d0-exp(3.0d0*x(i-1))-exp(3.0d0*x(i))
       else
-      fa=8.0d0-exp(3.0d0*x(i-1))-exp(3.0d0*x(i))+
-     & 4.0d0-exp(x(i))-exp(x(i+1))
+      fa=8.0d0-exp(3.0d0*x(i-1))-exp(3.0d0*x(i))+ &
+       4.0d0-exp(x(i))-exp(x(i+1))
       end if
       return
   110 i=(ka+1)/2
@@ -4801,8 +4817,8 @@ c 92/12/01 ra : original version
       l=mod((ka-1),4)+1
       fa=-y(l)
       do 161 j=1,4
-      fa=fa+dble((1-2*mod(j,2))*l*j*j)*sin(x(i+j))+
-     & dble(l*l*j)*cos(x(i+j))
+      fa=fa+dble((1-2*mod(j,2))*l*j*j)*sin(x(i+j))+ &
+       dble(l*l*j)*cos(x(i+j))
   161 continue
       return
   170 alfa=0.5d0
@@ -4815,31 +4831,31 @@ c 92/12/01 ra : original version
       else if (ka.eq.n) then
       fa=alfa*x(n-2)-(2.0d0-alfa)-x(n)*(1.0d0+4.0d0*x(n-1))
       else if (mod(ka,2).eq.1) then
-      fa=alfa*x(ka-2)-(1.0d0-alfa)*x(ka+2)-
-     & x(ka)*(1.0d0+4.0d0*x(ka+1))
+      fa=alfa*x(ka-2)-(1.0d0-alfa)*x(ka+2)- &
+       x(ka)*(1.0d0+4.0d0*x(ka+1))
       else
-      fa=alfa*x(ka-2)-(2.0d0-alfa)*x(ka+2)-
-     & x(ka)*(1.0d0+4.0d0*x(ka-1))
+      fa=alfa*x(ka-2)-(2.0d0-alfa)*x(ka+2)- &
+       x(ka)*(1.0d0+4.0d0*x(ka-1))
       end if
       return
   180 if (ka.lt.2) then
       fa=4.0d0*(x(ka)-x(ka+1)**2)
       else if (ka.lt.n) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)
       else
       fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))
       end if
       return
   190 if (ka.eq.1) then
-      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-2.0d0*x(ka+1)+
-     & 3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
+      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-2.0d0*x(ka+1)+ &
+       3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
       else if (ka.le.n-1) then
-      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-x(ka-1)-2.0d0*x(ka+1)+
-     & 3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
+      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-x(ka-1)-2.0d0*x(ka+1)+ &
+       3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
       else
-      fa=-2.0d0*x(n)**2+3.0d0*x(n)-x(n-1)+
-     & 3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
+      fa=-2.0d0*x(n)**2+3.0d0*x(n)-x(n-1)+ &
+       3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
       end if
       return
   200 u=1.0d0/dble(n+1)
@@ -4871,25 +4887,26 @@ c 92/12/01 ra : original version
       else if (mod(ka,2).eq.0) then
       fa=1.0d1*(x(i)**2-x(i+1))
       else
-      fa=2.0d0*exp(-(x(i)-x(i+1))**2)+
-     & exp(-2.0d0*(x(i+1)-x(i+2))**2)
+      fa=2.0d0*exp(-(x(i)-x(i+1))**2)+ &
+       exp(-2.0d0*(x(i+1)-x(i+2))**2)
       end if
       return
-      end
-* subroutine tagu15                all systems                92/12/01
-c portability : all systems
-c 92/12/01 ra : original version
-*
-* purpose :
-*  gradients of partial functions in the sum of squares.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  ka  index of the given partial function.
-*  ri  x(n)  vector of variables.
-*  ro  ga(n)  gradient of the ka-th partial function at the point x.
-*  ii  next  number of the selected test problem.
-*
+      end subroutine tafu15
+
+! subroutine tagu15                all systems                92/12/01
+! portability : all systems
+! 92/12/01 ra : original version
+!
+! purpose :
+!  gradients of partial functions in the sum of squares.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  ka  index of the given partial function.
+!  ri  x(n)  vector of variables.
+!  ro  ga(n)  gradient of the ka-th partial function at the point x.
+!  ii  next  number of the selected test problem.
+!
       subroutine tagu15(n,ka,x,ga,next)
       integer n,ka,next
       double precision x(*),ga(*)
@@ -4897,8 +4914,8 @@ c 92/12/01 ra : original version
       integer i,j,k,l,m,ia,ib,ic
       double precision y(20)
       common /empr15/ y
-      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,
-     & 170,180,190,200,210,220,260,270),next
+      go to(10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160, &
+       170,180,190,200,210,220,260,270),next
    10 i=(ka+1)/2
       if (mod(ka,2).eq.1) then
       ga(i)=2.0d1*x(i)
@@ -5164,8 +5181,8 @@ c 92/12/01 ra : original version
   160 i=2*((ka+3)/4)-2
       l=mod((ka-1),4)+1
       do 161 j=1,4
-      ga(i+j)=dble((1-2*mod(j,2))*l*j*j)*cos(x(i+j))-
-     & dble(l*l*j)*sin(x(i+j))
+      ga(i+j)=dble((1-2*mod(j,2))*l*j*j)*cos(x(i+j))- &
+       dble(l*l*j)*sin(x(i+j))
   161 continue
       return
   170 alfa=0.5d0
@@ -5306,24 +5323,25 @@ c 92/12/01 ra : original version
       if (ib+l.ne.i.and.ib+l.ne.j) ga(ib+l)=0.5d0*cos(x(ib+l))
   271 continue
       return
-      end
-* subroutine tiud16             all systems                 99/12/01
-c portability : all systems
-c 99/12/01 ga : original version
-*
-* purpose :
-*  initial values of the variables for nonlinear equations.
-*  unconstrained and dense version.
-*
-* parameters :
-*  io  n  number of variables.
-*  io  na  number of equations.
-*  ro  x(n)  vector of variables.
-*  ro  fmin  lower bound for value of the objective function.
-*  ro  xmax  maximum stepsize.
-*  io  next  number of the test problem.
-*  io  ierr  error indicator.
-*
+      end subroutine tagu15
+
+! subroutine tiud16             all systems                 99/12/01
+! portability : all systems
+! 99/12/01 ga : original version
+!
+! purpose :
+!  initial values of the variables for nonlinear equations.
+!  unconstrained and dense version.
+!
+! parameters :
+!  io  n  number of variables.
+!  io  na  number of equations.
+!  ro  x(n)  vector of variables.
+!  ro  fmin  lower bound for value of the objective function.
+!  ro  xmax  maximum stepsize.
+!  io  next  number of the test problem.
+!  io  ierr  error indicator.
+!
       subroutine tiud16(n,na,x,fmin,xmax,next,ierr)
       integer n,na,next,ierr
       double precision x(n),fmin,xmax
@@ -5333,9 +5351,9 @@ c 99/12/01 ga : original version
       fmin=0.0d0
       xmax=1.0d3
       ierr=0
-      go to (201,202,203,204,205,206,207,208,209,210,211,212,213,214,
-     & 217,218,219,220,221,222,223,224,225,226,227,228,
-     & 229,230,231,231),next
+      go to (201,202,203,204,205,206,207,208,209,210,211,212,213,214, &
+       217,218,219,220,221,222,223,224,225,226,227,228, &
+       229,230,231,231),next
 201   n1=n-1
       do 3030 i=1,n1
         x(i)=-1.2d0
@@ -5482,32 +5500,33 @@ c 99/12/01 ga : original version
         x(i)=1.0d0
 6030  continue
       return
-      end
-* subroutine eafu16             all systems                 99/12/01
-c portability : all systems
-c 99/12/01 ga : original version
-*
-* purpose :
-*  values of test functions for nonlinear equations.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  i  index of the approximated function.
-*  ri  x(n)  vector of variables.
-*  ro  f  value of the approximated function at the
-*          selected point.
-*  ii  next  number of the test problem.
-*
+      end subroutine tiud16
+
+! subroutine eafu16             all systems                 99/12/01
+! portability : all systems
+! 99/12/01 ga : original version
+!
+! purpose :
+!  values of test functions for nonlinear equations.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  i  index of the approximated function.
+!  ri  x(n)  vector of variables.
+!  ro  f  value of the approximated function at the
+!          selected point.
+!  ii  next  number of the test problem.
+!
       subroutine eafu16(n,i,x,f,next)
       integer n,i,next
       double precision x(n),f
       double precision s,t,s1,s2,s3,t1,c,h,al1,al2,be1,be2
       double precision al,be,a,b,ga,ca,cb,ff,u,la,h2
       integer j,n1,i1,i2,j1,j2,k,alf,bet,gam,l,nd
-      go to (201,202,203,204,205,206,207,208,209,210,211,212,213,214,
-     & 217,218,219,220,221,222,223,224,225,226,227,228,
-     & 229,230,231,232),next
+      go to (201,202,203,204,205,206,207,208,209,210,211,212,213,214, &
+       217,218,219,220,221,222,223,224,225,226,227,228, &
+       229,230,231,232),next
 201   if(i.eq.1) then
         f=1.0d0-x(1)
       else
@@ -5691,11 +5710,11 @@ c 99/12/01 ga : original version
       else if(i.eq.1) then
         f=3.d0*x(i)*(x(i+1)-2.d0*x(i))+(x(i+1))**2/4.0d0
       else if(i.eq.n) then
-        f=3.d0*x(i)*(20.0d0-2.d0*x(i)+x(i-1))+
-     &   (20.0d0-x(i-1))**2/4.0d0
+        f=3.d0*x(i)*(20.0d0-2.d0*x(i)+x(i-1))+ &
+         (20.0d0-x(i-1))**2/4.0d0
       else
-        f=3.d0*x(i)*(x(i+1)-2.d0*x(i)+x(i-1))+
-     &   (x(i+1)-x(i-1))**2/4.0d0
+        f=3.d0*x(i)*(x(i+1)-2.d0*x(i)+x(i-1))+ &
+         (x(i+1)-x(i-1))**2/4.0d0
       endif
       return
 218   s=1.0d0/dble(n+1)
@@ -5706,8 +5725,8 @@ c 99/12/01 ga : original version
       else if(i.eq.n) then
         f=2.d0*x(i)-x(i-1)+s**2/2.0d0*(x(i)+dble(i)*s+1.0d0)**3
       else
-        f=2.d0*x(i)-x(i-1)-x(i+1)+s**2/2.0d0*(x(i)+
-     +  dble(i)*s+1.0d0)**3
+        f=2.d0*x(i)-x(i-1)-x(i+1)+s**2/2.0d0*(x(i)+&
+          dble(i)*s+1.0d0)**3
       endif
       return
 219   s1=1.0d0/(dble(n)+1.0d0)
@@ -5766,12 +5785,12 @@ c 99/12/01 ga : original version
       f=-1.0d0+x(i)*f
       return
 225   if(i.eq.1) then
-        f=3.0d0*x(i)**3+2.0d0*x(i+1)-5.0d0+
-     +  sin(x(i)-x(i+1))*sin(x(i)+x(i+1))
+        f=3.0d0*x(i)**3+2.0d0*x(i+1)-5.0d0+&
+        sin(x(i)-x(i+1))*sin(x(i)+x(i+1))
       else if(i.ne.n) then
-        f=3.0d0*x(i)**3+2.0d0*x(i+1)-5.0d0+
-     +  sin(x(i)-x(i+1))*sin(x(i)+x(i+1))+
-     +  4.0d0*x(i)-3.0d0-x(i-1)*exp(x(i-1)-x(i))
+        f=3.0d0*x(i)**3+2.0d0*x(i+1)-5.0d0+&
+        sin(x(i)-x(i+1))*sin(x(i)+x(i+1))+&
+        4.0d0*x(i)-3.0d0-x(i-1)*exp(x(i-1)-x(i))
       else
         f= 4.0d0*x(i)-3.0d0-x(i-1)*exp(x(i-1)-x(i))
       endif
@@ -5945,63 +5964,64 @@ c 99/12/01 ga : original version
          f=4.0d0*x(1)-x(2)-x(nd+1)+h2*x(1)**2-24.0d0/(h+1.0d0)**2
       endif
       if(1.lt.l.and.l.lt.nd.and.k.eq.1) then
-         f=4.0d0*x(l)-x(l-1)-x(l+1)-x(l+nd)+h2*x(l)**2
-     *-12.0d0/(dble(l)*h+1.0d0)**2
+         f=4.0d0*x(l)-x(l-1)-x(l+1)-x(l+nd)+h2*x(l)**2 &
+      -12.0d0/(dble(l)*h+1.0d0)**2
       endif
       if(l.eq.nd.and.k.eq.1) then
-         f=4.0d0*x(nd)-x(nd-1)-x(nd+nd)+h2*x(nd)**2
-     *-12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
+         f=4.0d0*x(nd)-x(nd-1)-x(nd+nd)+h2*x(nd)**2 &
+      -12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
       endif
       if(l.eq.1.and.1.lt.k.and.k.lt.nd) then
-         f=4.0d0*x(i)-x(i+1)-x(i-nd)-x(i+nd)+h2*x(i)**2
-     *-12.0d0/(dble(k)*h+1.0d0)**2
+         f=4.0d0*x(i)-x(i+1)-x(i-nd)-x(i+nd)+h2*x(i)**2 &
+      -12.0d0/(dble(k)*h+1.0d0)**2
       endif
       if(l.eq.nd.and.1.lt.k.and.k.lt.nd) then
-         f=4.0d0*x(i)-x(i-nd)-x(i-1)-x(i+nd)+h2*x(i)**2
-     *-12.0d0/(dble(k)*h+2.0d0)**2
+         f=4.0d0*x(i)-x(i-nd)-x(i-1)-x(i+nd)+h2*x(i)**2 &
+      -12.0d0/(dble(k)*h+2.0d0)**2
       endif
       if(l.eq.1.and.k.eq.nd) then
-         f=4.0d0*x(i)-x(i+1)-x(i-nd)+h2*x(i)**2
-     *-12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
+         f=4.0d0*x(i)-x(i+1)-x(i-nd)+h2*x(i)**2 &
+      -12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
       endif
       if(1.lt.l.and.l.lt.nd.and.k.eq.nd) then
-         f=4.0d0*x(i)-x(i-1)-x(i+1)-x(i-nd)+h2*x(i)**2
-     *-12.0d0/(dble(l)*h+2.0d0)**2
+         f=4.0d0*x(i)-x(i-1)-x(i+1)-x(i-nd)+h2*x(i)**2 &
+      -12.0d0/(dble(l)*h+2.0d0)**2
       endif
       if(l.eq.nd.and.k.eq.nd) then
-        f=4.0d0*x(i)-x(i-1)-x(i-nd)+h2*x(i)**2
-     *-24.0d0/(dble(nd)*h+2.0d0)**2
+        f=4.0d0*x(i)-x(i-1)-x(i-nd)+h2*x(i)**2 &
+      -24.0d0/(dble(nd)*h+2.0d0)**2
       endif
       if(1.lt.l.and.l.lt.nd.and.1.lt.k.and.k.lt.nd) then
          f=4.0d0*x(i)-x(i-1)-x(i+1)-x(i-nd)-x(i+nd)+h2*x(i)**2
       endif
       return
-      end
-* subroutine eagu16             all systems                 99/12/01
-c portability : all systems
-c 99/12/01 ga : original version
-*
-* purpose :
-*  gradients of test functions for nonlinear equations.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  i  index of the approximated function.
-*  ri  x(n)  vector of variables.
-*  ro  g(n)  gradient of the approximated function at the
-*          selected point.
-*  ii  next  number of the test problem.
-*
+      end subroutine eafu16
+
+! subroutine eagu16             all systems                 99/12/01
+! portability : all systems
+! 99/12/01 ga : original version
+!
+! purpose :
+!  gradients of test functions for nonlinear equations.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  i  index of the approximated function.
+!  ri  x(n)  vector of variables.
+!  ro  g(n)  gradient of the approximated function at the
+!          selected point.
+!  ii  next  number of the test problem.
+!
       subroutine eagu16(n,i,x,g,next)
       integer n,i,next
       double precision x(n),g(n)
       double precision brow(1000),t,s,s1,s2,s3,t1,t2,c,h,h2,la,a,b,al,be
       double precision ga,ca,cb,u,ff,ti,tim1,tim2,si,sim1,sim2,v
       integer j,k,i1,i2,j1,j2,l,alf,bet,n1,nd
-      go to (201,202,203,204,205,206,207,208,209,210,211,212,213,214,
-     & 217,218,219,220,221,222,223,224,225,226,227,228,
-     & 229,230,231,232),next
+      go to (201,202,203,204,205,206,207,208,209,210,211,212,213,214, &
+       217,218,219,220,221,222,223,224,225,226,227,228, &
+       229,230,231,232),next
 201   if(i.eq.1) then
       g(1)=-1.0d0
       do 3010 j=2,n
@@ -6206,13 +6226,13 @@ c 99/12/01 ga : original version
            do 5013 l=2,n
               t1=t1+s**(l-2)*(l-1)*x(l)
 5013       continue
-         s3=s3+s**(i+j-2)*((dble(29*(i-1))/dble(k)-2.0d0*s1)*
-     +   (dble(29*(j - 1))/dble(k)-2.0d0*s1)-
-     +   2.0d0*(t1-s1*s1-1.0d0))
+         s3=s3+s**(i+j-2)*((dble(29*(i-1))/dble(k)-2.0d0*s1)* &
+         (dble(29*(j - 1))/dble(k)-2.0d0*s1)- &
+         2.0d0*(t1-s1*s1-1.0d0))
          if ((i.eq.1).and.(j.eq.1)) then
              g(j)=s3+6.0d0*x(1)*x(1)-2.0d0*x(2)+3.0d0
-         else if (((i.eq.1).and.(j.eq.2)).or.((i.eq.2)
-     +    .and.(j.eq.1))) then
+         else if (((i.eq.1).and.(j.eq.2)).or.((i.eq.2) &
+          .and.(j.eq.1))) then
             g(j)=s3-2.0d0*x(1)
          else if ((i.eq.2).and.(j.eq.2)) then
            g(j)=s3+1.0d0
@@ -6326,9 +6346,9 @@ c 99/12/01 ga : original version
         if(j.ne.i) then
         t=sqrt(x(j)**2+dble(i)/dble(j))
         s1=log(t)
-        g(j)=x(j)*(sin(s1)**alf+cos(s1)**alf+
-     +     alf*sin(s1)**(alf-1)*cos(s1)-
-     +     alf*sin(s1)*cos(s1)**(alf-1))/t
+        g(j)=x(j)*(sin(s1)**alf+cos(s1)**alf+ &
+           alf*sin(s1)**(alf-1)*cos(s1)- &
+           alf*sin(s1)*cos(s1)**(alf-1))/t
         else
           g(j)=dble(bet*n)
         endif
@@ -6358,18 +6378,18 @@ c 99/12/01 ga : original version
       return
 225   do 6020 j=1,n
         if(i.eq.1.and.j.eq.1) then
-        g(j)=9.0d0*x(i)**2+cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+
-     +     sin(x(i)-x(i+1))*cos(x(i)+x(i+1))
+        g(j)=9.0d0*x(i)**2+cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+ &
+           sin(x(i)-x(i+1))*cos(x(i)+x(i+1))
         else if(i.eq.1.and.j.eq.2) then
-           g(j)=2.0d0-cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+
-     +     sin(x(i)-x(i+1))*cos(x(i)+x(i+1))
+           g(j)=2.0d0-cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+ &
+           sin(x(i)-x(i+1))*cos(x(i)+x(i+1))
         else if(i.lt.n.and.j.eq.i) then
-           g(j)=9.0d0*x(i)**2+cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+
-     +     sin(x(i)-x(i+1))*cos(x(i)+x(i+1))+
-     +     4.0d0+x(i-1)*exp(x(i-1)-x(i))
+           g(j)=9.0d0*x(i)**2+cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+ &
+           sin(x(i)-x(i+1))*cos(x(i)+x(i+1))+ &
+           4.0d0+x(i-1)*exp(x(i-1)-x(i))
         else if(i.lt.n.and.j.eq.i+1) then
-           g(j)=2.0d0-cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+
-     +     sin(x(i)-x(i+1))*cos(x(i)+x(i+1))
+           g(j)=2.0d0-cos(x(i)-x(i+1))*sin(x(i)+x(i+1))+ &
+           sin(x(i)-x(i+1))*cos(x(i)+x(i+1))
         else if(j.eq.i-1) then
            g(j)=-exp(x(i-1)-x(i))-x(i-1)*exp(x(i-1)-x(i))
         else if(i.eq.n.and.j.eq.n) then
@@ -6611,22 +6631,23 @@ c 99/12/01 ga : original version
          g(i+nd)=-1.0d0
       endif
       return
-      end
-* subroutine tiud28                all systems                92/12/01
-c portability : all systems
-c 92/12/01 lu : original version
-*
-* purpose :
-*  initial values of the variables for unconstrained minimization.
-*  unconstrained and dense version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  na  number of approximated functions.
-*  ro  x(n)  vector of variables.
-*  ii  next  number of the test problem.
-*  io  ierr  error indicator.
-*
+      end subroutine eagu16
+
+! subroutine tiud28                all systems                92/12/01
+! portability : all systems
+! 92/12/01 lu : original version
+!
+! purpose :
+!  initial values of the variables for unconstrained minimization.
+!  unconstrained and dense version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  na  number of approximated functions.
+!  ro  x(n)  vector of variables.
+!  ii  next  number of the test problem.
+!  io  ierr  error indicator.
+!
       subroutine tiud28(n,x,fmin,xmax,next,ierr)
       integer n,na,next,ierr
       double precision x(n),fmin,xmax
@@ -6639,13 +6660,13 @@ c 92/12/01 lu : original version
       fmin=0.0d0
       xmax=1.0d3
       ierr=0
-      go to (10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,
-     &  170,180,190,200,210,220,230,250,310,320,330,350,370,390,400,
-     &  450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,
-     &  600,610,620,630,720,740,750,760,780,790,810,830,840,860,870,
-     &  880,900,910,920,930,940,950,960,970,980,990,800,240,410,420,
-     &  650,660,670,680,690,340,360,380,430,440,270,280,290,300,710,
-     &  820),next
+      go to (10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160, &
+        170,180,190,200,210,220,230,250,310,320,330,350,370,390,400, &
+        450,460,470,480,490,500,510,520,530,540,550,560,570,580,590, &
+        600,610,620,630,720,740,750,760,780,790,810,830,840,860,870, &
+        880,900,910,920,930,940,950,960,970,980,990,800,240,410,420, &
+        650,660,670,680,690,340,360,380,430,440,270,280,290,300,710, &
+        820),next
    10 if (n.lt.2) go to 999
       n=n-mod(n,2)
       do 11 i=1,n
@@ -7495,22 +7516,23 @@ c 92/12/01 lu : original version
       return
   999 ierr=1
       return
-      end
-* subroutine tfbu28                all systems                92/12/01
-c portability : all systems
-c 92/12/01 lu : original version
-*
-* purpose :
-*  values of model functions for unconstrained minimization.
-*  universal version.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  na  number of approximated functions.
-*  ri  x(n)  vector of variables.
-*  ro  f  value of the model function.
-*  ii  next  number of the test problem.
-*
+      end subroutine tiud28
+
+! subroutine tfbu28                all systems                92/12/01
+! portability : all systems
+! 92/12/01 lu : original version
+!
+! purpose :
+!  values of model functions for unconstrained minimization.
+!  universal version.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  na  number of approximated functions.
+!  ri  x(n)  vector of variables.
+!  ro  f  value of the model function.
+!  ii  next  number of the test problem.
+!
       subroutine tfbu28(n,x,f,g,next)
       use matrix_routines
       integer n,na,next
@@ -7520,20 +7542,20 @@ c 92/12/01 lu : original version
       double precision a1,a2,a3,a4,ex,d1s,d2s,h,pi
       data pi /3.14159265358979323d0/
       double precision ga1(2),ga2(2),ga3(6),ga4(6)
-      double precision al,al1,al2,alf,be,be1,be2,bet,ca,cb,ff,fg,ga,
-     & gam,h2,s,s1,s2,s3,t,t1
+      double precision al,al1,al2,alf,be,be1,be2,bet,ca,cb,ff,fg,ga, &
+       gam,h2,s,s1,s2,s3,t,t1
       integer i,j,k,l,m,ia,ib,ic,i1,i2,j1,j2,ka,la,n1,nd
       double precision y(20),par
       common /empr28/ y,par,na,m
       f=0.0d0
       call mxvset(n,0.0d0,g)
-      go to (10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,
-     &  170,180,190,200,210,220,230,250,310,320,330,350,370,390,400,
-     &  450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,
-     &  600,610,620,630,720,740,750,760,780,790,810,830,840,860,870,
-     &  880,900,910,920,930,940,950,960,970,980,990,800,240,410,420,
-     &  650,660,670,680,690,340,360,380,430,440,270,280,290,300,710,
-     &  820),next
+      go to (10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160, &
+        170,180,190,200,210,220,230,250,310,320,330,350,370,390,400, &
+        450,460,470,480,490,500,510,520,530,540,550,560,570,580,590, &
+        600,610,620,630,720,740,750,760,780,790,810,830,840,860,870, &
+        880,900,910,920,930,940,950,960,970,980,990,800,240,410,420, &
+        650,660,670,680,690,340,360,380,430,440,270,280,290,300,710, &
+        820),next
    10 do 11 j=2,n
       a=x(j-1)**2-x(j)
       b=x(j-1)-1.0d0
@@ -7549,8 +7571,8 @@ c 92/12/01 lu : original version
       d=x(j+1)-1.0d0
       u=x(j)+x(j+2)-2.0d0
       v=x(j)-x(j+2)
-      f=f+1.0d2*a**2+b**2+9.0d1*c**2+d**2+
-     &  1.0d1*u**2+0.1d0*v**2
+      f=f+1.0d2*a**2+b**2+9.0d1*c**2+d**2+ &
+        1.0d1*u**2+0.1d0*v**2
       g(j-1)=g(j-1)+4.0d2*x(j-1)*a+2.0d0*b
       g(j)=g(j)-2.0d2*a+2.0d1*u+0.2d0*v
       g(j+1)=g(j+1)+3.6d2*x(j+1)*c+2.0d0*d
@@ -7756,13 +7778,13 @@ c 92/12/01 lu : original version
       c=x(i+2)*x(i+3)-5.0d0*x(i+4)*x(i+5)-q
       d=x(i+1)**3+x(i+2)**3+1.0d0-r
       f=f+w+1.0d1*(b**2+c**2+d**2)
-      g(i+1)=g(i+1)+a/x(i+1)+2.0d1*(2.0d0*b*x(i+1)+
-     &  3.0d0*d*x(i+1)**2)
-      g(i+2)=g(i+2)+a/x(i+2)+2.0d1*(2.0d0*b*x(i+2)+
-     &  c*x(i+3)+3.0d0*d*x(i+2)**2)
+      g(i+1)=g(i+1)+a/x(i+1)+2.0d1*(2.0d0*b*x(i+1)+ &
+        3.0d0*d*x(i+1)**2)
+      g(i+2)=g(i+2)+a/x(i+2)+2.0d1*(2.0d0*b*x(i+2)+ &
+        c*x(i+3)+3.0d0*d*x(i+2)**2)
       g(i+3)=g(i+3)+a/x(i+3)+2.0d1*(2.0d0*b*x(i+3)+c*x(i+2))
-      g(i+4)=g(i+4)+a/x(i+4)+2.0d1*(2.0d0*b*x(i+4)-
-     &  5.0d0*c*x(i+5))
+      g(i+4)=g(i+4)+a/x(i+4)+2.0d1*(2.0d0*b*x(i+4)- &
+        5.0d0*c*x(i+5))
       g(i+5)=g(i+5)+a/x(i+5)+2.0d1*(2.0d0*b*x(i+5)-5.0d0*c*x(i+4))
   112 continue
       return
@@ -7817,12 +7839,12 @@ c 92/12/01 lu : original version
       g(j-1)=g(j-1)+q*(2.0d0*x(j-1)-x(j))
       g(j)=g(j)-q*x(j-1)
       if (abs(a).le.1.0d-6) then
-      f=f+r*exp(x(j))*(1.0d0+a/2.0d0*(1.0d0+a/3.0d0*(1.0d0+
-     &  a/4.0d0)))
-      g(j-1)=g(j-1)+r*exp(x(j))*(1.0d0/2.0d0+a*(1.0d0/3.0d0+
-     &  a/8.0d0))
-      g(j)=g(j)+r*exp(x(j))*(1.0d0/2.0d0+a*(1.0d0/6.0d0+
-     &  a/24.0d0))
+      f=f+r*exp(x(j))*(1.0d0+a/2.0d0*(1.0d0+a/3.0d0*(1.0d0+ &
+        a/4.0d0)))
+      g(j-1)=g(j-1)+r*exp(x(j))*(1.0d0/2.0d0+a*(1.0d0/3.0d0+ &
+        a/8.0d0))
+      g(j)=g(j)+r*exp(x(j))*(1.0d0/2.0d0+a*(1.0d0/6.0d0+ &
+        a/24.0d0))
       else
       b=exp(x(j-1))-exp(x(j))
       f=f+r*b/a
@@ -7830,11 +7852,11 @@ c 92/12/01 lu : original version
       g(j)=g(j)-r*(exp(x(j))*a-b)/a**2
       endif
   151 continue
-      f=f+q*x(n)**2+r*(exp(x(1))-1.0d0)/x(1)
-     &             +r*(exp(x(n))-1.0d0)/x(n)
+      f=f+q*x(n)**2+r*(exp(x(1))-1.0d0)/x(1) &
+                   +r*(exp(x(n))-1.0d0)/x(n)
       g(1)=g(1)+r*(exp(x(1))*(x(1)-1.0d0)+1.0d0)/x(1)**2
-      g(n)=g(n)+2.0d0*q*x(n)
-     &         +r*(exp(x(n))*(x(n)-1.0d0)+1.0d0)/x(n)**2
+      g(n)=g(n)+2.0d0*q*x(n) &
+               +r*(exp(x(n))*(x(n)-1.0d0)+1.0d0)/x(n)**2
       return
   160 do 161 j=1,n
       a=dble(j)*(1.0d0-cos(x(j)))
@@ -7850,13 +7872,13 @@ c 92/12/01 lu : original version
   170 p=1.0d0/dble(n+1)
       do 171 j=1,n
       if (j.eq.1) then
-      f=f+0.25d0*x(j)**2/p+1.25d-1*x(j+1)**2/p+
-     & p*(exp(x(j))-1.0d0)
+      f=f+0.25d0*x(j)**2/p+1.25d-1*x(j+1)**2/p+ &
+       p*(exp(x(j))-1.0d0)
       g(j)=g(j)+0.5d0*x(j)/p+p*exp(x(j))
       g(j+1)=g(j+1)+0.25d0*x(j+1)/p
       else if (j.eq.n) then
-      f=f+0.25d0*x(j)**2/p+1.25d-1*x(j-1)**2/p+
-     & p*(exp(x(j))-1.0d0)
+      f=f+0.25d0*x(j)**2/p+1.25d-1*x(j-1)**2/p+ &
+       p*(exp(x(j))-1.0d0)
       g(j)=g(j)+0.5d0*x(j)/p+p*exp(x(j))
       g(j-1)=g(j-1)+0.25d0*x(j-1)/p
       else
@@ -7872,18 +7894,18 @@ c 92/12/01 lu : original version
       do 181 j=1,n
       q=dble(j)*p
       if (j.eq.1) then
-      f=f+0.5d0*x(j)**2/p+0.25d0*x(j+1)**2/p-
-     & p*(x(j)**2+2.0d0*x(j)*q)
+      f=f+0.5d0*x(j)**2/p+0.25d0*x(j+1)**2/p- &
+       p*(x(j)**2+2.0d0*x(j)*q)
       g(j)=g(j)+x(j)/p-2.0d0*p*(x(j)+q)
       g(j+1)=g(j+1)+0.5d0*x(j+1)/p
       else if (j.eq.n) then
-      f=f+0.5d0*x(j)**2/p+0.25d0*x(j-1)**2/p-
-     & p*(x(j)**2+2.0d0*x(j)*q)
+      f=f+0.5d0*x(j)**2/p+0.25d0*x(j-1)**2/p- &
+       p*(x(j)**2+2.0d0*x(j)*q)
       g(j)=g(j)+x(j)/p-2.0d0*p*(x(j)+q)
       g(j-1)=g(j-1)+0.5d0*x(j-1)/p
       else
-      f=f+2.5d-1*(x(j+1)-x(j-1))**2/p-p*(x(j)**2+
-     & 2.0d0*x(j)*q)
+      f=f+2.5d-1*(x(j+1)-x(j-1))**2/p-p*(x(j)**2+ &
+       2.0d0*x(j)*q)
       a=0.5d0*(x(j+1)-x(j-1))/p
       g(j)=g(j)-2.0d0*p*(x(j)+q)
       g(j-1)=g(j-1)-a
@@ -7896,21 +7918,21 @@ c 92/12/01 lu : original version
       q=exp(2.0d0*dble(j)*p)
       if (j.eq.1) then
       r=1.0d0/3.0d0
-      f=f+0.5d0*(x(j)-r)**2/p+7.0d0*r**2+
-     & 2.5d-1*(x(j+1)-r)**2/p+p*(x(j)**2+2.0d0*x(j)*q)
+      f=f+0.5d0*(x(j)-r)**2/p+7.0d0*r**2+ &
+       2.5d-1*(x(j+1)-r)**2/p+p*(x(j)**2+2.0d0*x(j)*q)
       a=0.5d0*(x(j+1)-r)/p
       g(j)=g(j)+2.0d0*p*(x(j)+q)+(x(j)-r)/p
       g(j+1)=g(j+1)+a
       else if (j.eq.n) then
       r=exp(2.0d0)/3.0d0
-      f=f+0.5d0*(x(j)-r)**2/p+7.0d0*r**2+
-     & 2.5d-1*(x(j-1)-r)**2/p+p*(x(j)**2+2.0d0*x(j)*q)
+      f=f+0.5d0*(x(j)-r)**2/p+7.0d0*r**2+ &
+       2.5d-1*(x(j-1)-r)**2/p+p*(x(j)**2+2.0d0*x(j)*q)
       a=0.5d0*(x(j-1)-r)/p
       g(j)=g(j)+2.0d0*p*(x(j)+q)+(x(j)-r)/p
       g(j-1)=g(j-1)+a
       else
-      f=f+2.5d-1*(x(j+1)-x(j-1))**2/p+p*(x(j)**2+
-     & 2.0d0*x(j)*q)
+      f=f+2.5d-1*(x(j+1)-x(j-1))**2/p+p*(x(j)**2+ &
+       2.0d0*x(j)*q)
       a=0.5d0*(x(j+1)-x(j-1))/p
       g(j)=g(j)+2.0d0*p*(x(j)+q)
       g(j-1)=g(j-1)-a
@@ -7922,14 +7944,14 @@ c 92/12/01 lu : original version
       do 201 j=1,n
       a=exp(-2.0d0*x(j)**2)
       if (j.eq.1) then
-      f=f+(0.5d0*x(j)**2/p-p)+
-     & (2.5d-1*x(j+1)**2/p-p)*a
+      f=f+(0.5d0*x(j)**2/p-p)+ &
+       (2.5d-1*x(j+1)**2/p-p)*a
       b=0.5d0*x(j+1)/p
       g(j)=g(j)+x(j)/p-4.0d0*x(j)*a*p*(b**2-1.0d0)
       g(j+1)=g(j+1)+a*b
       else if (j.eq.n) then
-      f=f+(0.5d0*x(j)**2/p-p)*exp(-2.0d0)+
-     & (2.5d-1*x(j-1)**2/p-p)*a
+      f=f+(0.5d0*x(j)**2/p-p)*exp(-2.0d0)+ &
+       (2.5d-1*x(j-1)**2/p-p)*a
       b=0.5d0*x(j-1)/p
       g(j)=g(j)+x(j)/p*exp(-2.0d0)-4.0d0*x(j)*a*p*(b**2-1.0d0)
       g(j-1)=g(j-1)+a*b
@@ -7949,8 +7971,8 @@ c 92/12/01 lu : original version
       b=(x(j)-1.0d0)/p
       u=atan(a)
       v=atan(b)
-      f=f+p*(x(j)**2+a*u-log(sqrt(1.0d0+a**2)))+
-     &   0.5d0*p*(1.0d0+b*v-log(sqrt(1.0d0+b**2)))
+      f=f+p*(x(j)**2+a*u-log(sqrt(1.0d0+a**2)))+ &
+         0.5d0*p*(1.0d0+b*v-log(sqrt(1.0d0+b**2)))
       g(j)=g(j)+2.0d0*p*x(j)+0.5d0*v
       g(j+1)=g(j+1)+0.5d0*u
       else if (j.eq.n) then
@@ -7958,8 +7980,8 @@ c 92/12/01 lu : original version
       b=(2.0d0-x(j))/p
       u=atan(a)
       v=atan(b)
-      f=f+p*(x(j)**2+a*u-log(sqrt(1.0d0+a**2)))+
-     &   0.5d0*p*(4.0d0+b*v-log(sqrt(1.0d0+b**2)))
+      f=f+p*(x(j)**2+a*u-log(sqrt(1.0d0+a**2)))+ &
+         0.5d0*p*(4.0d0+b*v-log(sqrt(1.0d0+b**2)))
       g(j)=g(j)+2.0d0*p*x(j)-0.5d0*v
       g(j-1)=g(j-1)-0.5d0*u
       else
@@ -7977,15 +7999,15 @@ c 92/12/01 lu : original version
       if (j.eq.1) then
       a= 0.5d0*x(j+1)/p
       b= x(j)/p
-      f=f+p*(1.0d2*(x(j)-a**2)**2+(1.0d0-a)**2)+
-     &   0.5d0*p*(1.0d2*b**4+(1.0d0-b)**2)
+      f=f+p*(1.0d2*(x(j)-a**2)**2+(1.0d0-a)**2)+ &
+         0.5d0*p*(1.0d2*b**4+(1.0d0-b)**2)
       g(j)=g(j)+2.0d2*p*(x(j)-a**2)+2.0d2*b**3-(1.0d0-b)
       g(j+1)=g(j+1)-2.0d2*(x(j)-a**2)*a-(1.0d0-a)
       else if (j.eq.n) then
       a=-0.5d0*x(j-1)/p
       b=-x(j)/p
-      f=f+p*(1.0d2*(x(j)-a**2)**2+(1.0d0-a)**2)+
-     &   0.5d0*p*(1.0d2*b**4+(1.0d0-b)**2)
+      f=f+p*(1.0d2*(x(j)-a**2)**2+(1.0d0-a)**2)+ &
+         0.5d0*p*(1.0d2*b**4+(1.0d0-b)**2)
       g(j)=g(j)+2.0d2*p*(x(j)-a**2)-2.0d2*b**3+(1.0d0-b)
       g(j-1)=g(j-1)+2.0d2*(x(j)-a**2)*a+(1.0d0-a)
       else
@@ -8292,8 +8314,8 @@ c 92/12/01 lu : original version
       g(i+3)=g(i+3)+x(i+1)*fa
       elseif (mod(ka,6).eq.5) then
       fa=(x(i)+x(i+1)+x(i+2)+x(i+3))**2+(x(i)-1.0d0)**2
-      g(i)=g(i)+(2.0d0*(x(i)+x(i+1)+x(i+2)+x(i+3))+
-     & 2.0d0*(x(i)-1.0d0))*fa
+      g(i)=g(i)+(2.0d0*(x(i)+x(i+1)+x(i+2)+x(i+3))+ &
+       2.0d0*(x(i)-1.0d0))*fa
       g(i+1)=g(i+1)+2.0d0*(x(i)+x(i+1)+x(i+2)+x(i+3))*fa
       g(i+2)=g(i+2)+2.0d0*(x(i)+x(i+1)+x(i+2)+x(i+3))*fa
       g(i+3)=g(i+3)+2.0d0*(x(i)+x(i+1)+x(i+2)+x(i+3))*fa
@@ -8324,8 +8346,8 @@ c 92/12/01 lu : original version
       g(i-1)=g(i-1)-3.0d0*exp(3.0d0*x(i-1))*fa
       g(i)=g(i)-3.0d0*exp(3.0d0*x(i))*fa
       else
-      fa=8.0d0-exp(3.0d0*x(i-1))-exp(3.0d0*x(i))+
-     & 4.0d0-exp(x(i))-exp(x(i+1))
+      fa=8.0d0-exp(3.0d0*x(i-1))-exp(3.0d0*x(i))+ &
+       4.0d0-exp(x(i))-exp(x(i+1))
       g(i-1)=g(i-1)-3.0d0*exp(3.0d0*x(i-1))*fa
       g(i)=g(i)-(3.0d0*exp(3.0d0*x(i))+exp(x(i)))*fa
       g(i+1)=g(i+1)-exp(x(i+1))*fa
@@ -8470,13 +8492,13 @@ c 92/12/01 lu : original version
       l=mod((ka-1),4)+1
       fa=-y(l)
       do 561 j=1,4
-      fa=fa+dble((1-2*mod(j,2))*l*j*j)*sin(x(i+j))+
-     & dble(l*l*j)*cos(x(i+j))
+      fa=fa+dble((1-2*mod(j,2))*l*j*j)*sin(x(i+j))+ &
+       dble(l*l*j)*cos(x(i+j))
   561 continue
       f=f+fa**2
       do 562 j=1,4
-      g(i+j)=g(i+j)+(dble((1-2*mod(j,2))*l*j*j)*cos(x(i+j))-
-     & dble(l*l*j)*sin(x(i+j)))*fa
+      g(i+j)=g(i+j)+(dble((1-2*mod(j,2))*l*j*j)*cos(x(i+j))- &
+       dble(l*l*j)*sin(x(i+j)))*fa
   562 continue
   563 continue
       f=0.5d0*f
@@ -8504,15 +8526,15 @@ c 92/12/01 lu : original version
       g(n-1)=g(n-1)-4.0d0*x(n)*fa
       g(n)=g(n)-(1.0d0+4.0d0*x(n-1))*fa
       elseif (mod(ka,2).eq.1) then
-      fa=alfa*x(ka-2)-(1.0d0-alfa)*x(ka+2)-
-     & x(ka)*(1.0d0+4.0d0*x(ka+1))
+      fa=alfa*x(ka-2)-(1.0d0-alfa)*x(ka+2)- &
+       x(ka)*(1.0d0+4.0d0*x(ka+1))
       g(ka-2)=g(ka-2)+alfa*fa
       g(ka)=g(ka)-(1.0d0+4.0d0*x(ka+1))*fa
       g(ka+1)=g(ka+1)-4.0d0*x(ka)*fa
       g(ka+2)=g(ka+2)+(alfa-1.0d0)*fa
       else
-      fa=alfa*x(ka-2)-(2.0d0-alfa)*x(ka+2)-
-     & x(ka)*(1.0d0+4.0d0*x(ka-1))
+      fa=alfa*x(ka-2)-(2.0d0-alfa)*x(ka+2)- &
+       x(ka)*(1.0d0+4.0d0*x(ka-1))
       g(ka-2)=g(ka-2)+alfa*fa
       g(ka-1)=g(ka-1)-4.0d0*x(ka)*fa
       g(ka)=g(ka)-(1.0d0+4.0d0*x(ka-1))*fa
@@ -8528,8 +8550,8 @@ c 92/12/01 lu : original version
       g(ka)=g(ka)+4.0d0*fa
       g(ka+1)=g(ka+1)-8.0d0*x(ka+1)*fa
       elseif (ka.lt.n) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)
       g(ka-1)=g(ka-1)-8.0d0*x(ka)*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+6.0d0)*fa
       g(ka+1)=g(ka+1)-8.0d0*x(ka+1)*fa
@@ -8544,8 +8566,8 @@ c 92/12/01 lu : original version
       return
   590 do 591 ka=1,na
       if (ka.eq.1) then
-      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-2.0d0*x(ka+1)+
-     & 3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
+      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-2.0d0*x(ka+1)+ &
+       3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
       g(n-4)=g(n-4)+3.0d0*fa
       g(n-3)=g(n-3)-fa
       g(n-2)=g(n-2)-fa
@@ -8554,8 +8576,8 @@ c 92/12/01 lu : original version
       g(ka)=g(ka)-(4.0d0*x(ka)-3.0d0)*fa
       g(ka+1)=g(ka+1)-2.0d0*fa
       elseif (ka.le.n-1) then
-      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-x(ka-1)-2.0d0*x(ka+1)+
-     & 3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
+      fa=-2.0d0*x(ka)**2+3.0d0*x(ka)-x(ka-1)-2.0d0*x(ka+1)+ &
+       3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
       g(n-4)=g(n-4)+3.0d0*fa
       g(n-3)=g(n-3)-fa
       g(n-2)=g(n-2)-fa
@@ -8565,8 +8587,8 @@ c 92/12/01 lu : original version
       g(ka)=g(ka)-(4.0d0*x(ka)-3.0d0)*fa
       g(ka+1)=g(ka+1)-2.0d0*fa
       else
-      fa=-2.0d0*x(n)**2+3.0d0*x(n)-x(n-1)+
-     & 3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
+      fa=-2.0d0*x(n)**2+3.0d0*x(n)-x(n-1)+ &
+       3.0d0*x(n-4)-x(n-3)-x(n-2)+0.5d0*x(n-1)-x(n)+1.0d0
       g(n-4)=g(n-4)+3.0d0*fa
       g(n-3)=g(n-3)-fa
       g(n-2)=g(n-2)-fa
@@ -8659,16 +8681,16 @@ c 92/12/01 lu : original version
       do 631 l=0,6
       if (ib+l.ne.i.and.ib+l.ne.j) a=a+sin(x(ib+l))-y(1)
   631 continue
-      fa=(1.0d0+cos(c))*(x(j)-sin(x(i))-1.0d0)+
-     $ 5.0d0*(x(i)-2.0d0)*exp(sin(c*x(j)))+0.5d0*a
+      fa=(1.0d0+cos(c))*(x(j)-sin(x(i))-1.0d0)+ &
+       5.0d0*(x(i)-2.0d0)*exp(sin(c*x(j)))+0.5d0*a
       f=f+fa**2
       a=cos(c)
       b=exp(sin(c*x(j)))
       g(i)=g(i)-(cos(x(i))*(1.0d0+a)-5.0d0*b)*fa
       g(j)=g(j)+((1.0d0+a)+5.0d0*(x(i)-2.0d0)*c*cos(c*x(j))*b)*fa
       do 632 l=0,6
-      if (ib+l.ne.i.and.ib+l.ne.j)
-     & g(ib+l)=g(ib+l)+0.5d0*cos(x(ib+l))*fa
+      if (ib+l.ne.i.and.ib+l.ne.j) &
+       g(ib+l)=g(ib+l)+0.5d0*cos(x(ib+l))*fa
   632 continue
   633 continue
       f=0.5d0*f
@@ -8692,8 +8714,8 @@ c 92/12/01 lu : original version
       g(3)=g(3)-(1.0d0+4.0d0*x(2))*fa
       g(5)=g(5)-(1.0d0-x(1))*fa
       elseif (ka.le.n-2) then
-      fa=x(1)*x(ka-2)-(1.0d0-x(1))*x(ka+2)-
-     & x(ka)*(1.0d0+4.0d0*x(ka-1))
+      fa=x(1)*x(ka-2)-(1.0d0-x(1))*x(ka+2)- &
+       x(ka)*(1.0d0+4.0d0*x(ka-1))
       g(1)=g(1)+(x(ka-2)+x(ka+2))*fa
       g(ka-2)=g(ka-2)+x(1)*fa
       g(ka-1)=g(ka-1)-4.0d0*x(ka)*fa
@@ -8718,16 +8740,16 @@ c 92/12/01 lu : original version
       return
   740 do 741 ka=1,na
       if (ka.lt.2) then
-      fa=3.0d0*x(ka)**3+2.0d0*x(ka+1)-5.0d0+
-     & sin(x(ka)-x(ka+1))*sin(x(ka)+x(ka+1))
+      fa=3.0d0*x(ka)**3+2.0d0*x(ka+1)-5.0d0+ &
+       sin(x(ka)-x(ka+1))*sin(x(ka)+x(ka+1))
       d1s=cos(x(ka)-x(ka+1))*sin(x(ka)+x(ka+1))
       d2s=sin(x(ka)-x(ka+1))*cos(x(ka)+x(ka+1))
       g(ka)=g(ka)+(9.0d0*x(ka)**2+d1s+d2s)*fa
       g(ka+1)=g(ka+1)+(2.0d0-d1s+d2s)*fa
       elseif (ka.lt.n) then
-      fa=3.0d0*x(ka)**3+2.0d0*x(ka+1)-5.0d0+
-     & sin(x(ka)-x(ka+1))*sin(x(ka)+x(ka+1))+4.0d0*x(ka)-
-     & x(ka-1)*exp(x(ka-1)-x(ka))-3.0d0
+      fa=3.0d0*x(ka)**3+2.0d0*x(ka+1)-5.0d0+ &
+       sin(x(ka)-x(ka+1))*sin(x(ka)+x(ka+1))+4.0d0*x(ka)- &
+       x(ka-1)*exp(x(ka-1)-x(ka))-3.0d0
       d1s=cos(x(ka)-x(ka+1))*sin(x(ka)+x(ka+1))
       d2s=sin(x(ka)-x(ka+1))*cos(x(ka)+x(ka+1))
       ex=exp(x(ka-1)-x(ka))
@@ -8747,12 +8769,12 @@ c 92/12/01 lu : original version
   750 do 751 ka=1,na
       if (mod(ka,2).eq.1) then
       fa=0.0d0
-      if (ka.ne.1) fa=fa-6.0d0*(x(ka-2)-x(ka))**3+1.0d1-
-     & 4.0d0*x(ka-1)-2.0d0*sin(x(ka-2)-x(ka-1)-x(ka))*
-     & sin(x(ka-2)+x(ka-1)-x(ka))
-      if (ka.ne.n) fa=fa+3.0d0*(x(ka)-x(ka+2))**3-5.0d0+
-     & 2.0d0*x(ka+1)+sin(x(ka)-x(ka+1)-x(ka+2))*
-     & sin(x(ka)+x(ka+1)-x(ka+2))
+      if (ka.ne.1) fa=fa-6.0d0*(x(ka-2)-x(ka))**3+1.0d1- &
+       4.0d0*x(ka-1)-2.0d0*sin(x(ka-2)-x(ka-1)-x(ka))* &
+       sin(x(ka-2)+x(ka-1)-x(ka))
+      if (ka.ne.n) fa=fa+3.0d0*(x(ka)-x(ka+2))**3-5.0d0+ &
+       2.0d0*x(ka+1)+sin(x(ka)-x(ka+1)-x(ka+2))* &
+       sin(x(ka)+x(ka+1)-x(ka+2))
       if (ka.ne.1) then
       d1s=cos(x(ka-2)-x(ka-1)-x(ka))*sin(x(ka-2)+x(ka-1)-x(ka))
       d2s=sin(x(ka-2)-x(ka-1)-x(ka))*cos(x(ka-2)+x(ka-1)-x(ka))
@@ -8783,23 +8805,23 @@ c 92/12/01 lu : original version
       h=2.0d0
       if (ka.eq.1) then
       fa=((3.0d0-h*x(1))*x(1)-2.0d0*x(2)+1.0d0)**2
-      g(1)=g(1)+2.0d0*((3.0d0-h*x(1))*x(1)-2.0d0*x(2)+1.0d0)*
-     & (3.0d0-2.0d0*h*x(1))*fa
+      g(1)=g(1)+2.0d0*((3.0d0-h*x(1))*x(1)-2.0d0*x(2)+1.0d0)* &
+       (3.0d0-2.0d0*h*x(1))*fa
       g(2)=g(2)-4.0d0*((3.0d0-h*x(1))*x(1)-2.0d0*x(2)+1.0d0)*fa
       elseif (ka.le.n-1) then
       fa=((3.0d0-h*x(ka))*x(ka)-x(ka-1)-2.0d0*x(ka+1)+1.0d0)**2
-      g(ka-1)=g(ka-1)-2.0d0*
-     & ((3.0d0-h*x(ka))*x(ka)-x(ka-1)-2.0d0*x(ka+1)+1.0d0)*fa
-      g(ka)=g(ka)+2.0d0*
-     & ((3.0d0-h*x(ka))*x(ka)-x(ka-1)-2.0d0*x(ka+1)+1.0d0)*
-     & (3.0d0-2.0d0*h*x(ka))*fa
-      g(ka+1)=g(ka+1)-4.0d0*
-     & ((3.0d0-h*x(ka))*x(ka)-x(ka-1)-2.0d0*x(ka+1)+1.0d0)*fa
+      g(ka-1)=g(ka-1)-2.0d0* &
+       ((3.0d0-h*x(ka))*x(ka)-x(ka-1)-2.0d0*x(ka+1)+1.0d0)*fa
+      g(ka)=g(ka)+2.0d0* &
+       ((3.0d0-h*x(ka))*x(ka)-x(ka-1)-2.0d0*x(ka+1)+1.0d0)* &
+       (3.0d0-2.0d0*h*x(ka))*fa
+      g(ka+1)=g(ka+1)-4.0d0* &
+       ((3.0d0-h*x(ka))*x(ka)-x(ka-1)-2.0d0*x(ka+1)+1.0d0)*fa
       else
       fa=((3.0d0-h*x(n))*x(n)-x(n-1)+1.0d0)**2
       g(n-1)=g(n-1)-2.0d0*((3.0d0-h*x(n))*x(n)-x(n-1)+1.0d0)*fa
-      g(n)=g(n)+2.0d0*((3.0d0-h*x(n))*x(n)-x(n-1)+1.0d0)*
-     & (3.0d0-2.0d0*h*x(n))*fa
+      g(n)=g(n)+2.0d0*((3.0d0-h*x(n))*x(n)-x(n-1)+1.0d0)* &
+       (3.0d0-2.0d0*h*x(n))*fa
       endif
       f=f+fa**2
   761 continue
@@ -8812,31 +8834,31 @@ c 92/12/01 lu : original version
       g(ka+1)=g(ka+1)-(8.0d0*x(ka+1)-1.0d0)*fa
       g(ka+2)=g(ka+2)-2.0d0*x(ka+2)*fa
       elseif (ka.lt.3) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka+1)-x(ka+2)**2
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka+1)-x(ka+2)**2
       g(ka-1)=g(ka-1)-8.0d0*x(ka)*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+6.0d0)*fa
       g(ka+1)=g(ka+1)-(8.0d0*x(ka+1)-1.0d0)*fa
       g(ka+2)=g(ka+2)-2.0d0*x(ka+2)*fa
       elseif (ka.lt.n-1) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+x(ka+1)-
-     & x(ka+2)**2
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+x(ka+1)- &
+       x(ka+2)**2
       g(ka-2)=g(ka-2)-fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+6.0d0)*fa
       g(ka+1)=g(ka+1)-(8.0d0*x(ka+1)-1.0d0)*fa
       g(ka+2)=g(ka+2)-2.0d0*x(ka+2)*fa
       elseif (ka.lt.n) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)
       g(ka-2)=g(ka-2)-fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+6.0d0)*fa
       g(ka+1)=g(ka+1)-8.0d0*x(ka+1)*fa
       else
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))
-     & +x(ka-1)**2-x(ka-2)
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka)) &
+       +x(ka-1)**2-x(ka-2)
       g(ka-2)=g(ka-2)-fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+2.0d0)*fa
@@ -8847,25 +8869,25 @@ c 92/12/01 lu : original version
       return
   790 do 791 ka=1,na
       if (ka.lt.2) then
-      fa=4.0d0*(x(ka)-x(ka+1)**2)+x(ka+1)-x(ka+2)**2+
-     & x(ka+2)-x(ka+3)**2
+      fa=4.0d0*(x(ka)-x(ka+1)**2)+x(ka+1)-x(ka+2)**2+ &
+       x(ka+2)-x(ka+3)**2
       g(ka)=g(ka)+4.0d0*fa
       g(ka+1)=g(ka+1)-(8.0d0*x(ka+1)-1.0d0)*fa
       g(ka+2)=g(ka+2)-(2.0d0*x(ka+2)-1.0d0)*fa
       g(ka+3)=g(ka+3)-2.0d0*x(ka+3)*fa
       elseif (ka.lt.3) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2+x(ka+1)-x(ka+2)**2+
-     & x(ka+2)-x(ka+3)**2
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2+x(ka+1)-x(ka+2)**2+ &
+       x(ka+2)-x(ka+3)**2
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+6.0d0)*fa
       g(ka+1)=g(ka+1)-(8.0d0*x(ka+1)-1.0d0)*fa
       g(ka+2)=g(ka+2)-(2.0d0*x(ka+2)-1.0d0)*fa
       g(ka+3)=g(ka+3)-2.0d0*x(ka+3)*fa
       elseif (ka.lt.4) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+
-     & x(ka+1)-x(ka+2)**2+x(ka-2)**2+x(ka+2)-x(ka+3)**2
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+ &
+       x(ka+1)-x(ka+2)**2+x(ka-2)**2+x(ka+2)-x(ka+3)**2
       g(ka-2)=g(ka-2)+(2.0d0*x(ka-2)-1.0d0)*fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+6.0d0)*fa
@@ -8873,9 +8895,9 @@ c 92/12/01 lu : original version
       g(ka+2)=g(ka+2)-(2.0d0*x(ka+2)-1.0d0)*fa
       g(ka+3)=g(ka+3)-2.0d0*x(ka+3)*fa
       elseif (ka.lt.n-2) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+
-     & x(ka+1)-x(ka+2)**2+x(ka-2)**2-x(ka-3)+x(ka+2)-x(ka+3)**2
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+ &
+       x(ka+1)-x(ka+2)**2+x(ka-2)**2-x(ka-3)+x(ka+2)-x(ka+3)**2
       g(ka-3)=g(ka-3)-fa
       g(ka-2)=g(ka-2)+(2.0d0*x(ka-2)-1.0d0)*fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
@@ -8884,9 +8906,9 @@ c 92/12/01 lu : original version
       g(ka+2)=g(ka+2)-(2.0d0*x(ka+2)-1.0d0)*fa
       g(ka+3)=g(ka+3)-2.0d0*x(ka+3)*fa
       elseif (ka.lt.n-1) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+
-     & x(ka+1)-x(ka+2)**2+x(ka-2)**2-x(ka-3)+x(ka+2)
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+ &
+       x(ka+1)-x(ka+2)**2+x(ka-2)**2-x(ka-3)+x(ka+2)
       g(ka-3)=g(ka-3)-fa
       g(ka-2)=g(ka-2)+(2.0d0*x(ka-2)-1.0d0)*fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
@@ -8894,17 +8916,17 @@ c 92/12/01 lu : original version
       g(ka+1)=g(ka+1)-(8.0d0*x(ka+1)-1.0d0)*fa
       g(ka+2)=g(ka+2)-(2.0d0*x(ka+2)-1.0d0)*fa
       elseif (ka.lt.n) then
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+
-     & 4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+
-     & x(ka+1)+x(ka-2)**2-x(ka-3)
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))+ &
+       4.0d0*(x(ka)-x(ka+1)**2)+x(ka-1)**2-x(ka-2)+ &
+       x(ka+1)+x(ka-2)**2-x(ka-3)
       g(ka-3)=g(ka-3)-fa
       g(ka-2)=g(ka-2)+(2.0d0*x(ka-2)-1.0d0)*fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
       g(ka)=g(ka)+(24.0d0*x(ka)**2-8.0d0*x(ka-1)+6.0d0)*fa
       g(ka+1)=g(ka+1)-(8.0d0*x(ka+1)-1.0d0)*fa
       else
-      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka))
-     & +x(ka-1)**2-x(ka-2)+x(ka-2)**2-x(ka-3)
+      fa=8.0d0*x(ka)*(x(ka)**2-x(ka-1))-2.0d0*(1.0d0-x(ka)) &
+       +x(ka-1)**2-x(ka-2)+x(ka-2)**2-x(ka-3)
       g(ka-3)=g(ka-3)-fa
       g(ka-2)=g(ka-2)+(2.0d0*x(ka-2)-1.0d0)*fa
       g(ka-1)=g(ka-1)-(8.0d0*x(ka)-2.0d0*x(ka-1))*fa
@@ -8992,8 +9014,8 @@ c 92/12/01 lu : original version
       g(ka)=g(ka)-(2.0d2*(x(ka+1)-3.0d0*x(ka)**2)-1.0d0)*fa
       g(ka+1)=g(ka+1)-2.0d2*x(ka)*fa
       elseif(mod(ka,4).eq.2) then
-      fa=2.0d2*(x(ka)-x(ka-1)**2)+2.02d1*(x(ka)-1.0d0)+
-     &  1.98d1*(x(ka+2)-1.0d0)
+      fa=2.0d2*(x(ka)-x(ka-1)**2)+2.02d1*(x(ka)-1.0d0)+ &
+        1.98d1*(x(ka+2)-1.0d0)
       g(ka-1)=g(ka-1)-4.0d2*x(ka-1)*fa
       g(ka)=g(ka)+2.202d2*fa
       g(ka+2)=g(ka+2)+1.98d1*fa
@@ -9002,8 +9024,8 @@ c 92/12/01 lu : original version
       g(ka)=g(ka)-(1.8d2*(x(ka+1)-3.0d0*x(ka)**2)-1.0d0)*fa
       g(ka+1)=g(ka+1)-1.8d2*x(ka)*fa
       else
-      fa=1.8d2*(x(ka)-x(ka-1)**2)+2.02d1*(x(ka)-1.0d0)+
-     & 1.98d1*(x(ka-2)-1.0d0)
+      fa=1.8d2*(x(ka)-x(ka-1)**2)+2.02d1*(x(ka)-1.0d0)+ &
+       1.98d1*(x(ka-2)-1.0d0)
       g(ka-2)=g(ka-2)+1.98d1*fa
       g(ka-1)=g(ka-1)-3.6d2*x(ka-1)*fa
       g(ka)=g(ka)+2.002d2*fa
@@ -9043,13 +9065,13 @@ c 92/12/01 lu : original version
       g(ka)=g(ka)+3.0d0*(x(ka+1)-4.0d0*x(ka))*fa
       g(ka+1)=g(ka+1)+(3.0d0*x(ka)+0.5d0*x(ka+1))*fa
       elseif(ka.eq.n) then
-      fa=3.0d0*x(ka)*(2.0d1-2.0d0*x(ka)+x(ka-1))+
-     & 0.25d0*(2.0d1-x(ka-1))**2
+      fa=3.0d0*x(ka)*(2.0d1-2.0d0*x(ka)+x(ka-1))+ &
+       0.25d0*(2.0d1-x(ka-1))**2
       g(ka-1)=g(ka-1)+(3.0d0*x(ka)-0.5d0*(2.0d1-x(ka-1)))*fa
       g(ka)=g(ka)+3.0d0*(2.0d1-4.0d0*x(ka)+x(ka-1))*fa
       else
-      fa=3.0d0*x(ka)*(x(ka+1)-2.0d0*x(ka)+x(ka-1))+
-     & 0.25d0*(x(ka+1)-x(ka-1))**2
+      fa=3.0d0*x(ka)*(x(ka+1)-2.0d0*x(ka)+x(ka-1))+ &
+       0.25d0*(x(ka+1)-x(ka-1))**2
       g(ka-1)=g(ka-1)+(3.0d0*x(ka)-0.5d0*(x(ka+1)-x(ka-1)))*fa
       g(ka)=g(ka)+3.0d0*(x(ka+1)-4.0d0*x(ka)+x(ka-1))*fa
       g(ka+1)=g(ka+1)+(3.0d0*x(ka)+0.5d0*(x(ka+1)-x(ka-1)))*fa
@@ -9137,10 +9159,10 @@ c 92/12/01 lu : original version
       ga2(2)= 1.0d0
       endif
       g(ka)=g(ka)+0.5d0*par*a3*fa
-      if (ka.gt.1)
-     & g(ka-1)=g(ka-1)-0.5d0*par*(ga1(1)*a2+a1*ga2(1))*fa
-      if (ka.lt.n)
-     & g(ka+1)=g(ka+1)-0.5d0*par*(ga1(2)*a2+a1*ga2(2))*fa
+      if (ka.gt.1) &
+       g(ka-1)=g(ka-1)-0.5d0*par*(ga1(1)*a2+a1*ga2(1))*fa
+      if (ka.lt.n) &
+       g(ka+1)=g(ka+1)-0.5d0*par*(ga1(2)*a2+a1*ga2(2))*fa
   921 continue
       f=0.5d0*f
       return
@@ -9254,8 +9276,8 @@ c 92/12/01 lu : original version
   950 do 951 ka=1,na
       j=(ka-1)/m+1
       i=ka-(j-1)*m
-      fa=4.0d0*x(ka)+par*x(ka)**3/(1.0d0+par*dble(i)**2+
-     & par*dble(j)**2)
+      fa=4.0d0*x(ka)+par*x(ka)**3/(1.0d0+par*dble(i)**2+ &
+       par*dble(j)**2)
       if(i.eq.1) fa=fa-1.0d0
       if(i.gt.1) fa=fa-x(ka-1)
       if(i.lt.m) fa=fa-x(ka+1)
@@ -9265,8 +9287,8 @@ c 92/12/01 lu : original version
       if(j.lt.m) fa=fa-x(ka+m)
       if(j.eq.m) fa=fa-2.0d0+exp(dble(i)/dble(m+1))
       f=f+fa**2
-      g(ka)=g(ka)+(4.0d0+3.0d0*par*x(ka)**2/(1.0d0+par*dble(i)**2+
-     & par*dble(j)**2))*fa
+      g(ka)=g(ka)+(4.0d0+3.0d0*par*x(ka)**2/(1.0d0+par*dble(i)**2+ &
+       par*dble(j)**2))*fa
       if(j.gt.1) g(ka-m)=g(ka-m)-fa
       if(i.gt.1) g(ka-1)=g(ka-1)-fa
       if(i.lt.m) g(ka+1)=g(ka+1)-fa
@@ -9279,38 +9301,38 @@ c 92/12/01 lu : original version
       i=ka-(j-1)*m
       a1=dble(i)/dble(m+1)
       a2=dble(j)/dble(m+1)
-      fa=4.0d0*x(ka)-par*sin(2.0d0*pi*x(ka))-
-     & 1.0d4*((a1-0.25d0)**2+(a2-0.75d0)**2)*par
+      fa=4.0d0*x(ka)-par*sin(2.0d0*pi*x(ka))- &
+       1.0d4*((a1-0.25d0)**2+(a2-0.75d0)**2)*par
       if(i.eq.1) fa=fa-x(ka+1)-par*sin(pi*x(ka+1)*dble(m+1))
-      if(i.gt.1.and.i.lt.m) fa=fa-x(ka+1)-x(ka-1)-
-     & par*sin(pi*(x(ka+1)-x(ka-1))*dble(m+1))
+      if(i.gt.1.and.i.lt.m) fa=fa-x(ka+1)-x(ka-1)- &
+       par*sin(pi*(x(ka+1)-x(ka-1))*dble(m+1))
       if(i.eq.m) fa=fa-x(ka-1)+par*sin(pi*x(ka-1)*dble(m+1))
       if(j.eq.1) fa=fa-x(ka+m)-par*sin(pi*x(ka+m)*dble(m+1))
-      if(j.gt.1.and.j.lt.m) fa=fa-x(ka+m)-x(ka-m)-
-     & par*sin(pi*(x(ka+m)-x(ka-m))*dble(m+1))
+      if(j.gt.1.and.j.lt.m) fa=fa-x(ka+m)-x(ka-m)- &
+       par*sin(pi*(x(ka+m)-x(ka-m))*dble(m+1))
       if(j.eq.m) fa=fa-x(ka-m)+par*sin(pi*x(ka-m)*dble(m+1))
       f=f+fa**2
       g(ka)=g(ka)+(4.0d0-2.0d0*pi*par*cos(2.0d0*pi*x(ka)))*fa
-      if(i.eq.1) g(ka+1)=g(ka+1)-
-     & (1.0d0+pi*dble(m+1)*par*cos(pi*x(ka+1)*dble(m+1)))*fa
+      if(i.eq.1) g(ka+1)=g(ka+1)- &
+       (1.0d0+pi*dble(m+1)*par*cos(pi*x(ka+1)*dble(m+1)))*fa
       if(i.gt.1.and.i.lt.m) then
-      g(ka-1)=g(ka-1)-
-     & (1.0d0-pi*dble(m+1)*par*cos(pi*(x(ka+1)-x(ka-1))*dble(m+1)))*fa
-      g(ka+1)=g(ka+1)-
-     & (1.0d0+pi*dble(m+1)*par*cos(pi*(x(ka+1)-x(ka-1))*dble(m+1)))*fa
+      g(ka-1)=g(ka-1)- &
+       (1.0d0-pi*dble(m+1)*par*cos(pi*(x(ka+1)-x(ka-1))*dble(m+1)))*fa
+      g(ka+1)=g(ka+1)- &
+       (1.0d0+pi*dble(m+1)*par*cos(pi*(x(ka+1)-x(ka-1))*dble(m+1)))*fa
       endif
-      if(i.eq.m) g(ka-1)=g(ka-1)-
-     & (1.0d0-pi*dble(m+1)*par*cos(pi*x(ka-1)*dble(m+1)))*fa
-      if(j.eq.1) g(ka+m)=g(ka+m)-
-     & (1.0d0+pi*dble(m+1)*par*cos(pi*x(ka+m)*dble(m+1)))*fa
+      if(i.eq.m) g(ka-1)=g(ka-1)- &
+       (1.0d0-pi*dble(m+1)*par*cos(pi*x(ka-1)*dble(m+1)))*fa
+      if(j.eq.1) g(ka+m)=g(ka+m)- &
+       (1.0d0+pi*dble(m+1)*par*cos(pi*x(ka+m)*dble(m+1)))*fa
       if(j.gt.1.and.j.lt.m) then
-      g(ka-m)=g(ka-m)-
-     & (1.0d0-pi*dble(m+1)*par*cos(pi*(x(ka+m)-x(ka-m))*dble(m+1)))*fa
-      g(ka+m)=g(ka+m)-
-     & (1.0d0+pi*dble(m+1)*par*cos(pi*(x(ka+m)-x(ka-m))*dble(m+1)))*fa
+      g(ka-m)=g(ka-m)- &
+       (1.0d0-pi*dble(m+1)*par*cos(pi*(x(ka+m)-x(ka-m))*dble(m+1)))*fa
+      g(ka+m)=g(ka+m)- &
+       (1.0d0+pi*dble(m+1)*par*cos(pi*(x(ka+m)-x(ka-m))*dble(m+1)))*fa
       endif
-      if(j.eq.m) g(ka-m)=g(ka-m)-
-     & (1.0d0-pi*dble(m+1)*par*cos(pi*x(ka-m)*dble(m+1)))*fa
+      if(j.eq.m) g(ka-m)=g(ka-m)- &
+       (1.0d0-pi*dble(m+1)*par*cos(pi*x(ka-m)*dble(m+1)))*fa
   961 continue
       f=0.5d0*f
       return
@@ -9318,37 +9340,37 @@ c 92/12/01 lu : original version
       j=(ka-1)/m+1
       i=ka-(j-1)*m
       fa=8.0d0*x(ka)**2
-      if(i.eq.1) fa=fa-2.0d0*x(ka)*(x(ka+1)+1.0d0)-
-     & 0.5d0*(x(ka+1)-1.0d0)**2-
-     & 1.5d0*x(ka)**2*(x(ka+1)-1.0d0)*par
-      if(i.gt.1.and.i.lt.m) fa=fa-2.0d0*x(ka)*(x(ka+1)+x(ka-1))-
-     & 0.5d0*(x(ka+1)-x(ka-1))**2-
-     & 1.5d0*x(ka)**2*(x(ka+1)-x(ka-1))*par
-      if(i.eq.m) fa=fa-2.0d0*x(ka)*x(ka-1)-
-     & 0.5d0*x(ka-1)**2+
-     & 1.5d0*x(ka)**2*x(ka-1)*par
-      if(j.eq.1) fa=fa-2.0d0*x(ka)*(x(ka+m)+1.0d0)-
-     & 0.5d0*(x(ka+m)-1.0d0)**2
-      if(j.gt.1.and.j.lt.m) fa=fa-2.0d0*x(ka)*(x(ka+m)+x(ka-m))-
-     & 0.5d0*(x(ka+m)-x(ka-m))**2
-      if(j.eq.m) fa=fa-2.0d0*x(ka)*x(ka-m)-
-     & 0.5d0*x(ka-m)**2
+      if(i.eq.1) fa=fa-2.0d0*x(ka)*(x(ka+1)+1.0d0)- &
+       0.5d0*(x(ka+1)-1.0d0)**2- &
+       1.5d0*x(ka)**2*(x(ka+1)-1.0d0)*par
+      if(i.gt.1.and.i.lt.m) fa=fa-2.0d0*x(ka)*(x(ka+1)+x(ka-1))- &
+       0.5d0*(x(ka+1)-x(ka-1))**2- &
+       1.5d0*x(ka)**2*(x(ka+1)-x(ka-1))*par
+      if(i.eq.m) fa=fa-2.0d0*x(ka)*x(ka-1)- &
+       0.5d0*x(ka-1)**2+ &
+       1.5d0*x(ka)**2*x(ka-1)*par
+      if(j.eq.1) fa=fa-2.0d0*x(ka)*(x(ka+m)+1.0d0)- &
+       0.5d0*(x(ka+m)-1.0d0)**2
+      if(j.gt.1.and.j.lt.m) fa=fa-2.0d0*x(ka)*(x(ka+m)+x(ka-m))- &
+       0.5d0*(x(ka+m)-x(ka-m))**2
+      if(j.eq.m) fa=fa-2.0d0*x(ka)*x(ka-m)- &
+       0.5d0*x(ka-m)**2
       if (i.eq.1.and.j.eq.1) fa=fa-par/dble(m+1)
       f=f+fa**2
       g(ka)=g(ka)+1.6d1*x(ka)*fa
       if(i.eq.1) then
-      g(ka)=g(ka)-(2.0d0*(x(ka+1)+1.0d0)+3.0d0*x(ka)*
-     & (x(ka+1)-1.0d0)*par)*fa
-      g(ka+1)=g(ka+1)-(2.0d0*x(ka)+(x(ka+1)-1.0d0)+
-     & 1.5d0*x(ka)**2*par)*fa
+      g(ka)=g(ka)-(2.0d0*(x(ka+1)+1.0d0)+3.0d0*x(ka)* &
+       (x(ka+1)-1.0d0)*par)*fa
+      g(ka+1)=g(ka+1)-(2.0d0*x(ka)+(x(ka+1)-1.0d0)+ &
+       1.5d0*x(ka)**2*par)*fa
       endif
       if(i.gt.1.and.i.lt.m) then
-      g(ka)=g(ka)-(2.0d0*(x(ka+1)+x(ka-1))+3.0d0*x(ka)*
-     & (x(ka+1)-x(ka-1))*par)*fa
-      g(ka-1)=g(ka-1)-(2.0d0*x(ka)-(x(ka+1)-x(ka-1))-
-     & 1.5d0*x(ka)**2*par)*fa
-      g(ka+1)=g(ka+1)-(2.0d0*x(ka)+(x(ka+1)-x(ka-1))+
-     & 1.5d0*x(ka)**2*par)*fa
+      g(ka)=g(ka)-(2.0d0*(x(ka+1)+x(ka-1))+3.0d0*x(ka)* &
+       (x(ka+1)-x(ka-1))*par)*fa
+      g(ka-1)=g(ka-1)-(2.0d0*x(ka)-(x(ka+1)-x(ka-1))- &
+       1.5d0*x(ka)**2*par)*fa
+      g(ka+1)=g(ka+1)-(2.0d0*x(ka)+(x(ka+1)-x(ka-1))+ &
+       1.5d0*x(ka)**2*par)*fa
       endif
       if(i.eq.m) then
       g(ka)=g(ka)-(2.0d0*x(ka-1)-3.0d0*x(ka)*x(ka-1)*par)*fa
@@ -9415,8 +9437,8 @@ c 92/12/01 lu : original version
   990 do 991 ka=1,na
       j=(ka-1)/m+1
       i=ka-(j-1)*m
-      fa=2.0d1*x(ka)-par*max(0.0d0,x(ka))-
-     & sign(par,(dble(i)/dble(m+2)-0.5d0))
+      fa=2.0d1*x(ka)-par*max(0.0d0,x(ka))- &
+       sign(par,(dble(i)/dble(m+2)-0.5d0))
       if (j.gt.2) then
         fa=fa+x(ka-m-m)
       endif
@@ -9678,30 +9700,30 @@ c 92/12/01 lu : original version
       if (j.eq.m-1) then
         a4=a4+h
       endif
-      if (ka.gt.m+m)
-     & g(ka-m-m)=g(ka-m-m)+0.25d0*par*(-a2*ga4(1))*fa
-      if (ka.gt.m+1)
-     & g(ka-m-1)=g(ka-m-1)+0.25d0*par*(+a1*ga3(1)-a2*ga4(2))*fa
-      if (ka.gt.m)
-     & g(ka-m)=g(ka-m)+0.25d0*par*(ga1(1)*a3)*fa
-      if (ka.gt.m-1)
-     & g(ka-m+1)=g(ka-m+1)+0.25d0*par*(+a1*ga3(2)-a2*ga4(3))*fa
-      if (ka.gt.2)
-     & g(ka-2)=g(ka-2)+0.25d0*par*(+a1*ga3(3))*fa
-      if (ka.gt.1)
-     & g(ka-1)=g(ka-1)+0.25d0*par*(-ga2(1)*a4)*fa
-      if (ka.le.n-1)
-     & g(ka+1)=g(ka+1)+0.25d0*par*(-ga2(2)*a4)*fa
-      if (ka.le.n-2)
-     & g(ka+2)=g(ka+2)+0.25d0*par*(+a1*ga3(4))*fa
-      if (ka.le.n-m+1)
-     & g(ka+m-1)=g(ka+m-1)+0.25d0*par*(+a1*ga3(5)-a2*ga4(4))*fa
-      if (ka.le.n-m)
-     & g(ka+m)=g(ka+m)+0.25d0*par*(ga1(2)*a3)*fa
-      if (ka.le.n-m-1)
-     & g(ka+m+1)=g(ka+m+1)+0.25d0*par*(+a1*ga3(6)-a2*ga4(5))*fa
-      if (ka.le.n-m-m)
-     & g(ka+m+m)=g(ka+m+m)+0.25d0*par*(-a2*ga4(6))*fa
+      if (ka.gt.m+m) &
+       g(ka-m-m)=g(ka-m-m)+0.25d0*par*(-a2*ga4(1))*fa
+      if (ka.gt.m+1) &
+       g(ka-m-1)=g(ka-m-1)+0.25d0*par*(+a1*ga3(1)-a2*ga4(2))*fa
+      if (ka.gt.m) &
+       g(ka-m)=g(ka-m)+0.25d0*par*(ga1(1)*a3)*fa
+      if (ka.gt.m-1) &
+       g(ka-m+1)=g(ka-m+1)+0.25d0*par*(+a1*ga3(2)-a2*ga4(3))*fa
+      if (ka.gt.2) &
+       g(ka-2)=g(ka-2)+0.25d0*par*(+a1*ga3(3))*fa
+      if (ka.gt.1) &
+       g(ka-1)=g(ka-1)+0.25d0*par*(-ga2(1)*a4)*fa
+      if (ka.le.n-1) &
+       g(ka+1)=g(ka+1)+0.25d0*par*(-ga2(2)*a4)*fa
+      if (ka.le.n-2) &
+       g(ka+2)=g(ka+2)+0.25d0*par*(+a1*ga3(4))*fa
+      if (ka.le.n-m+1) &
+       g(ka+m-1)=g(ka+m-1)+0.25d0*par*(+a1*ga3(5)-a2*ga4(4))*fa
+      if (ka.le.n-m) &
+       g(ka+m)=g(ka+m)+0.25d0*par*(ga1(2)*a3)*fa
+      if (ka.le.n-m-1) &
+       g(ka+m+1)=g(ka+m+1)+0.25d0*par*(+a1*ga3(6)-a2*ga4(5))*fa
+      if (ka.le.n-m-m) &
+       g(ka+m+m)=g(ka+m+m)+0.25d0*par*(-a2*ga4(6))*fa
   802 continue
       f=0.5d0*f
       return
@@ -9710,8 +9732,8 @@ c 92/12/01 lu : original version
       do 241 i=1,n-1
       w=w+(dble(ka)/dble(ka+i))*x(i)
   241 continue
-      fa=x(ka)-(1.0d0+(0.4d0/dble(n))*x(ka)*(0.5d0+w+
-     & 0.5d0*(dble(ka)/dble(ka+n))*x(n)))
+      fa=x(ka)-(1.0d0+(0.4d0/dble(n))*x(ka)*(0.5d0+w+ &
+       0.5d0*(dble(ka)/dble(ka+n))*x(n)))
       f=f+fa**2
       w=w+0.5d0+0.5d0*dble(ka)/dble(ka+n)*x(n)
       do 242 i=1,n-1
@@ -9931,9 +9953,9 @@ c 92/12/01 lu : original version
         if(j.ne.ka) then
         t=sqrt(x(j)**2+dble(ka)/dble(j))
         s1=log(t)
-        g(j)=g(j)+(x(j)*(sin(s1)**alf+cos(s1)**alf+
-     +     alf*sin(s1)**(alf-1)*cos(s1)-
-     +     alf*sin(s1)*cos(s1)**(alf-1))/t)*fa
+        g(j)=g(j)+(x(j)*(sin(s1)**alf+cos(s1)**alf+ &
+           alf*sin(s1)**(alf-1)*cos(s1)- &
+           alf*sin(s1)*cos(s1)**(alf-1))/t)*fa
         else
           g(j)=g(j)+dble(bet*n)*fa
         endif
@@ -10259,32 +10281,32 @@ c 92/12/01 lu : original version
          fa=4.0d0*x(1)-x(2)-x(nd+1)+h2*x(1)**2-24.0d0/(h+1.0d0)**2
       endif
       if(1.lt.l.and.l.lt.nd.and.k.eq.1) then
-         fa=4.0d0*x(l)-x(l-1)-x(l+1)-x(l+nd)+h2*x(l)**2
-     *-12.0d0/(dble(l)*h+1.0d0)**2
+         fa=4.0d0*x(l)-x(l-1)-x(l+1)-x(l+nd)+h2*x(l)**2 &
+      -12.0d0/(dble(l)*h+1.0d0)**2
       endif
       if(l.eq.nd.and.k.eq.1) then
-         fa=4.0d0*x(nd)-x(nd-1)-x(nd+nd)+h2*x(nd)**2
-     *-12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
+         fa=4.0d0*x(nd)-x(nd-1)-x(nd+nd)+h2*x(nd)**2 &
+      -12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
       endif
       if(l.eq.1.and.1.lt.k.and.k.lt.nd) then
-         fa=4.0d0*x(ka)-x(ka+1)-x(ka-nd)-x(ka+nd)+h2*x(ka)**2
-     *-12.0d0/(dble(k)*h+1.0d0)**2
+         fa=4.0d0*x(ka)-x(ka+1)-x(ka-nd)-x(ka+nd)+h2*x(ka)**2 &
+      -12.0d0/(dble(k)*h+1.0d0)**2
       endif
       if(l.eq.nd.and.1.lt.k.and.k.lt.nd) then
-         fa=4.0d0*x(ka)-x(ka-nd)-x(ka-1)-x(ka+nd)+h2*x(ka)**2
-     *-12.0d0/(dble(k)*h+2.0d0)**2
+         fa=4.0d0*x(ka)-x(ka-nd)-x(ka-1)-x(ka+nd)+h2*x(ka)**2 &
+      -12.0d0/(dble(k)*h+2.0d0)**2
       endif
       if(l.eq.1.and.k.eq.nd) then
-         fa=4.0d0*x(ka)-x(ka+1)-x(ka-nd)+h2*x(ka)**2
-     *-12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
+         fa=4.0d0*x(ka)-x(ka+1)-x(ka-nd)+h2*x(ka)**2 &
+      -12.0d0/(dble(nd)*h+1.0d0)**2-12.0d0/(h+2.0d0)**2
       endif
       if(1.lt.l.and.l.lt.nd.and.k.eq.nd) then
-         fa=4.0d0*x(ka)-x(ka-1)-x(ka+1)-x(ka-nd)+h2*x(ka)**2
-     *-12.0d0/(dble(l)*h+2.0d0)**2
+         fa=4.0d0*x(ka)-x(ka-1)-x(ka+1)-x(ka-nd)+h2*x(ka)**2 &
+      -12.0d0/(dble(l)*h+2.0d0)**2
       endif
       if(l.eq.nd.and.k.eq.nd) then
-        fa=4.0d0*x(ka)-x(ka-1)-x(ka-nd)+h2*x(ka)**2
-     *-24.0d0/(dble(nd)*h+2.0d0)**2
+        fa=4.0d0*x(ka)-x(ka-1)-x(ka-nd)+h2*x(ka)**2 &
+      -24.0d0/(dble(nd)*h+2.0d0)**2
       endif
       if(1.lt.l.and.l.lt.nd.and.1.lt.k.and.k.lt.nd) then
          fa=4.0d0*x(ka)-x(ka-1)-x(ka+1)-x(ka-nd)-x(ka+nd)+h2*x(ka)**2
@@ -10344,38 +10366,39 @@ c 92/12/01 lu : original version
   821 continue
       f=0.5d0*f
       return
-      end
-* subroutine tild22             all systems                 99/12/01
-c portability : all systems
-c 94/12/01 lu : original version
-*
-* purpose :
-*  initiation of variables for nonlinear minimax approximation.
-*  linearly constrained dense version.
-*
-* parameters :
-*  io  n  number of variables.
-*  io  na  number of partial functions.
-*  io  nb  number of box constraints.
-*  io  nc  number of general linear constraints.
-*  ro  x(n)  vector of variables.
-*  io  ix(nf)  vector containing types of bounds.
-*  ro  xl(nf)  vector containing lower bounds for variables.
-*  ro  xu(nf)  vector containing upper bounds for variables.
-*  io  ic(nc)  vector containing types of constraints.
-*  ro  cl(nc)  vector containing lower bounds for constraint functions.
-*  ro  cu(nc)  vector containing upper bounds for constraint functions.
-*  ro  cg(nf*nc) matrix whose columns are normals of the linear
-*         constraints.
-*  ro  fmin  lower bound for value of the objective function.
-*  ro  xmax  maximum stepsize.
-*  io  next  number of the test problem.
-*  io  iext  type of objective function. iext<0-maximum of values.
-*         iext=0-maximum of absolute values.
-*  io  ierr  error indicator.
-*
-      subroutine tild22(n,na,nb,nc,x,ix,xl,xu,ic,cl,cu,cg,fmin,xmax,
-     +                  next,iext,ierr)
+      end subroutine tfbu28
+
+! subroutine tild22             all systems                 99/12/01
+! portability : all systems
+! 94/12/01 lu : original version
+!
+! purpose :
+!  initiation of variables for nonlinear minimax approximation.
+!  linearly constrained dense version.
+!
+! parameters :
+!  io  n  number of variables.
+!  io  na  number of partial functions.
+!  io  nb  number of box constraints.
+!  io  nc  number of general linear constraints.
+!  ro  x(n)  vector of variables.
+!  io  ix(nf)  vector containing types of bounds.
+!  ro  xl(nf)  vector containing lower bounds for variables.
+!  ro  xu(nf)  vector containing upper bounds for variables.
+!  io  ic(nc)  vector containing types of constraints.
+!  ro  cl(nc)  vector containing lower bounds for constraint functions.
+!  ro  cu(nc)  vector containing upper bounds for constraint functions.
+!  ro  cg(nf*nc) matrix whose columns are normals of the linear
+!         constraints.
+!  ro  fmin  lower bound for value of the objective function.
+!  ro  xmax  maximum stepsize.
+!  io  next  number of the test problem.
+!  io  iext  type of objective function. iext<0-maximum of values.
+!         iext=0-maximum of absolute values.
+!  io  ierr  error indicator.
+!
+      subroutine tild22(n,na,nb,nc,x,ix,xl,xu,ic,cl,cu,cg,fmin,xmax,&
+                        next,iext,ierr)
       double precision pi
       parameter (pi=3.14159265358979323846d0)
       double precision fmin,xmax
@@ -10588,22 +10611,23 @@ c 94/12/01 lu : original version
           ierr = 1
       end if
       return
-      end
-* subroutine tafu22             all systems                 99/12/01
-c portability : all systems
-c 94/12/01 lu : original version
-*
-* purpose :
-*  values of partial functions in the minimax criterion.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  ka  index of the partial function.
-*  ri  x(n)  vector of variables.
-*  ro  fa  value of the partial function at the
-*          selected point.
-*  ii  next  number of the test problem.
-*
+      end subroutine tild22
+
+! subroutine tafu22             all systems                 99/12/01
+! portability : all systems
+! 94/12/01 lu : original version
+!
+! purpose :
+!  values of partial functions in the minimax criterion.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  ka  index of the partial function.
+!  ri  x(n)  vector of variables.
+!  ro  fa  value of the partial function at the
+!          selected point.
+!  ii  next  number of the test problem.
+!
       subroutine tafu22(n,ka,x,fa,next)
       double precision fa
       integer ka,n,next
@@ -10653,22 +10677,23 @@ c 94/12/01 lu : original version
           k = k + n
   170 continue
       return
-      end
-* subroutine tagu22             all systems                 99/12/01
-c portability : all systems
-c 94/12/01 lu : original version
-*
-* purpose :
-*  gradients of partial functions in the minimax criterion.
-*
-* parameters :
-*  ii  n  number of variables.
-*  ii  ka  index of the partial function.
-*  ri  x(n)  vector of variables.
-*  ro  ga(n)  gradient of the partial function at the
-*          selected point.
-*  ii  next  number of the test problem.
-*
+      end subroutine tafu22
+
+! subroutine tagu22             all systems                 99/12/01
+! portability : all systems
+! 94/12/01 lu : original version
+!
+! purpose :
+!  gradients of partial functions in the minimax criterion.
+!
+! parameters :
+!  ii  n  number of variables.
+!  ii  ka  index of the partial function.
+!  ri  x(n)  vector of variables.
+!  ro  ga(n)  gradient of the partial function at the
+!          selected point.
+!  ii  next  number of the test problem.
+!
       subroutine tagu22(n,ka,x,ga,next)
       integer ka,n,next
       double precision ga(n),x(n)
@@ -10746,27 +10771,28 @@ c 94/12/01 lu : original version
           k = k + n
   190 continue
       return
-      end
-* subroutine tytim1                ms dos                     91/12/01
-c portability : ms dos / ms fortran v.5.0
-c 91/12/01 si : original version
-*
-* purpose :
-*  get time in 100th of sec.
-*
+      end subroutine tagu22
+
+! subroutine tytim1                ms dos                     91/12/01
+! portability : ms dos / ms fortran v.5.0
+! 91/12/01 si : original version
+!
+! purpose :
+!  get time in 100th of sec.
+!
       subroutine tytim1(itime)
-      integer itime
-      real*4 time
+      integer :: itime
+      real :: time
       call cpu_time(time)
       itime=1.0d2*time
-      end
-* subroutine tytim2                all systems                91/12/01
-c portability : all systems
-c 91/12/01 si : original version
-*
-* purpose :
-*  print time elapsed.
-*
+      end subroutine tytim1
+! subroutine tytim2                all systems                91/12/01
+! portability : all systems
+! 91/12/01 si : original version
+!
+! purpose :
+!  print time elapsed.
+!
       subroutine tytim2(itime)
       integer itime
       integer ihr,it,imin,isec
@@ -10780,4 +10806,6 @@ c 91/12/01 si : original version
       it=it-isec*100
       write(6,10) ihr,imin,isec,it
    10 format(' time=',i2,':',i2.2,':',i2.2,'.',i2.2)
-      end
+      end subroutine tytim2
+
+end module tqsubs_module

@@ -456,9 +456,8 @@
       call me%pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
       cf(nc+1) = f
       if ( abs(iprnt)>1 ) &
-        write (6,'(1x,''nit='',i9,2x,''nfv='',i9,2x,''nfg='',i9,2x,&
-                ''f='',g13.6,2x,''c='',e8.1,2x,''g='',e8.1)') &
-                me%nit , me%nfv , me%nfg , f , cmax , gmax
+        write (6,'(1x,''nit='',i9,2x,''nfv='',i9,2x,''nfg='',i9,2x,''f='',g13.6,2x,''c='',e8.1,2x,''g='',e8.1)') &
+               me%nit , me%nfv , me%nfg , f , cmax , gmax
 !
 !     start of the iteration with tests for termination.
 !
@@ -623,8 +622,7 @@
 
  500  if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,''exit from psqp :'')')
       if ( iprnt/=0 ) &
-         write (6,'(1x,''nit='',i4,2x,''nfv='',i4,2x,''nfg='',i4,2x,''f='',&
-                  g13.6,2x,''c='',e8.1,2x,''g='',e8.1,2x,''iterm='',i3)') &
+         write (6,'(1x,''nit='',i4,2x,''nfv='',i4,2x,''nfg='',i4,2x,''f='',g13.6,2x,''c='',e8.1,2x,''g='',e8.1,2x,''iterm='',i3)') &
                   me%nit , me%nfv , me%nfg , f , cmax , gmax , iterm
       if ( iprnt<0 ) write (6,'(1x,''x='',5(g14.7,1x):/(3x,5(g14.7,1x)))') (x(i),i=1,nf)
 
@@ -650,9 +648,9 @@
       real(wp) :: cl(*) !! cl(nc)  vector containing lower bounds for constraint functions.
       real(wp) :: cu(*) !! cu(nc)  vector containing upper bounds for constraint functions.
       integer :: ic(*)  !! ic(nc)  vector containing types of constraints.
-      real(wp) :: gc(*) !! gc(nf)  gradient of the selected constraint function.
+      real(wp) :: gc(nf) !! gc(nf)  gradient of the selected constraint function.
       real(wp) :: cg(*) !! cg(nf*nc)  matrix whose columns are gradients of constraint functions.
-      real(wp) :: x(*)  !! x(nf)  vector of variables.
+      real(wp) :: x(nf)  !! x(nf)  vector of variables.
 
       real(wp) :: pom , temp
       integer :: kc
@@ -710,9 +708,9 @@
       integer :: kd     !! degree of required derivatives.
       integer :: ld     !! degree of previously computed derivatives.
       integer :: nf     !! number of variables.
-      real(wp) :: gf(*) !! gf(nf)  gradient of the model function.
-      real(wp) :: g(*)  !! g(nf)  gradient of the objective function.
-      real(wp) :: x(*)  !! x(nf)  vector of variables.
+      real(wp) :: gf(nf) !! gf(nf)  gradient of the model function.
+      real(wp) :: g(nf)  !! g(nf)  gradient of the objective function.
+      real(wp) :: x(nf)  !! x(nf)  vector of variables.
 
       if ( kd<=ld ) return
       if ( ld<0 ) then
