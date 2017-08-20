@@ -334,15 +334,15 @@
                             !! * ix(i)=5 - variable x(i) is fixed.
 
       real(wp) :: alf1 , alf2 , cmaxo , dmax , eps7 , eps9 , eta0 ,&
-                       eta2 , eta9 , fmax , fmin , fo , gnorm , p , po ,&
-                       r , rmax , rmin , ro , snorm , tolb , tolf ,     &
-                       umax , rp , fp , pp , ff , fc
+                  eta2 , eta9 , fmax , fmin , fo , gnorm , p , po ,&
+                  r , rmax , rmin , ro , snorm , tolb , tolf ,     &
+                  umax , rp , fp , pp , ff , fc
       integer :: i , idecf , iext , irest , iterd , iterl , iterh , iterq ,&
-              iters , kbc , kbf , kc , kd , kit , ld , mred , mtesf ,   &
-              mtesx , n , k , ntesx , iest , inits , kters , maxst ,    &
-              isys , mfp , nred , ipom , lds
+                 iters , kbc , kbf , kc , kd , kit , ld , mred , mtesf ,   &
+                 mtesx , n , k , ntesx , iest , inits , kters , maxst ,    &
+                 isys , mfp , nred , ipom , lds
 
-      if ( abs(iprnt)>1 ) write (6,'(1x,''entry to psqp :'')')
+      if ( abs(iprnt)>1 ) write (6,'(1x,"entry to psqp :")')
 !
 !     initiation
 !
@@ -456,7 +456,7 @@
       call me%pc1f01(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
       cf(nc+1) = f
       if ( abs(iprnt)>1 ) &
-        write (6,'(1x,''nit='',i9,2x,''nfv='',i9,2x,''nfg='',i9,2x,''f='',g13.6,2x,''c='',e8.1,2x,''g='',e8.1)') &
+        write (6,'(1x,"nit=",i9,2x,"nfv=",i9,2x,"nfg=",i9,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1)') &
                me%nit , me%nfv , me%nfg , f , cmax , gmax
 !
 !     start of the iteration with tests for termination.
@@ -620,11 +620,11 @@
          end if
       end if
 
- 500  if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,''exit from psqp :'')')
+ 500  if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,"exit from psqp :")')
       if ( iprnt/=0 ) &
-         write (6,'(1x,''nit='',i4,2x,''nfv='',i4,2x,''nfg='',i4,2x,''f='',g13.6,2x,''c='',e8.1,2x,''g='',e8.1,2x,''iterm='',i3)') &
+         write (6,'(1x,"nit=",i4,2x,"nfv=",i4,2x,"nfg=",i4,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1,2x,"iterm=",i3)') &
                   me%nit , me%nfv , me%nfg , f , cmax , gmax , iterm
-      if ( iprnt<0 ) write (6,'(1x,''x='',5(g14.7,1x):/(3x,5(g14.7,1x)))') (x(i),i=1,nf)
+      if ( iprnt<0 ) write (6,'(1x,"x=",5(g14.7,1x):/(3x,5(g14.7,1x)))') (x(i),i=1,nf)
 
       end subroutine psqp
 
@@ -638,19 +638,19 @@
       implicit none
 
       class(psqp_class),intent(inout) :: me
-      real(wp) :: fc    !! value of the selected constraint function.
-      real(wp) :: cmax  !! maximum constraint violation.
-      integer :: kd     !! degree of required derivatives.
-      integer :: ld     !! degree of previously computed derivatives.
-      integer :: nc     !! number of constraints.
-      integer :: nf     !! number of variables.
-      real(wp) :: cf(*) !! cf(nc)  vector containing values of constraint functions.
-      real(wp) :: cl(*) !! cl(nc)  vector containing lower bounds for constraint functions.
-      real(wp) :: cu(*) !! cu(nc)  vector containing upper bounds for constraint functions.
-      integer :: ic(*)  !! ic(nc)  vector containing types of constraints.
-      real(wp) :: gc(nf) !! gc(nf)  gradient of the selected constraint function.
-      real(wp) :: cg(*) !! cg(nf*nc)  matrix whose columns are gradients of constraint functions.
-      real(wp) :: x(nf)  !! x(nf)  vector of variables.
+      real(wp) :: fc      !! value of the selected constraint function.
+      real(wp) :: cmax    !! maximum constraint violation.
+      integer  :: kd      !! degree of required derivatives.
+      integer  :: ld      !! degree of previously computed derivatives.
+      integer  :: nc      !! number of constraints.
+      integer  :: nf      !! number of variables.
+      real(wp) :: cf(*)   !! cf(nc)  vector containing values of constraint functions.
+      real(wp) :: cl(*)   !! cl(nc)  vector containing lower bounds for constraint functions.
+      real(wp) :: cu(*)   !! cu(nc)  vector containing upper bounds for constraint functions.
+      integer  :: ic(*)   !! ic(nc)  vector containing types of constraints.
+      real(wp) :: gc(nf)  !! gc(nf)  gradient of the selected constraint function.
+      real(wp) :: cg(*)   !! cg(nf*nc)  matrix whose columns are gradients of constraint functions.
+      real(wp) :: x(nf)   !! x(nf)  vector of variables.
 
       real(wp) :: pom , temp
       integer :: kc
@@ -659,23 +659,20 @@
       if ( ld<0 ) cmax = 0.0_wp
       do kc = 1 , nc
          if ( kd>=0 ) then
-            if ( ld>=0 ) then
-               fc = cf(kc)
-               goto 20
+            if ( ld<0 ) then
+                call me%con(nf,kc,x,fc)
+                cf(kc) = fc
+                if ( ic(kc)>0 ) then
+                    pom = 0.0_wp
+                    temp = cf(kc)
+                    if ( ic(kc)==1 .or. ic(kc)>=3 ) pom = min(pom,temp-cl(kc))
+                    if ( ic(kc)==2 .or. ic(kc)>=3 ) pom = min(pom,cu(kc)-temp)
+                    if ( pom<0.0_wp ) cmax = max(cmax,-pom)
+                end if
             else
-               call me%con(nf,kc,x,fc)
-               cf(kc) = fc
+               fc = cf(kc)
             end if
-            if ( ic(kc)>0 ) then
-               pom = 0.0_wp
-               temp = cf(kc)
-               if ( ic(kc)==1 .or. ic(kc)>=3 ) &
-                    pom = min(pom,temp-cl(kc))
-               if ( ic(kc)==2 .or. ic(kc)>=3 ) &
-                    pom = min(pom,cu(kc)-temp)
-               if ( pom<0.0_wp ) cmax = max(cmax,-pom)
-            end if
- 20         if ( kd>=1 ) then
+            if ( kd>=1 ) then
                if ( ld>=1 ) then
                   call mxvcop(nf,cg((kc-1)*nf+1),gc)
                else

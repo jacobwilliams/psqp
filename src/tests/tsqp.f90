@@ -11,7 +11,7 @@
       implicit none
 
       type(psqp_class) :: solver
-      integer  :: next,nfv,nit
+      integer  :: next
       real(wp) :: f,fmin,cmax,gmax
       integer  :: i,ierr,iprnt,iterm,itime,nb,nc,nf
       real(wp) :: cf(200),cl(200),cu(200),rpar(5),x(40),xl(40),xu(40)
