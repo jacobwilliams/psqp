@@ -292,12 +292,12 @@
                             !!
                             !! * met=1 - the bfgs update.
                             !! * met=2 - the hoshino update.
-      integer :: met1       !! 
+      integer :: met1       !!
       integer :: mec        !! correction if the negative curvature occurs.
                             !!
                             !! * mec=1 - correction suppressed.
                             !! * mec=2 - powell's correction.
-      integer :: mes        !! 
+      integer :: mes        !!
       integer :: mfv        !! maximum number of function evaluations.
       integer :: mit        !! maximum number of iterations.
       integer :: nb         !! choice of simple bounds.
@@ -456,8 +456,8 @@
       fo = fmin
       gmax = eta9
       dmax = eta9
-      
-      main : do 
+
+      main : do
 
          lds = ld
          call me%compute_obj_and_dobj(nf,x,gf,gf,ff,f,kd,ld,iext)
@@ -492,127 +492,139 @@
          end if
          iterm = 0
          me%nit = me%nit + 1
-         ! restart
-   200   n = nf
-         if ( irest>0 ) then
-            call mxdsmi(n,h)
-            ld = min(ld,1)
-            idecf = 1
-            if ( kit<me%nit ) then
-               me%nres = me%nres + 1
-               kit = me%nit
-            else
-               iterm = -10
-               if ( iters<0 ) iterm = iters - 5
-               exit main
-            end if
-         end if
-         ! direction determination using a quadratic programming procedure
-         call mxvcop(nc+1,cf,cfo)
-         mfp = 2
-         ipom = 0
-         dir_loop : do
-            call me%dual_range_space_quad_prog(nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,&
-                     cl,cu,cg,cr,cz,g,gf,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,&
-                     eps9,umax,gmax,n,iterq)
-            if ( iterq<0 ) then
-               if ( ipom<10 ) then
-                  ipom = ipom + 1
-                  call transform_incompatible_qp_subproblem(nc,cf,ic,cl,cu,kbc)
-                  cycle dir_loop
+
+         restart : do
+
+            ! restart
+            n = nf
+            if ( irest>0 ) then
+               call mxdsmi(n,h)
+               ld = min(ld,1)
+               idecf = 1
+               if ( kit<me%nit ) then
+                  me%nres = me%nres + 1
+                  kit = me%nit
+               else
+                  iterm = -10
+                  if ( iters<0 ) iterm = iters - 5
+                  exit main
                end if
-               iterd = iterq - 10
-            else
-               ipom = 0
-               iterd = 1
-               gmax = mxvmax(nf,g)
-               gnorm = sqrt(mxvdot(nf,g,g))
-               snorm = sqrt(mxvdot(nf,s,s))
             end if
-            exit dir_loop
-         end do dir_loop
-         if ( iterd<0 ) iterm = iterd
-         if ( iterm==0 ) then
-            call mxvcop(nc+1,cfo,cf)
-            ! test for sufficient descent
-            p = mxvdot(nf,g,s)
-            irest = 1
-            if ( snorm<=0.0_wp ) then
-            elseif ( p+told*gnorm*snorm<=0.0_wp ) then
-               irest = 0
-            end if
-            if ( irest/=0 ) goto 200
-            nred = 0
-            rmin = alf1*gnorm/snorm
-            rmax = min(alf2*gnorm/snorm,xmax/snorm)
-            if ( gmax<=tolg .and. cmax<=tolc ) then
-               iterm = 4
-               exit main
-            end if
-            call compute_new_penalty_parameters(nf,n,nc,ica,cz,cp)
-            call mxvina(nc,ic)
-            call compute_augmented_lagrangian(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
-            ! preparation of line search
-            ro = 0.0_wp
-            fo = f
-            po = p
-            cmaxo = cmax
-            call mxvcop(nf,x,xo)
-            call mxvcop(nf,g,go)
-            call mxvcop(nf,gf,cr)
-            call mxvcop(nc+1,cf,cfo)            
-            ! line search without directional derivatives
-   450      call me%extended_line_search(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,&
-                        rmax,tols,kd,ld,me%nit,kit,nred,mred,maxst,iest,inits,&
-                        iters,kters,mes,isys)
-            if ( isys==0 ) then
-               kd = 1
-               ! decision after unsuccessful line search
-               if ( iters<=0 ) then
-                  r = 0.0_wp
-                  f = fo
-                  p = po
-                  call mxvcop(nf,xo,x)
-                  call mxvcop(nf,cr,gf)
-                  call mxvcop(nc+1,cfo,cf)
-                  irest = 1
-                  ld = kd
-                  goto 200
+            ! direction determination using a quadratic programming procedure
+            call mxvcop(nc+1,cf,cfo)
+            mfp = 2
+            ipom = 0
+            dir_loop : do
+               call me%dual_range_space_quad_prog(nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,&
+                        cl,cu,cg,cr,cz,g,gf,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,&
+                        eps9,umax,gmax,n,iterq)
+               if ( iterq<0 ) then
+                  if ( ipom<10 ) then
+                     ipom = ipom + 1
+                     call transform_incompatible_qp_subproblem(nc,cf,ic,cl,cu,kbc)
+                     cycle dir_loop
+                  end if
+                  iterd = iterq - 10
+               else
+                  ipom = 0
+                  iterd = 1
+                  gmax = mxvmax(nf,g)
+                  gnorm = sqrt(mxvdot(nf,g,g))
+                  snorm = sqrt(mxvdot(nf,s,s))
                end if
-               ! computation of the value and the gradient of the objective
-               ! function together with the values and the gradients of the
-               ! approximated functions
-               if ( kd>ld ) then
-                  lds = ld
-                  call me%compute_obj_and_dobj(nf,x,gf,gf,ff,f,kd,ld,iext)
-                  ld = lds
-                  call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,&
-                                               cg,cmax,kd,ld)
+               exit dir_loop
+            end do dir_loop
+            if ( iterd<0 ) iterm = iterd
+            if ( iterm==0 ) then
+               call mxvcop(nc+1,cfo,cf)
+               ! test for sufficient descent
+               p = mxvdot(nf,g,s)
+               irest = 1
+               if ( snorm<=0.0_wp ) then
+               elseif ( p+told*gnorm*snorm<=0.0_wp ) then
+                  irest = 0
                end if
-               ! preparation of variable metric update
-               call mxvcop(nf,gf,g)
-               call dual_range_space_qp(nf,n,x,xo,ica,cg,cz,g,go,r,f,fo,p,po,&
-                                        cmax,cmaxo,dmax,kd,ld,iters)
-               ! variable metric update
-               call bfgs_variable_metric_update(n,h,g,s,xo,go,r,po,me%nit,&
-                                                kit,iterh,met,met1,mec)
-               ! if (mer>0.and.iterh>0) irest=1   
-               cycle main   ! end of the iteration
-            else
-               ! go to (11174,11172) isys+1
-               call mxvdir(nf,r,s,xo,x)
-               lds = ld
-               call me%compute_obj_and_dobj(nf,x,gf,g,ff,f,kd,ld,iext)
-               ld = lds
-               call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
-               cf(nc+1) = f
+               if ( irest/=0 ) cycle restart
+               nred = 0
+               rmin = alf1*gnorm/snorm
+               rmax = min(alf2*gnorm/snorm,xmax/snorm)
+               if ( gmax<=tolg .and. cmax<=tolc ) then
+                  iterm = 4
+                  exit main
+               end if
+               call compute_new_penalty_parameters(nf,n,nc,ica,cz,cp)
+               call mxvina(nc,ic)
                call compute_augmented_lagrangian(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
-               goto 450
+               ! preparation of line search
+               ro = 0.0_wp
+               fo = f
+               po = p
+               cmaxo = cmax
+               call mxvcop(nf,x,xo)
+               call mxvcop(nf,g,go)
+               call mxvcop(nf,gf,cr)
+               call mxvcop(nc+1,cf,cfo)
+
+               line_search : do
+
+                  ! line search without directional derivatives
+                  call me%extended_line_search(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,&
+                              rmax,tols,kd,ld,me%nit,kit,nred,mred,maxst,iest,inits,&
+                              iters,kters,mes,isys)
+                  if ( isys==0 ) then
+                     kd = 1
+                     ! decision after unsuccessful line search
+                     if ( iters<=0 ) then
+                        r = 0.0_wp
+                        f = fo
+                        p = po
+                        call mxvcop(nf,xo,x)
+                        call mxvcop(nf,cr,gf)
+                        call mxvcop(nc+1,cfo,cf)
+                        irest = 1
+                        ld = kd
+                        cycle restart
+                     end if
+                     ! computation of the value and the gradient of the objective
+                     ! function together with the values and the gradients of the
+                     ! approximated functions
+                     if ( kd>ld ) then
+                        lds = ld
+                        call me%compute_obj_and_dobj(nf,x,gf,gf,ff,f,kd,ld,iext)
+                        ld = lds
+                        call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,&
+                                                   cg,cmax,kd,ld)
+                     end if
+                     ! preparation of variable metric update
+                     call mxvcop(nf,gf,g)
+                     call dual_range_space_qp(nf,n,x,xo,ica,cg,cz,g,go,r,f,fo,p,po,&
+                                             cmax,cmaxo,dmax,kd,ld,iters)
+                     ! variable metric update
+                     call bfgs_variable_metric_update(n,h,g,s,xo,go,r,po,me%nit,&
+                                                      kit,iterh,met,met1,mec)
+                     ! if (mer>0.and.iterh>0) irest=1
+                     cycle main   ! end of the iteration
+                  else
+                     ! go to (11174,11172) isys+1
+                     call mxvdir(nf,r,s,xo,x)
+                     lds = ld
+                     call me%compute_obj_and_dobj(nf,x,gf,g,ff,f,kd,ld,iext)
+                     ld = lds
+                     call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+                     cf(nc+1) = f
+                     call compute_augmented_lagrangian(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
+                     cycle line_search
+                  end if
+
+                  exit line_search
+               end do line_search
+
             end if
-         end if
 
-         exit main 
+            exit restart
+         end do restart
 
+         exit main
       end do main
 
       if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,"exit from psqp :")')
@@ -831,152 +843,161 @@
          if ( kbc>0 ) call mxvina(nc,ic)
       end if
 
-      ! direction determination
+      outer : do
 
- 100  call mxvneg(nf,go,s)
-      do j = 1 , nca
-         kc = ica(j)
-         if ( kc>0 ) then
-            call mxvdir(nf,cz(j),cg((kc-1)*nf+1),s,s)
-         else
-            k = -kc
-            s(k) = s(k) + cz(j)
-         end if
-      end do
-      call mxvcop(nf,s,g)
-      if ( idecf==1 ) then
-         call mxdpgb(nf,h,s,0)
-      else
-         call mxdsmm(nf,h,g,s)
-      end if
-      if ( iterq/=3 ) then
-         ! check of feasibility
-         inew = 0
-         par = 0.0_wp
-         call determine_new_active_linear_constr(nf,nc,cf,cfd,ic,cl,cu,&
-                                                 cg,s,eps9,par,kbc,inew,knew)
-         call determine_new_active_simple_bound(nf,ix,x,xl,xu,s,kbf,inew,&
-                                                knew,eps9,par)
-         if ( inew==0 ) then
-            ! solution achieved
-            call mxvneg(nf,g,g)
-            iterq = 2
-            return
-         else
-            snorm = 0.0_wp
-         end if
- 150     ier = 0
+         ! direction determination
 
-         ! stepsize determination
-
-         call update_tri_decomp_general(nf,n,ica,cg,cr,h,s,g,eps7,gmax,umax,&
-                                idecf,inew,me%nadd,ier,1)
-         call mxdprb(nca,cr,g,-1)
-         if ( knew<0 ) call mxvneg(nca,g,g)
-
-         ! primal stepsize
-
-         if ( ier/=0 ) then
-            step1 = con
-         else
-            step1 = -par/umax
-         end if
-
-         ! dual stepsize
-
-         iold = 0
-         step2 = con
+         call mxvneg(nf,go,s)
          do j = 1 , nca
             kc = ica(j)
-            if ( kc>=0 ) then
-               k = ic(kc)
+            if ( kc>0 ) then
+               call mxvdir(nf,cz(j),cg((kc-1)*nf+1),s,s)
             else
-               i = -kc
-               k = ix(i)
-            end if
-            if ( k<=-5 ) then
-            elseif ( (k==-1 .or. k==-3.) .and. g(j)<=0.0_wp ) then
-            elseif ( .not.((k==-2 .or. k==-4.) .and. g(j)>=0.0_wp) ) then
-               temp = cz(j)/g(j)
-               if ( step2>temp ) then
-                  iold = j
-                  step2 = temp
-               end if
+               k = -kc
+               s(k) = s(k) + cz(j)
             end if
          end do
-
-         ! final stepsize
-
-         step = min(step1,step2)
-         if ( step>=con ) then
-            ! feasible solution does not exist
-            iterq = -1
-            return
-         end if
-
-         ! new lagrange multipliers
-
-         dmax = step
-         call mxvdir(nca,-step,g,cz,cz)
-         snorm = snorm + sign(1,knew)*step
-         par = par - (step/step1)*par
-         if ( step==step1 ) then
-            if ( n<=0 ) then
-               ! impossible situation
-               iterq = -5
-               return
-            end if
-
-            ! constraint addition
-
-            if ( ier==0 ) then
-               n = n - 1
-               nca = nca + 1
-               ncr = ncr + nca
-               cz(nca) = snorm
-            end if
-            if ( inew>0 ) then
-               kc = inew
-               call mxvinv(ic,kc,knew)
-            elseif ( abs(knew)==1 ) then
-               i = -inew
-               call mxvinv(ix,i,knew)
-            else
-               i = -inew
-               if ( knew>0 ) ix(i) = -3
-               if ( knew<0 ) ix(i) = -4
-            end if
-            nred = nred + 1
-            me%nadd = me%nadd + 1
-            jnew = inew
-            jold = 0
-            goto 100
+         call mxvcop(nf,s,g)
+         if ( idecf==1 ) then
+            call mxdpgb(nf,h,s,0)
          else
-
-            ! constraint deletion
-
-            do j = iold , nca - 1
-               cz(j) = cz(j+1)
-            end do
-            call me%ops_after_constr_deletion(nf,nc,ix,ic,ica,cr,ic,g,n,iold,krem,ier)
-            ncr = ncr - nca
-            nca = nca - 1
-            jold = iold
-            jnew = 0
-            if ( kbc>0 ) call mxvina(nc,ic)
-            if ( kbf>0 ) call mxvina(nf,ix)
-            do j = 1 , nca
-               kc = ica(j)
-               if ( kc>0 ) then
-                  ic(kc) = -ic(kc)
-               else
-                  kc = -kc
-                  ix(kc) = -ix(kc)
-               end if
-            end do
-            goto 150
+            call mxdsmm(nf,h,g,s)
          end if
-      end if
+         if ( iterq/=3 ) then
+            ! check of feasibility
+            inew = 0
+            par = 0.0_wp
+            call determine_new_active_linear_constr(nf,nc,cf,cfd,ic,cl,cu,&
+                                                   cg,s,eps9,par,kbc,inew,knew)
+            call determine_new_active_simple_bound(nf,ix,x,xl,xu,s,kbf,inew,&
+                                                   knew,eps9,par)
+            if ( inew==0 ) then
+               ! solution achieved
+               call mxvneg(nf,g,g)
+               iterq = 2
+               return
+            else
+               snorm = 0.0_wp
+            end if
+
+            inner : do
+
+               ier = 0
+
+               ! stepsize determination
+
+               call update_tri_decomp_general(nf,n,ica,cg,cr,h,s,g,eps7,gmax,umax,&
+                                    idecf,inew,me%nadd,ier,1)
+               call mxdprb(nca,cr,g,-1)
+               if ( knew<0 ) call mxvneg(nca,g,g)
+
+               ! primal stepsize
+
+               if ( ier/=0 ) then
+                  step1 = con
+               else
+                  step1 = -par/umax
+               end if
+
+               ! dual stepsize
+
+               iold = 0
+               step2 = con
+               do j = 1 , nca
+                  kc = ica(j)
+                  if ( kc>=0 ) then
+                     k = ic(kc)
+                  else
+                     i = -kc
+                     k = ix(i)
+                  end if
+                  if ( k<=-5 ) then
+                  elseif ( (k==-1 .or. k==-3.) .and. g(j)<=0.0_wp ) then
+                  elseif ( .not.((k==-2 .or. k==-4.) .and. g(j)>=0.0_wp) ) then
+                     temp = cz(j)/g(j)
+                     if ( step2>temp ) then
+                        iold = j
+                        step2 = temp
+                     end if
+                  end if
+               end do
+
+               ! final stepsize
+
+               step = min(step1,step2)
+               if ( step>=con ) then
+                  ! feasible solution does not exist
+                  iterq = -1
+                  return
+               end if
+
+               ! new lagrange multipliers
+
+               dmax = step
+               call mxvdir(nca,-step,g,cz,cz)
+               snorm = snorm + sign(1,knew)*step
+               par = par - (step/step1)*par
+               if ( step==step1 ) then
+                  if ( n<=0 ) then
+                     ! impossible situation
+                     iterq = -5
+                     return
+                  end if
+
+                  ! constraint addition
+
+                  if ( ier==0 ) then
+                     n = n - 1
+                     nca = nca + 1
+                     ncr = ncr + nca
+                     cz(nca) = snorm
+                  end if
+                  if ( inew>0 ) then
+                     kc = inew
+                     call mxvinv(ic,kc,knew)
+                  elseif ( abs(knew)==1 ) then
+                     i = -inew
+                     call mxvinv(ix,i,knew)
+                  else
+                     i = -inew
+                     if ( knew>0 ) ix(i) = -3
+                     if ( knew<0 ) ix(i) = -4
+                  end if
+                  nred = nred + 1
+                  me%nadd = me%nadd + 1
+                  jnew = inew
+                  jold = 0
+                  cycle outer
+               end if
+
+               ! constraint deletion
+
+               do j = iold , nca - 1
+                  cz(j) = cz(j+1)
+               end do
+               call me%ops_after_constr_deletion(nf,nc,ix,ic,ica,cr,ic,g,n,iold,krem,ier)
+               ncr = ncr - nca
+               nca = nca - 1
+               jold = iold
+               jnew = 0
+               if ( kbc>0 ) call mxvina(nc,ic)
+               if ( kbf>0 ) call mxvina(nf,ix)
+               do j = 1 , nca
+                  kc = ica(j)
+                  if ( kc>0 ) then
+                     ic(kc) = -ic(kc)
+                  else
+                     kc = -kc
+                     ix(kc) = -ix(kc)
+                  end if
+               end do
+
+            end do inner
+
+         end if
+
+         exit outer
+      end do outer
 
       end subroutine dual_range_space_quad_prog
 
