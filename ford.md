@@ -1,6 +1,7 @@
 project: psqp
-project_dir: ./src
+src_dir: ./src
 output_dir: ./doc
+media_dir: ./media
 project_github: https://github.com/jacobwilliams/psqp
 summary: Modern Fortran edition of PSQP
 author: Jacob Williams
@@ -14,9 +15,8 @@ display: public
          protected
 source: true
 graph: true
-exclude_dir: ./src/tests
+search: true
+preprocessor: gfortran -E
+extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
 
-Brief description
----------------
-
-PSQP
+{!README.md!}

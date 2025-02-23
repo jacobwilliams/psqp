@@ -1,44 +1,41 @@
-***********************************************************************
-*                                                                     *
-*         PSQP - A SEQUENTIAL QUADRATIC PROGRAMMING ALGORITHM         *
-*                FOR GENERAL NONLINEAR PROGRAMMING PROBLEMS.          *
-*                                                                     *
-***********************************************************************
 
+PSQP - A SEQUENTIAL QUADRATIC PROGRAMMING ALGORITHM
+FOR GENERAL NONLINEAR PROGRAMMING PROBLEMS.
 
-1. Introduction:
-----------------
+## Introduction
 
-      The double-precision FORTRAN 77 basic subroutine PSQP is designed
+The double-precision FORTRAN 77 basic subroutine PSQP is designed
 to find a close approximation to a local minimum of a nonlinear
 objective function F(X) with simple bounds on variables and general
 nonlinear constraints. Here X is a vector of N variables and F(X), is
 a smooth function. Simple bounds are assumed in the form
-
+```
                X(I) unbounded if  IX(I) = 0,
       XL(I) <= X(I)           if  IX(I) = 1,
                X(I) <= XU(I)  if  IX(I) = 2,
       XL(I) <= X(I) <= XU(I)  if  IX(I) = 3,
       XL(I)  = X(I)  = XU(I)  if  IX(I) = 5,
-
+```
 where 1 <= I <= N. General nonlinear constraints are assumed in the form
-
+```
                C_I(X) unbounded if  IC(I) = 0,
       CL(I) <= C_I(X)           if  IC(I) = 1,
                C_I(X) <= CU(I)  if  IC(I) = 2,
       CL(I) <= C_I(X) <= CU(I)  if  IC(I) = 3,
       CL(I)  = C_I(X)  = CU(I)  if  IC(I) = 5,
-
+```
 where C_I(X), 1 <= I <= NC, are twice continuously differentiable
 functions.
-      To simplify user's work, an additional easy to use subroutine
+
+To simplify user's work, an additional easy to use subroutine
 PSQPN is added. It calls the basic general subroutine PSQP. All
 subroutines contain a description of formal parameters and extensive
 comments. Furthermore, test program TSQPN is included, which contains
 several test problems. This test programs serve as an example for
 using the subroutine PSQPN, verify its correctness and demonstrate
 its efficiency.
-      In this short guide, we describe all subroutines which can be
+
+In this short guide, we describe all subroutines which can be
 called from the user's program. In the description of formal parameters,
 we introduce a type of the argument that specifies whether the argument
 must have a value defined on entry to the subroutine (I), whether it
@@ -48,11 +45,11 @@ changed on output under some circumstances, especially if improper
 input values were given. Besides formal parameters, we can use a
 COMMON /STAT/ block containing statistical information. This block,
 used in each subroutine has the following form:
-
+```
       COMMON /STAT/ NRES,NDEC,NREM,NADD,NIT,NFV,NFG,NFH
-
+```
 The arguments have the following meaning:
-
+```
  Argument  Type Significance
  ----------------------------------------------------------------------
   NRES      O   Positive INTEGER variable that indicates the number of
@@ -73,18 +70,17 @@ The arguments have the following meaning:
                 gradient evaluations.
   NFH       O   Positive INTEGER variable that specifies the number of
                 Hessian evaluations.
+```
 
-
-2. Subroutine PSQN:
--------------------
+## Subroutine PSQN
 
 The calling sequence is
-
+```
       CALL PSQPN(NF,NB,NC,X,IX,XL,XU,CF,IC,CL,CU,IPAR,RPAR,F,GMAX,
      &           CMAX,IPRNT,ITERM)
-
+```
 The arguments have the following meaning.
-
+```
  Argument  Type Significance
  ----------------------------------------------------------------------
   NF        I   Positive INTEGER variable that specifies the number of
@@ -159,19 +155,19 @@ The arguments have the following meaning.
                   ITERM< 0 - if the method failed. If ITERM=-6, then the
                              termination criterion has not been satisfied,
                              but the point obtained is usually acceptable.
-
-      The subroutine PSQPN requires the user supplied subroutines OBJ,
+```
+The subroutine PSQPN requires the user supplied subroutines OBJ,
 DOBJ that define the objective function and its gradient and CON, DCON
 that define constraint functions and their gradients. These subroutines
 have the form
-
+```
       SUBROUTINE  OBJ(NF,X,F)
       SUBROUTINE DOBJ(NF,X,G)
       SUBROUTINE  CON(NF,KC,X,FC)
       SUBROUTINE DCON(NF,KC,X,GC)
-
+```
 The arguments of the user supplied subroutine have the following meaning.
-
+```
  Argument  Type Significance
  ----------------------------------------------------------------------
   NF        I   Positive INTEGER variable that specifies the number of
@@ -186,21 +182,21 @@ The arguments of the user supplied subroutine have the following meaning.
                 the point X.
   GC(NF)    O   DOUBLE PRECISION gradient of the KC-th partial function
                 at the point X.
+```
 
-3. Subroutine PSQP:
--------------------
+## Subroutine PSQP
 
 This general subroutine is called from all the subroutines described
 in Section 2. The calling sequence is
-
+```
       CALL PSQP(NF,NB,NC,X,IX,XL,XU,CF,IC,CL,CU,CG,CFO,CFD,GC,ICA,CR,
      & CZ,CP,GF,G,H,S,XO,GO,XMAX,TOLX,TOLC,TOLG,RPF,CMAX,GMAX,F,MIT,
      & MFV,MEC,IPRNT,ITERM).
-
+```
 The arguments NF, NB, NC, X, IX, XL, XU, CF, IC, CL, CU, CMAX, GMAX,
 F, IPRNT, ITERM, have the same meaning as in Section 2. Other arguments
 have the following meaning:
-
+```
  Argument  Type Significance
  ----------------------------------------------------------------------
   CG(NF*NC) A   DOUBLE PRECISION elements of the constraint Jacobian
@@ -258,24 +254,23 @@ have the following meaning:
                   MEC=2 - the Powell correction is used.
                 The choice MEC=0 causes that the default value MEC=2
                 will be taken.
-
+```
 The default velue RPF=0.0001 is relatively small. Therefore, larger
 value (RPF=1 say) can sometimes be more suitable.
-      The subroutine PSQP requires the user supplied subroutines OBJ
+
+The subroutine PSQP requires the user supplied subroutines OBJ
 DOBJ, CON, DCON,  which are described in Section 2.
 
-
-4. Subroutine PLQDB1:
----------------------
+## Subroutine PLQDB1
 
 Since the dual range space method for solving quadratic programming
 subproblems arising in sequential quadratic programming algorithms
 can be used separately in many applications, we describe the subroutine
 PLQDB1 in more details. The calling sequence is
-
+```
       CALL PLQDB1(NF,NC,X,IX,XL,XU,CF,CFD,IC,ICA,CL,CU,CG,CR,CZ,G,GO,
      & H,S,MFP,KBF,KBC,IDECF,ETA2,ETA9,EPS7,EPS9,UMAX,GMAX,N,ITERQ)
-
+```
 The arguments NF, NC, X, IX, XL, XU, CF, IC, CL, CU, have the same
 meaning as in Section 2 (only with the difference that the
 arguments X and CF are of the type (I), i.e. they  must have a value
@@ -284,7 +279,7 @@ CFD, ICA, CG, CR, CZ have the same meaning as in Section 3 (only with
 the difference that the arguments CFD, ICA, CR, CZ are of the type (O),
 i.e. their values can be used subsequently). Other arguments have the
 following meaning:
-
+```
  Argument  Type Significance
  ----------------------------------------------------------------------
   G(NF)     O   DOUBLE PRECISION gradient of the Lagrangian function.
@@ -339,11 +334,11 @@ following meaning:
                              exist,
                   ITERQ=-2 - the optimum feasible point does not
                              exist.
+```
 
-5. Verification of the subroutines:
------------------------------------
+## Verification of the subroutines
 
-      Subroutine PSQPN can be verified and tested using the program
+Subroutine PSQPN can be verified and tested using the program
 TSQPN. This program calls the subroutines TIND07 (initiation),
 TFFU07 (objective function evaluation), TFGU07 (objective gradient
 evaluation), TCFU07 (constraint functions evaluation) and TFGU07
@@ -351,7 +346,7 @@ evaluation), TCFU07 (constraint functions evaluation) and TFGU07
 test problems with at most 20 variables. The results obtained
 by the program TSQPN on a PC computer with Microsoft Power Station
 Fortran compiler have the following form.
-
+```
 NIT=   7  NFV=   7  NFG=   7  F=-1.41421      C=0.8E-08  G=0.4E-06  ITERM=  4
 NIT=  12  NFV=  12  NFG=  12  F=-1.00000      C=0.5E-10  G=0.6E-07  ITERM=  4
 NIT=  10  NFV=  11  NFG=  10  F=-30.0000      C=0.3E-10  G=0.8E-08  ITERM=  4
@@ -388,11 +383,10 @@ NIT=  77  NFV=  77  NFG=  77  F= 174.787      C=0.6E-11  G=0.4E-10  ITERM=  4
 NIT=  32  NFV=  35  NFG=  32  F= 133.728      C=0.9E-13  G=0.8E-06  ITERM=  4
 NITER =  734    NFVAL =  823    NSUCC =   34
 TIME= 0:00:00.03
+```
 
 The rows corresponding to individual test problems contain the number of
 iterations NIT, the number of function evaluations NFV, the number of
 gradient evaluations NFG, the final value of the objective function F,
 the constraint violation C, the norm of the Lagrangian function gradient
 G and the cause of termination ITERM.
-
-

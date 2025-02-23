@@ -6,7 +6,7 @@
 !### History
 !  * Original Fortran 77 code by Ladislav Luksan
 !    http://www.cs.cas.cz/~luksan/subroutines.html
-!  * Jacob Williams, Aug 2007,
+!  * Jacob Williams, Aug 2017,
 !    Significant refactoring to modern Fortran.
 
     module psqp_module

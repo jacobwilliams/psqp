@@ -36,3 +36,6 @@ build
 doc
 lib
 bin
+
+# misc
+.DS_Store

@@ -57,7 +57,7 @@
 
       implicit none
 
-      integer :: job  !! option:
+      integer :: job  !! option
                       !!
                       !! * if job=0 then x:=(a+e)**(-1)*x.
                       !! * if job>0 then x:=l**(-1)*x.
@@ -279,7 +279,7 @@
       implicit none
 
       integer :: n  !! order of the matrix a.
-      integer :: job  !! option:
+      integer :: job  !! option
                       !!
                       !! * if job=0 then only estimated eigenvalue is computed.
                       !! * if job>0 then both estimated eigenvalue and
@@ -578,7 +578,7 @@
 
       implicit none
 
-      integer :: job    !! option:
+      integer :: job    !! option
                         !!
                         !! * if job=0 then x:=a**(-1)*x.
                         !! * if job>0 then x:=trans(r)**(-1)*x.
@@ -672,7 +672,7 @@
       implicit none
 
       integer :: n  !! order of the matrix a.
-      integer :: job  !! option:
+      integer :: job  !! option
                       !!
                       !! * if job=0 then x:=a*x.
                       !! * if job>0 then x:=r*x.
