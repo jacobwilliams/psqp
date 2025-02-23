@@ -1427,60 +1427,6 @@
       end subroutine update_tri_decomp_orthogonal
 
 !***********************************************************************
-!> date: 97/12/01
-!
-! maximum absolute value of the negative lagrange multiplier is
-! computed.
-!
-!@note This routine was formerly called `pltlag`.
-
-      subroutine compute_max_abs_neg_lagrange_mult(nf,n,nc,ix,ia,iaa,&
-                                                   az,ic,eps7,umax,iold)
-
-      implicit none
-
-      integer :: nf      !! declared number of variables.
-      integer :: n       !! actual number of variables.
-      integer :: nc      !! number of linearized constraints.
-      integer :: ix(*)   !! ix(nf)  vector containing types of bounds.
-      integer :: ia(*)   !! ia(na)  vector containing types of deviations.
-      integer :: iaa(*)  !! iaa(nf+1)  vector containing indices of active functions.
-      integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
-      integer :: iold    !! index of the removed constraint.
-      real(wp) :: az(*)  !! az(nf+1)  vector of lagrange multipliers.
-      real(wp) :: eps7   !! tolerance for linear and quadratic programming.
-      real(wp) :: umax   !! maximum absolute value of the negative lagrange multiplier.
-
-      real(wp) :: temp
-      integer :: naa , j , k , l
-
-      iold = 0
-      umax = 0.0_wp
-      naa = nf - n
-      do j = 1 , naa
-         temp = az(j)
-         l = iaa(j)
-         if ( l>nc ) then
-            l = l - nc
-            k = ia(l)
-         elseif ( l>0 ) then
-            k = ic(l)
-         else
-            l = -l
-            k = ix(l)
-         end if
-         if ( k<=-5 ) then
-         elseif ( (k==-1 .or. k==-3) .and. umax+temp>=0.0_wp ) then
-         elseif ( .not.((k==-2 .or. k==-4) .and. umax-temp>=0.0_wp) ) then
-            iold = j
-            umax = abs(temp)
-         end if
-      end do
-      if ( umax<=eps7 ) iold = 0
-
-      end subroutine compute_max_abs_neg_lagrange_mult
-
-!***********************************************************************
 !> date: 91/12/01
 !
 ! extrapolation or interpolation for line search without directional
