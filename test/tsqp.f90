@@ -4,8 +4,8 @@
 
     program main
 
-      use kind_module, only: wp
-      use psqp_module, only: psqp_class
+      use psqp_kind_module, only: wp => psqp_wp
+      use psqp_module,      only: psqp_class
       use tqsubs_module
 
       implicit none

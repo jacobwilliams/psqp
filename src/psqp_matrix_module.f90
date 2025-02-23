@@ -5,9 +5,9 @@
 !### History
 ! * Original version: LU, 1991
 
-   module matrix_routines
+   module psqp_matrix_module
 
-      use kind_module, only: wp
+      use psqp_kind_module, only: wp => psqp_wp
 
       implicit none
 
@@ -346,7 +346,7 @@
             x(k) = x(k)/a(kk)
          endif
       end do
-      fp = dble(n)
+      fp = real(n,wp)
       if ( job<=0 ) then
 !
 !     first estimation of the minimum eigenvalue by the formula
@@ -1959,4 +1959,4 @@
 
       end subroutine mxvsum
 
-    end module matrix_routines
+    end module psqp_matrix_module

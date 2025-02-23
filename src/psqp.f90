@@ -11,8 +11,8 @@
 
     module psqp_module
 
-    use matrix_routines
-    use kind_module, only: wp
+    use psqp_matrix_module
+    use psqp_kind_module, only: wp => psqp_wp
 
     implicit none
 
@@ -385,12 +385,12 @@
       idecf = 1
       eta0 = 1.0e-15_wp
       eta2 = 1.0e-15_wp
-      eta9 = 1.0e60_wp
+      eta9 = huge(1.0_wp) !1.0e60_wp
       eps7 = 1.0e-15_wp
       eps9 = 1.0e-8_wp
       alf1 = 1.0e-10_wp
       alf2 = 1.0e10_wp
-      fmax = 1.0e60_wp
+      fmax = huge(1.0_wp) !1.0e60_wp
       fmin = -fmax
       tolb = -fmax
       dmax = eta9
