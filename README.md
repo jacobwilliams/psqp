@@ -1,11 +1,10 @@
 
-PSQP - A SEQUENTIAL QUADRATIC PROGRAMMING ALGORITHM
-FOR GENERAL NONLINEAR PROGRAMMING PROBLEMS.
+PSQP - A sequential quadratic programming algorithm
+for general nonlinear programming problems.
 
 [![Language](https://img.shields.io/badge/-Fortran-734f96?logo=fortran&logoColor=white)](https://github.com/topics/fortran)
 [![CI Status](https://github.com/jacobwilliams/psqp/actions/workflows/CI.yml/badge.svg)](https://github.com/jacobwilliams/psqp/actions)
 [![last-commit](https://img.shields.io/github/last-commit/jacobwilliams/psqp)](https://github.com/jacobwilliams/psqp/commits/master)
-
 
 This is work in progress to refactor the original [PSQP](http://www.cs.cas.cz/~luksan/subroutines.html) (by Ladislav Luksan) into Modern Fortran. The latest API documentation can be found [here](https://jacobwilliams.github.io/psqp/index.html).
 
