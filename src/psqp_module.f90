@@ -267,39 +267,39 @@
       real(wp) :: told      !!
       real(wp) :: tols      !!
       real(wp) :: xmax      !! maximum stepsize.
-      integer :: iprnt      !! print specification.
+      integer :: iprnt      !! print specification.
                             !!
                             !! * iprnt=0      - no print.
                             !! * abs(iprnt)=1 - print of final results.
                             !! * abs(iprnt)=2 - print of final results and iterations.
                             !! * iprnt>0      - basic final results.
                             !! * iprnt<0      - extended final results.
-      integer :: iterm      !! variable that indicates the cause of termination.
+      integer :: iterm      !! variable that indicates the cause of termination.
                             !!
-                            !! * iterm=1-if abs(x-xo) was less than or equal to tolx in
-                            !!   mtesx (usually two) subsequent iterations.
-                            !! * iterm=2-if abs(f-fo) was less than or equal to tolf in
-                            !!   mtesf (usually two) subsequent iterations.
-                            !! * iterm=3-if f is less than or equal to tolb.
-                            !! * iterm=4-if gmax is less than or equal to tolg.
-                            !! * iterm=11-if nit exceeded mit.
+                            !! * iterm=1-if abs(x-xo) was less than or equal to tolx in
+                            !!   mtesx (usually two) subsequent iterations.
+                            !! * iterm=2-if abs(f-fo) was less than or equal to tolf in
+                            !!   mtesf (usually two) subsequent iterations.
+                            !! * iterm=3-if f is less than or equal to tolb.
+                            !! * iterm=4-if gmax is less than or equal to tolg.
+                            !! * iterm=11-if nit exceeded mit.
                             !! * iterm=12-if nfv exceeded mfv.
-                            !! * iterm=13-if nfg exceeded mfg.
+                            !! * iterm=13-if nfg exceeded mfg.
                             !! * iterm<0-if the method failed.
-                            !! * if iterm=-6, then the termination criterion has not been
-                            !!   satisfied, but the point obtained if usually acceptable.
-      integer :: met        !! variable metric update used.
+                            !! * if iterm=-6, then the termination criterion has not been
+                            !!   satisfied, but the point obtained if usually acceptable.
+      integer :: met        !! variable metric update used.
                             !!
                             !! * met=1 - the bfgs update.
                             !! * met=2 - the hoshino update.
-      integer :: met1       !! 
-      integer :: mec        !! correction if the negative curvature occurs.
+      integer :: met1       !! 
+      integer :: mec        !! correction if the negative curvature occurs.
                             !!
                             !! * mec=1 - correction suppressed.
                             !! * mec=2 - powell's correction.
-      integer :: mes        !! 
-      integer :: mfv        !! maximum number of function evaluations.
-      integer :: mit        !! maximum number of iterations.
+      integer :: mes        !! 
+      integer :: mfv        !! maximum number of function evaluations.
+      integer :: mit        !! maximum number of iterations.
       integer :: nb         !! choice of simple bounds.
                             !!
                             !! * nb=0 - simple bounds suppressed.
@@ -307,9 +307,9 @@
       integer :: nc         !! number of linear constraints.
       integer :: nf         !! number of variables.
       real(wp) :: cf(*)     !! cf(nc+1)  vector containing values of the constraint functions.
-      real(wp) :: cg(*)     !! cg(nf*nc)  matrix whose columns are normals of the linear constraints.
-      real(wp) :: cfo(*)    !! cfo(nc)  vector containing saved values of the constraint functions.
-      real(wp) :: cfd(*)    !! cfd(nc)  vector containing increments of the constraint functions.
+      real(wp) :: cg(*)     !! cg(nf*nc)  matrix whose columns are normals of the linear constraints.
+      real(wp) :: cfo(*)    !! cfo(nc)  vector containing saved values of the constraint functions.
+      real(wp) :: cfd(*)    !! cfd(nc)  vector containing increments of the constraint functions.
       real(wp) :: cl(*)     !! cl(nc)  vector containing lower bounds for constraint functions.
       real(wp) :: cu(*)     !! cu(nc)  vector containing upper bounds for constraint functions.
       real(wp) :: cp(*)     !!
@@ -353,9 +353,8 @@
                  isys , mfp , nred , ipom , lds
 
       if ( abs(iprnt)>1 ) write (6,'(1x,"entry to psqp :")')
-!
-!     initiation
-!
+
+      ! initiation
       kbf = 0
       kbc = 0
       if ( nb>0 ) kbf = 2
@@ -412,9 +411,7 @@
       ld = -1
       kit = 0
       call mxvset(nc,0.0_wp,cp)
-!
-!     initial operations with simple bounds
-!
+      ! initial operations with simple bounds
       if ( kbf>0 ) then
          do i = 1 , nf
             if ( (ix(i)==3 .or. ix(i)==4) .and. xu(i)<=xl(i) ) then
@@ -429,8 +426,7 @@
             if ( ix(i)==2 .or. ix(i)==3 ) x(i) = min(x(i),xu(i))
          end do
       end if
-!     initial operations with general constraints
-!
+      ! initial operations with general constraints
       if ( kbc>0 ) then
          k = 0
          do kc = 1 , nc
@@ -460,181 +456,169 @@
       fo = fmin
       gmax = eta9
       dmax = eta9
- 100  lds = ld
-      call me%compute_obj_and_dobj(nf,x,gf,gf,ff,f,kd,ld,iext)
-      ld = lds
-      call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
-      cf(nc+1) = f
-      if ( abs(iprnt)>1 ) &
-        write (6,'(1x,"nit=",i9,2x,"nfv=",i9,2x,"nfg=",i9,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1)') &
-               me%nit , me%nfv , me%nfg , f , cmax , gmax
-!
-!     start of the iteration with tests for termination.
-!
-      if ( iterm<0 ) goto 500
-      if ( iters/=0 ) then
-         if ( f<=tolb ) then
-            iterm = 3
-            goto 500
-         end if
-         if ( dmax<=tolx ) then
-            iterm = 1
-            ntesx = ntesx + 1
-            if ( ntesx>=mtesx ) goto 500
-         else
-            ntesx = 0
-         end if
-      end if
-      if ( me%nit>=mit ) then
-         iterm = 11
-         goto 500
-      end if
-      if ( me%nfv>=mfv ) then
-         iterm = 12
-         goto 500
-      end if
-      iterm = 0
-      me%nit = me%nit + 1
-!
-!     restart
-!
- 200  n = nf
-      if ( irest>0 ) then
-         call mxdsmi(n,h)
-         ld = min(ld,1)
-         idecf = 1
-         if ( kit<me%nit ) then
-            me%nres = me%nres + 1
-            kit = me%nit
-         else
-            iterm = -10
-            if ( iters<0 ) iterm = iters - 5
-            goto 500
-         end if
-      end if
-!
-!     direction determination using a quadratic programming procedure
-!
-      call mxvcop(nc+1,cf,cfo)
-      mfp = 2
-      ipom = 0
- 300  call me%dual_range_space_quad_prog(nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,&
-                cl,cu,cg,cr,cz,g,gf,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,&
-                eps9,umax,gmax,n,iterq)
-      if ( iterq<0 ) then
-         if ( ipom<10 ) then
-            ipom = ipom + 1
-            call transform_incompatible_qp_subproblem(nc,cf,ic,cl,cu,kbc)
-            goto 300
-         end if
-         iterd = iterq - 10
-         goto 400
-      end if
-      ipom = 0
-      iterd = 1
-      gmax = mxvmax(nf,g)
-      gnorm = sqrt(mxvdot(nf,g,g))
-      snorm = sqrt(mxvdot(nf,s,s))
- 400  if ( iterd<0 ) iterm = iterd
-      if ( iterm==0 ) then
-         call mxvcop(nc+1,cfo,cf)
-!
-!     test for sufficient descent
-!
-         p = mxvdot(nf,g,s)
-         irest = 1
-         if ( snorm<=0.0_wp ) then
-         elseif ( p+told*gnorm*snorm<=0.0_wp ) then
-            irest = 0
-         end if
-         if ( irest/=0 ) goto 200
-         nred = 0
-         rmin = alf1*gnorm/snorm
-         rmax = min(alf2*gnorm/snorm,xmax/snorm)
-         if ( gmax<=tolg .and. cmax<=tolc ) then
-            iterm = 4
-            goto 500
-         end if
-         call compute_new_penalty_parameters(nf,n,nc,ica,cz,cp)
-         call mxvina(nc,ic)
-         call compute_augmented_lagrangian(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
-!
-!     preparation of line search
-!
-         ro = 0.0_wp
-         fo = f
-         po = p
-         cmaxo = cmax
-         call mxvcop(nf,x,xo)
-         call mxvcop(nf,g,go)
-         call mxvcop(nf,gf,cr)
-         call mxvcop(nc+1,cf,cfo)
-!
-!     line search without directional derivatives
-!
- 450     call me%extended_line_search(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,&
-                     rmax,tols,kd,ld,me%nit,kit,nred,mred,maxst,iest,inits,&
-                     iters,kters,mes,isys)
-         if ( isys==0 ) then
-            kd = 1
-!
-!     decision after unsuccessful line search
-!
-            if ( iters<=0 ) then
-               r = 0.0_wp
-               f = fo
-               p = po
-               call mxvcop(nf,xo,x)
-               call mxvcop(nf,cr,gf)
-               call mxvcop(nc+1,cfo,cf)
-               irest = 1
-               ld = kd
-               goto 200
-            end if
-!
-!     computation of the value and the gradient of the objective
-!     function together with the values and the gradients of the
-!     approximated functions
-!
-            if ( kd>ld ) then
-               lds = ld
-               call me%compute_obj_and_dobj(nf,x,gf,gf,ff,f,kd,ld,iext)
-               ld = lds
-               call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,&
-                                            cg,cmax,kd,ld)
-            end if
-!
-!     preparation of variable metric update
-!
-            call mxvcop(nf,gf,g)
-            call dual_range_space_qp(nf,n,x,xo,ica,cg,cz,g,go,r,f,fo,p,po,&
-                                     cmax,cmaxo,dmax,kd,ld,iters)
-!
-!     variable metric update
-!
-            call bfgs_variable_metric_update(n,h,g,s,xo,go,r,po,me%nit,&
-                                             kit,iterh,met,met1,mec)
-!      if (mer>0.and.iterh>0) irest=1
-!
-!     end of the iteration
-!
-            goto 100
-         else
-!      go to (11174,11172) isys+1
-            call mxvdir(nf,r,s,xo,x)
-            lds = ld
-            call me%compute_obj_and_dobj(nf,x,gf,g,ff,f,kd,ld,iext)
-            ld = lds
-            call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
-            cf(nc+1) = f
-            call compute_augmented_lagrangian(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
-            goto 450
-         end if
-      end if
+      
+      main : do 
 
- 500  if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,"exit from psqp :")')
+         lds = ld
+         call me%compute_obj_and_dobj(nf,x,gf,gf,ff,f,kd,ld,iext)
+         ld = lds
+         call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+         cf(nc+1) = f
+         if ( abs(iprnt)>1 ) &
+         write (6,'(1x,"nit=",i9,2x,"nfv=",i9,2x,"nfg=",i9,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1)') &
+                  me%nit , me%nfv , me%nfg , f , cmax , gmax
+         ! start of the iteration with tests for termination.
+         if ( iterm<0 ) exit main
+         if ( iters/=0 ) then
+            if ( f<=tolb ) then
+               iterm = 3
+               exit main
+            end if
+            if ( dmax<=tolx ) then
+               iterm = 1
+               ntesx = ntesx + 1
+               if ( ntesx>=mtesx ) exit main
+            else
+               ntesx = 0
+            end if
+         end if
+         if ( me%nit>=mit ) then
+            iterm = 11
+            exit main
+         end if
+         if ( me%nfv>=mfv ) then
+            iterm = 12
+            exit main
+         end if
+         iterm = 0
+         me%nit = me%nit + 1
+         ! restart
+   200   n = nf
+         if ( irest>0 ) then
+            call mxdsmi(n,h)
+            ld = min(ld,1)
+            idecf = 1
+            if ( kit<me%nit ) then
+               me%nres = me%nres + 1
+               kit = me%nit
+            else
+               iterm = -10
+               if ( iters<0 ) iterm = iters - 5
+               exit main
+            end if
+         end if
+         ! direction determination using a quadratic programming procedure
+         call mxvcop(nc+1,cf,cfo)
+         mfp = 2
+         ipom = 0
+         dir_loop : do
+            call me%dual_range_space_quad_prog(nf,nc,x,ix,xl,xu,cf,cfd,ic,ica,&
+                     cl,cu,cg,cr,cz,g,gf,h,s,mfp,kbf,kbc,idecf,eta2,eta9,eps7,&
+                     eps9,umax,gmax,n,iterq)
+            if ( iterq<0 ) then
+               if ( ipom<10 ) then
+                  ipom = ipom + 1
+                  call transform_incompatible_qp_subproblem(nc,cf,ic,cl,cu,kbc)
+                  cycle dir_loop
+               end if
+               iterd = iterq - 10
+            else
+               ipom = 0
+               iterd = 1
+               gmax = mxvmax(nf,g)
+               gnorm = sqrt(mxvdot(nf,g,g))
+               snorm = sqrt(mxvdot(nf,s,s))
+            end if
+            exit dir_loop
+         end do dir_loop
+         if ( iterd<0 ) iterm = iterd
+         if ( iterm==0 ) then
+            call mxvcop(nc+1,cfo,cf)
+            ! test for sufficient descent
+            p = mxvdot(nf,g,s)
+            irest = 1
+            if ( snorm<=0.0_wp ) then
+            elseif ( p+told*gnorm*snorm<=0.0_wp ) then
+               irest = 0
+            end if
+            if ( irest/=0 ) goto 200
+            nred = 0
+            rmin = alf1*gnorm/snorm
+            rmax = min(alf2*gnorm/snorm,xmax/snorm)
+            if ( gmax<=tolg .and. cmax<=tolc ) then
+               iterm = 4
+               exit main
+            end if
+            call compute_new_penalty_parameters(nf,n,nc,ica,cz,cp)
+            call mxvina(nc,ic)
+            call compute_augmented_lagrangian(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
+            ! preparation of line search
+            ro = 0.0_wp
+            fo = f
+            po = p
+            cmaxo = cmax
+            call mxvcop(nf,x,xo)
+            call mxvcop(nf,g,go)
+            call mxvcop(nf,gf,cr)
+            call mxvcop(nc+1,cf,cfo)            
+            ! line search without directional derivatives
+   450      call me%extended_line_search(r,ro,rp,f,fo,fp,po,pp,fmin,fmax,rmin,&
+                        rmax,tols,kd,ld,me%nit,kit,nred,mred,maxst,iest,inits,&
+                        iters,kters,mes,isys)
+            if ( isys==0 ) then
+               kd = 1
+               ! decision after unsuccessful line search
+               if ( iters<=0 ) then
+                  r = 0.0_wp
+                  f = fo
+                  p = po
+                  call mxvcop(nf,xo,x)
+                  call mxvcop(nf,cr,gf)
+                  call mxvcop(nc+1,cfo,cf)
+                  irest = 1
+                  ld = kd
+                  goto 200
+               end if
+               ! computation of the value and the gradient of the objective
+               ! function together with the values and the gradients of the
+               ! approximated functions
+               if ( kd>ld ) then
+                  lds = ld
+                  call me%compute_obj_and_dobj(nf,x,gf,gf,ff,f,kd,ld,iext)
+                  ld = lds
+                  call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,&
+                                               cg,cmax,kd,ld)
+               end if
+               ! preparation of variable metric update
+               call mxvcop(nf,gf,g)
+               call dual_range_space_qp(nf,n,x,xo,ica,cg,cz,g,go,r,f,fo,p,po,&
+                                        cmax,cmaxo,dmax,kd,ld,iters)
+               ! variable metric update
+               call bfgs_variable_metric_update(n,h,g,s,xo,go,r,po,me%nit,&
+                                                kit,iterh,met,met1,mec)
+               ! if (mer>0.and.iterh>0) irest=1   
+               cycle main   ! end of the iteration
+            else
+               ! go to (11174,11172) isys+1
+               call mxvdir(nf,r,s,xo,x)
+               lds = ld
+               call me%compute_obj_and_dobj(nf,x,gf,g,ff,f,kd,ld,iext)
+               ld = lds
+               call me%compute_con_and_dcon(nf,nc,x,fc,cf,cl,cu,ic,gc,cg,cmax,kd,ld)
+               cf(nc+1) = f
+               call compute_augmented_lagrangian(nf,n,nc,cf,ic,ica,cl,cu,cz,rpf,fc,f)
+               goto 450
+            end if
+         end if
+
+         exit main 
+
+      end do main
+
+      if ( iprnt>1 .or. iprnt<0 ) write (6,'(1x,"exit from psqp :")')
       if ( iprnt/=0 ) &
-         write (6,'(1x,"nit=",i4,2x,"nfv=",i4,2x,"nfg=",i4,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1,2x,"iterm=",i3)') &
+         write (6,'(1x,"nit=",i4,2x,"nfv=",i4,2x,"nfg=",i4,2x,"f=",&
+                  g13.6,2x,"c=",e8.1,2x,"g=",e8.1,2x,"iterm=",i3)') &
                   me%nit , me%nfv , me%nfg , f , cmax , gmax , iterm
       if ( iprnt<0 ) write (6,'(1x,"x=",5(g14.7,1x):/(3x,5(g14.7,1x)))') (x(i),i=1,nf)
 
@@ -1486,11 +1470,9 @@
       end if
       l1 = rl<=ro
       l2 = ri<=rl
-      do ntyp = mtyp , 1 , -1
+      main : do ntyp = mtyp , 1 , -1
          if ( ntyp==1 ) then
-!
-!     bisection
-!
+            ! bisection
             if ( mode==1 ) then
                r = two*ru
                return
@@ -1506,46 +1488,36 @@
             au = (fu-fo)/(ru*po)
          end if
          if ( l1 .and. (ntyp==2 .or. l2) ) then
-!
-!     two point quadratic extrapolation or interpolation
-!
-            if ( au>=one ) goto 100
+            ! two point quadratic extrapolation or interpolation
+            if ( au>=one ) cycle main
             r = half*ru/(one-au)
          elseif ( .not.l1 .or. .not.l2 .and. ntyp==3 ) then
-!
-!     three point quadratic extrapolation or interpolation
-!
+            ! three point quadratic extrapolation or interpolation
             al = (fi-fl)/(ri-rl)
             au = (fu-fi)/(ru-ri)
             den = au - al
-            if ( den<=zero ) goto 100
+            if ( den<=zero ) cycle main
             r = ri - half*(au*(ri-rl)+al*(ru-ri))/den
          elseif ( l1 .and. .not.l2 .and. ntyp==4 ) then
-!
-!     three point cubic extrapolation or interpolation
-!
+            ! three point cubic extrapolation or interpolation
             dis = (ai-one)*(ru/ri)
             den = (au-one)*(ri/ru) - dis
             dis = au + ai - den - two*(one+dis)
             dis = den*den - three*dis
-            if ( dis<zero ) goto 100
+            if ( dis<zero ) cycle main
             den = den + sqrt(dis)
-            if ( den==zero ) goto 100
+            if ( den==zero ) cycle main
             r = (ru-ri)/den
          else
-            goto 100
+            cycle main
          end if
          if ( mode==1 .and. r>ru ) then
-!
-!     extrapolation accepted
-!
+            ! extrapolation accepted
             r = max(r,c1l*ru)
             r = min(r,c1u*ru)
             return
          elseif ( mode==2 .and. r>rl .and. r<ru ) then
-!
-!     interpolation accepted
-!
+            ! interpolation accepted
             if ( ri==zero .and. ntyp/=4 ) then
                r = max(r,rl+c2l*(ru-rl))
             else
@@ -1554,7 +1526,7 @@
             r = min(r,rl+c2u*(ru-rl))
             if ( r/=ri ) return
          end if
- 100  end do
+      end do main
 
       end subroutine line_search_interpolation
 
