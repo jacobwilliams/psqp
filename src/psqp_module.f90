@@ -18,6 +18,8 @@ module psqp_module
 
    private
 
+   integer,parameter,public :: psqp_wp = wp !! export the working precision
+
    type, public :: psqp_class
 
         !! The main class to use.
@@ -120,15 +122,15 @@ contains
 !
 ! easy to use subroutine for general nonlinear programming problems.
 
-   subroutine psqpn(me, nf, nb, nc, x, ix, xl, xu, cf, ic, cl, cu, ipar, rpar, f, gmax, &
+   subroutine psqpn(me, nf, nb, nc, x, ix, xl, xu, cf, constraint_type, cl, cu, ipar, rpar, f, gmax, &
                     cmax, iprnt, iterm, obj, dobj, con, dcon)
 
       class(psqp_class), intent(inout) :: me
 
-      real(wp) :: f     !! value of the objective function.
-      real(wp) :: cmax  !! maximum constraint violation.
-      real(wp) :: gmax  !! maximum partial derivative of the lagrangian function.
-      integer :: iprnt  !! print specification:
+      real(wp),intent(out) :: f     !! value of the objective function.
+      real(wp),intent(out) :: cmax  !! maximum constraint violation.
+      real(wp),intent(out) :: gmax  !! maximum partial derivative of the lagrangian function.
+      integer,intent(in) :: iprnt  !! print specification:
                         !!
                         !! * iprnt=0      - no print.
                         !! * abs(iprnt)=1 - print of final results.
@@ -154,48 +156,48 @@ contains
                                    !!
                                    !! * nb=0-simple bounds suppressed.
                                    !! * nb>0-simple bounds accepted.
-      integer, intent(in) :: nc     !! number of linear constraints.
+      integer, intent(in) :: nc     !! number of general nonlinear constraints.
       integer, intent(in) :: nf     !! number of variables
-      real(wp) :: cf(*)    !! cf(nc+1) vector containing values of the constraint functions.
-      real(wp) :: cl(*)    !! cl(nc) vector containing lower bounds for constraint functions.
-      real(wp) :: cu(*)    !! cu(nc) vector containing upper bounds for constraint functions.
-      real(wp) :: rpar(5)  !! real parameters:
+      real(wp),intent(out) :: cf(*)    !! cf(nc+1) vector containing values of the constraint functions.
+      real(wp),intent(in) :: cl(*)    !! cl(nc) vector containing lower bounds for constraint functions.
+      real(wp),intent(in) :: cu(*)    !! cu(nc) vector containing upper bounds for constraint functions.
+      real(wp),intent(in) :: rpar(5)  !! real parameters:
                            !!
-                           !! * rpar(1)  maximum stepsize.
-                           !! * rpar(2)  tolerance for change of variables.
-                           !! * rpar(3)  tolerance for constraint violations.
-                           !! * rpar(4)  tolerance for the gradient of the lagrangian function.
-                           !! * rpar(5)  penalty coefficient.
-      real(wp) :: x(*)    !! x(nf) vector of variables.
-      real(wp) :: xl(*)   !! xl(nf)vector containing lower bounds for variables.
-      real(wp) :: xu(*)   !! xu(nf) vector containing upper bounds for variables.
-      integer :: ic(*)  !! ic(nc) vector containing types of constraints:
+                           !! * `rpar(1)` -- maximum stepsize.
+                           !! * `rpar(2)` -- tolerance for change of variables.
+                           !! * `rpar(3)` -- tolerance for constraint violations.
+                           !! * `rpar(4)` -- tolerance for the gradient of the lagrangian function.
+                           !! * `rpar(5)` -- penalty coefficient.
+      real(wp),intent(inout) :: x(*)    !! x(nf) vector of variables.
+      real(wp),intent(in) :: xl(*)   !! xl(nf) vector containing lower bounds for variables.
+      real(wp),intent(in) :: xu(*)   !! xu(nf) vector containing upper bounds for variables.
+      integer,dimension(nc),intent(in) :: constraint_type  !! ic(nc) vector containing types of constraints:
                         !!
-                        !! * ic(kc) = 0 -- constraint cf(kc) is not used.
-                        !! * ic(kc) = 1 -- lower constraint cl(kc) <= cf(kc).
-                        !! * ic(kc) = 2 -- upper constraint cf(kc) <= cu(kc).
-                        !! * ic(kc) = 3 -- two side constraint cl(kc) <= cf(kc) <= cu(kc).
-                        !! * ic(kc) = 5 -- equality constraint cf(kc) == cl(kc).
-      integer :: ipar(6)    !! integer paremeters:
+                        !! * `ic(kc) = 0` -- constraint cf(kc) is not used.
+                        !! * `ic(kc) = 1` -- lower constraint cl(kc) <= cf(kc).
+                        !! * `ic(kc) = 2` -- upper constraint cf(kc) <= cu(kc).
+                        !! * `ic(kc) = 3` -- two side constraint cl(kc) <= cf(kc) <= cu(kc).
+                        !! * `ic(kc) = 5` -- equality constraint cf(kc) == cl(kc).
+      integer,intent(in) :: ipar(6)    !! integer paremeters:
                             !!
-                            !! * ipar(1)  maximum number of iterations.
-                            !! * ipar(2)  maximum number of function evaluations.
-                            !! * ipar(3)  this parameter is not used in the subroutine psqp.
-                            !! * ipar(4)  this parameter is not used in the subroutine psqp.
-                            !! * ipar(5)  variable metric update used.
-                            !!   ipar(5)=1 - the bfgs update.
-                            !!   ipar(5)=2 - the hoshino update.
-                            !! * ipar(6)  correction of the variable metric update if a negative
+                            !! * `ipar(1)`  maximum number of iterations.
+                            !! * `ipar(2)`  maximum number of function evaluations.
+                            !! * `ipar(3)`  this parameter is not used in the subroutine psqp.
+                            !! * `ipar(4)`  this parameter is not used in the subroutine psqp.
+                            !! * `ipar(5)`  variable metric update used.
+                            !!   `ipar(5)=1` - the bfgs update.
+                            !!   `ipar(5)=2` - the hoshino update.
+                            !! * `ipar(6)`  correction of the variable metric update if a negative
                             !!   curvature occurs.
-                            !!   ipar(6)=1 - no correction.
-                            !!   ipar(6)=2 - powell's correction.
+                            !!   `ipar(6)=1` - no correction.
+                            !!   `ipar(6)=2` - powell's correction.
       integer, intent(in) :: ix(*) !! ix(nf) vector containing types of bounds.
                                    !!
-                                   !! * ix(i) = 0 -- variable x(i) is unbounded.
-                                   !! * ix(i) = 1 -- lower bound xl(i) <= x(i).
-                                   !! * ix(i) = 2 -- upper bound x(i) <= xu(i).
-                                   !! * ix(i) = 3 -- two side bound xl(i) <= x(i) <= xu(i).
-                                   !! * ix(i) = 5 -- variable x(i) is fixed.
+                                   !! * `ix(i) = 0` -- variable x(i) is unbounded.
+                                   !! * `ix(i) = 1` -- lower bound xl(i) <= x(i).
+                                   !! * `ix(i) = 2` -- upper bound x(i) <= xu(i).
+                                   !! * `ix(i) = 3` -- two side bound xl(i) <= x(i) <= xu(i).
+                                   !! * `ix(i) = 5` -- variable x(i) is fixed.
       procedure(obj_func)  :: obj  !! computation of the value of the objective function
       procedure(dobj_func) :: dobj !! computation of the gradient of the objective function
       procedure(con_func)  :: con  !! computation of the value of the constraint function
@@ -204,12 +206,15 @@ contains
       integer :: lcfd, lcfo, lcg, lcp, lcr, lcz, lg, lgc, lgf, lgo, lh, lia, ls, lxo
       integer, dimension(:), allocatable :: ia
       real(wp), dimension(:), allocatable :: ra
+      integer,dimension(nc) :: ic !! local copy of `constraint_type` since it is modified
 
       ! set the functions:
       me%obj => obj
       me%dobj => dobj
       me%con => con
       me%dcon => dcon
+
+      ic = constraint_type
 
       allocate (ia(nf), ra((nf + nc + 8)*nf + 3*nc + 1))
 
@@ -626,8 +631,7 @@ contains
 
       if (iprnt > 1 .or. iprnt < 0) write (6, '(1x,"exit from psqp :")')
       if (iprnt /= 0) &
-         write (6, '(1x,"nit=",i4,2x,"nfv=",i4,2x,"nfg=",i4,2x,"f=",&
-                  g13.6,2x,"c=",e8.1,2x,"g=",e8.1,2x,"iterm=",i3)') &
+         write (6, '(1x,"nit=",i4,2x,"nfv=",i4,2x,"nfg=",i4,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1,2x,"iterm=",i3)') &
                   me%nit, me%nfv, me%nfg, f, cmax, gmax, iterm
       if (iprnt < 0) write (6, '(1x,"x=",5(g14.7,1x):/(3x,5(g14.7,1x)))') (x(i), i=1, nf)
 
