@@ -702,18 +702,18 @@ contains
    subroutine compute_obj_and_dobj(me, nf, x, gf, g, ff, f, kd, ld, iext)
 
       class(psqp_class), intent(inout) :: me
-      real(wp) :: f     !! value of the objective function.
-      real(wp) :: ff    !! value of the model function.
-      integer :: iext   !! type of extremum.
-                        !!
-                        !! * iext=0 - minimum.
-                        !! * iext=1 - maximum.
-      integer :: kd     !! degree of required derivatives.
-      integer :: ld     !! degree of previously computed derivatives.
-      integer :: nf     !! number of variables.
-      real(wp) :: gf(nf) !! gf(nf)  gradient of the model function.
-      real(wp) :: g(nf)  !! g(nf)  gradient of the objective function.
-      real(wp) :: x(nf)  !! x(nf)  vector of variables.
+      integer,intent(in) :: nf       !! number of variables.
+      real(wp),intent(in) :: x(nf)   !! x(nf)   vector of variables.
+      real(wp),intent(out) :: gf(nf) !! gf(nf)  gradient of the model function.
+      real(wp),intent(out) :: g(nf)  !! g(nf)   gradient of the objective function.
+      real(wp),intent(out) :: ff     !! value of the model function.
+      real(wp),intent(out) :: f      !! value of the objective function.
+      integer,intent(in) :: kd       !! degree of required derivatives.
+      integer,intent(inout) :: ld    !! degree of previously computed derivatives.
+      integer,intent(in) :: iext     !! type of extremum.
+                                     !!
+                                     !! * `iext=0` -- minimum.
+                                     !! * `iext=1` -- maximum.
 
       if (kd <= ld) return
       if (ld < 0) then
