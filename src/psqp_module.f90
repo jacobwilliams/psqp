@@ -178,19 +178,19 @@ contains
       real(wp),intent(out) :: cmax  !! maximum constraint violation.
       integer,intent(in) :: iprnt  !! print specification:
                                    !!
-                                   !! * iprnt=0      - no print.
-                                   !! * abs(iprnt)=1 - print of final results.
-                                   !! * abs(iprnt)=2 - print of final results and iterations.
-                                   !! * iprnt>0      - basic final results.
-                                   !! * iprnt<0      - extended final results.
+                                   !! * `iprnt=0`      -- no print.
+                                   !! * `abs(iprnt)=1` -- print of final results.
+                                   !! * `abs(iprnt)=2` -- print of final results and iterations.
+                                   !! * `iprnt>0`      -- basic final results.
+                                   !! * `iprnt<0`      -- extended final results.
       integer, intent(out) :: iterm !! variable that indicates the cause of termination.
                                     !!
                                     !! * `iterm=1`  -- if abs(x-xo) was less than or equal to tolx in mtesx (usually two) subsequent iterations.
-                                    !! * `iterm=2   -- if abs(f-fo) was less than or equal to tolf in mtesf (usually two) subsequent iterations.
+                                    !! * `iterm=2`  -- if abs(f-fo) was less than or equal to tolf in mtesf (usually two) subsequent iterations.
                                     !! * `iterm=3`  -- if f is less than or equal to tolb.
                                     !! * `iterm=4`  -- if gmax is less than or equal to tolg.
-                                    !! * `iterm=11` -- if nit exceeded mit. iterm=12-if nfv exceeded mfv.
-                                    !! * `iterm=13` -- if nfg exceeded mfg. iterm<0-if the method failed.
+                                    !! * `iterm=11` -- if nit exceeded mit. iterm=12 - if nfv exceeded mfv.
+                                    !! * `iterm=13` -- if nfg exceeded mfg. iterm<0 - if the method failed.
                                     !! * `iterm=-6` -- then the termination criterion has not been satisfied, but the point obtained if usually acceptable.
       procedure(obj_func)  :: obj  !! computation of the value of the objective function
       procedure(dobj_func) :: dobj !! computation of the gradient of the objective function
