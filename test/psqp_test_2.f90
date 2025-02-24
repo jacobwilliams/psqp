@@ -26,7 +26,7 @@
                                                 0, &  ! this parameter is not used in the subroutine psqp.
                                                 1, &  ! variable metric update used.
                                                 1]    ! correction of the variable metric update if a negative curvature occurs.
-    real(wp),dimension(5) :: rpar = [0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp, 0.0_wp]    !! real parameters:
+    real(wp),dimension(5) :: rpar = [0.0_wp, 2*epsilon(1.0_wp), 2*epsilon(1.0_wp), 0.0_wp, 0.0_wp]    !! real parameters:
                                                                                 !!
                                                                                 !! * rpar(1)  maximum stepsize.
                                                                                 !! * rpar(2)  tolerance for change of variables.
