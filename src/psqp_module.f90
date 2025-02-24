@@ -4,8 +4,8 @@
 !  nonlinear programming problems.
 !
 !### History
-!  * Original Fortran 77 code by Ladislav Luksan
-!    http://www.cs.cas.cz/~luksan/subroutines.html
+!  * [Original Fortran 77 code](http://www.cs.cas.cz/~luksan/subroutines.html)
+!    by Ladislav Luksan.
 !  * Jacob Williams, Aug 2017,
 !    Significant refactoring to modern Fortran.
 
@@ -22,7 +22,7 @@ module psqp_module
 
    type, public :: psqp_class
 
-        !! The main class to use.
+      !! The main PSQP class to use.
 
       private
 
@@ -48,9 +48,9 @@ module psqp_module
       real(wp) :: ri = 0.0_wp
       real(wp) :: fi = 0.0_wp
 
-      procedure(obj_func), pointer :: obj => null() !! objective function
+      procedure(obj_func), pointer  :: obj  => null() !! objective function
       procedure(dobj_func), pointer :: dobj => null() !! gradient of the objective function
-      procedure(con_func), pointer :: con => null() !! constraint function
+      procedure(con_func), pointer  :: con  => null() !! constraint function
       procedure(dcon_func), pointer :: dcon => null() !! gradient of the constraint function
 
    contains
@@ -122,82 +122,76 @@ contains
 !
 ! easy to use subroutine for general nonlinear programming problems.
 
-   subroutine psqpn(me, nf, nb, nc, x, ix, xl, xu, cf, constraint_type, cl, cu, ipar, rpar, f, gmax, &
+   subroutine psqpn(me, nf, nb, nc, x, bound_type, xl, xu, cf, constraint_type, &
+                    cl, cu, ipar, rpar, f, gmax, &
                     cmax, iprnt, iterm, obj, dobj, con, dcon)
 
       class(psqp_class), intent(inout) :: me
-
+      integer, intent(in) :: nf  !! number of variables
+      integer, intent(in) :: nb  !! choice of simple bounds.
+                                 !!
+                                 !! * `nb=0` -- simple bounds suppressed.
+                                 !! * `nb>0` -- simple bounds accepted.
+      integer, intent(in) :: nc  !! number of general nonlinear constraints.
+      real(wp),dimension(nf),intent(inout) :: x !! x(nf) vector of variables.
+      integer, dimension(nf), intent(in) :: bound_type !! ix(nf) vector containing types of bounds.
+                                                       !!
+                                                       !! * `ix(i) = 0` -- variable x(i) is unbounded.
+                                                       !! * `ix(i) = 1` -- lower bound xl(i) <= x(i).
+                                                       !! * `ix(i) = 2` -- upper bound x(i) <= xu(i).
+                                                       !! * `ix(i) = 3` -- two side bound xl(i) <= x(i) <= xu(i).
+                                                       !! * `ix(i) = 5` -- variable x(i) is fixed.
+      real(wp),dimension(nf),intent(in) :: xl   !! xl(nf) vector containing lower bounds for variables.
+      real(wp),dimension(nf),intent(in) :: xu   !! xu(nf) vector containing upper bounds for variables.
+      real(wp),dimension(nc+1),intent(out) :: cf !! cf(nc+1) vector containing values of the constraint functions.
+      integer,dimension(nc),intent(in) :: constraint_type  !! ic(nc) vector containing types of constraints:
+                                                           !!
+                                                           !! * `ic(kc) = 0` -- constraint cf(kc) is not used.
+                                                           !! * `ic(kc) = 1` -- lower constraint cl(kc) <= cf(kc).
+                                                           !! * `ic(kc) = 2` -- upper constraint cf(kc) <= cu(kc).
+                                                           !! * `ic(kc) = 3` -- two side constraint cl(kc) <= cf(kc) <= cu(kc).
+                                                           !! * `ic(kc) = 5` -- equality constraint cf(kc) == cl(kc).
+      real(wp),dimension(nc),intent(in) :: cl  !! cl(nc) vector containing lower bounds for constraint functions.
+      real(wp),dimension(nc),intent(in) :: cu  !! cu(nc) vector containing upper bounds for constraint functions.
+      integer,dimension(6),intent(in) :: ipar  !! integer paremeters:
+                                               !!
+                                               !! * `ipar(1)`  maximum number of iterations.
+                                               !! * `ipar(2)`  maximum number of function evaluations.
+                                               !! * `ipar(3)`  this parameter is not used in the subroutine psqp.
+                                               !! * `ipar(4)`  this parameter is not used in the subroutine psqp.
+                                               !! * `ipar(5)`  variable metric update used.
+                                               !!   `ipar(5)=1` - the bfgs update.
+                                               !!   `ipar(5)=2` - the hoshino update.
+                                               !! * `ipar(6)`  correction of the variable metric update if a negative
+                                               !!   curvature occurs.
+                                               !!   `ipar(6)=1` - no correction.
+                                               !!   `ipar(6)=2` - powell's correction.
+      real(wp),dimension(5),intent(in) :: rpar   !! real parameters:
+                                                 !!
+                                                 !! * `rpar(1)` -- maximum stepsize.
+                                                 !! * `rpar(2)` -- tolerance for change of variables.
+                                                 !! * `rpar(3)` -- tolerance for constraint violations.
+                                                 !! * `rpar(4)` -- tolerance for the gradient of the lagrangian function.
+                                                 !! * `rpar(5)` -- penalty coefficient.
       real(wp),intent(out) :: f     !! value of the objective function.
-      real(wp),intent(out) :: cmax  !! maximum constraint violation.
       real(wp),intent(out) :: gmax  !! maximum partial derivative of the lagrangian function.
+      real(wp),intent(out) :: cmax  !! maximum constraint violation.
       integer,intent(in) :: iprnt  !! print specification:
-                        !!
-                        !! * iprnt=0      - no print.
-                        !! * abs(iprnt)=1 - print of final results.
-                        !! * abs(iprnt)=2 - print of final results and iterations.
-                        !! * iprnt>0      - basic final results.
-                        !! * iprnt<0      - extended final results.
+                                   !!
+                                   !! * iprnt=0      - no print.
+                                   !! * abs(iprnt)=1 - print of final results.
+                                   !! * abs(iprnt)=2 - print of final results and iterations.
+                                   !! * iprnt>0      - basic final results.
+                                   !! * iprnt<0      - extended final results.
       integer, intent(out) :: iterm !! variable that indicates the cause of termination.
                                     !!
-                                    !! * iterm=1  - if abs(x-xo) was less than or equal
-                                    !!   to tolx in mtesx (usually two) subsequent iterations.
-                                    !! * iterm=2  - if abs(f-fo) was less than or equal to
-                                    !!   tolf in mtesf (usually two) subsequent iterations.
-                                    !! * iterm=3  - if f is less than or equal to tolb.
-                                    !! * iterm=4  - if gmax is less than or equal to tolg.
-                                    !! * iterm=11 - if nit exceeded mit. iterm=12-if nfv
-                                    !!   exceeded mfv.
-                                    !! * iterm=13 - if nfg exceeded mfg. iterm<0-if the
-                                    !!   method failed.
-                                    !! * iterm=-6, then the termination criterion has not
-                                    !!   been satisfied, but the point obtained if usually
-                                    !!   acceptable.
-      integer, intent(in) :: nb    !! choice of simple bounds.
-                                   !!
-                                   !! * nb=0-simple bounds suppressed.
-                                   !! * nb>0-simple bounds accepted.
-      integer, intent(in) :: nc     !! number of general nonlinear constraints.
-      integer, intent(in) :: nf     !! number of variables
-      real(wp),intent(out) :: cf(*)    !! cf(nc+1) vector containing values of the constraint functions.
-      real(wp),intent(in) :: cl(*)    !! cl(nc) vector containing lower bounds for constraint functions.
-      real(wp),intent(in) :: cu(*)    !! cu(nc) vector containing upper bounds for constraint functions.
-      real(wp),intent(in) :: rpar(5)  !! real parameters:
-                           !!
-                           !! * `rpar(1)` -- maximum stepsize.
-                           !! * `rpar(2)` -- tolerance for change of variables.
-                           !! * `rpar(3)` -- tolerance for constraint violations.
-                           !! * `rpar(4)` -- tolerance for the gradient of the lagrangian function.
-                           !! * `rpar(5)` -- penalty coefficient.
-      real(wp),intent(inout) :: x(*)    !! x(nf) vector of variables.
-      real(wp),intent(in) :: xl(*)   !! xl(nf) vector containing lower bounds for variables.
-      real(wp),intent(in) :: xu(*)   !! xu(nf) vector containing upper bounds for variables.
-      integer,dimension(nc),intent(in) :: constraint_type  !! ic(nc) vector containing types of constraints:
-                        !!
-                        !! * `ic(kc) = 0` -- constraint cf(kc) is not used.
-                        !! * `ic(kc) = 1` -- lower constraint cl(kc) <= cf(kc).
-                        !! * `ic(kc) = 2` -- upper constraint cf(kc) <= cu(kc).
-                        !! * `ic(kc) = 3` -- two side constraint cl(kc) <= cf(kc) <= cu(kc).
-                        !! * `ic(kc) = 5` -- equality constraint cf(kc) == cl(kc).
-      integer,intent(in) :: ipar(6)    !! integer paremeters:
-                            !!
-                            !! * `ipar(1)`  maximum number of iterations.
-                            !! * `ipar(2)`  maximum number of function evaluations.
-                            !! * `ipar(3)`  this parameter is not used in the subroutine psqp.
-                            !! * `ipar(4)`  this parameter is not used in the subroutine psqp.
-                            !! * `ipar(5)`  variable metric update used.
-                            !!   `ipar(5)=1` - the bfgs update.
-                            !!   `ipar(5)=2` - the hoshino update.
-                            !! * `ipar(6)`  correction of the variable metric update if a negative
-                            !!   curvature occurs.
-                            !!   `ipar(6)=1` - no correction.
-                            !!   `ipar(6)=2` - powell's correction.
-      integer, intent(in) :: ix(*) !! ix(nf) vector containing types of bounds.
-                                   !!
-                                   !! * `ix(i) = 0` -- variable x(i) is unbounded.
-                                   !! * `ix(i) = 1` -- lower bound xl(i) <= x(i).
-                                   !! * `ix(i) = 2` -- upper bound x(i) <= xu(i).
-                                   !! * `ix(i) = 3` -- two side bound xl(i) <= x(i) <= xu(i).
-                                   !! * `ix(i) = 5` -- variable x(i) is fixed.
+                                    !! * `iterm=1`  -- if abs(x-xo) was less than or equal to tolx in mtesx (usually two) subsequent iterations.
+                                    !! * `iterm=2   -- if abs(f-fo) was less than or equal to tolf in mtesf (usually two) subsequent iterations.
+                                    !! * `iterm=3`  -- if f is less than or equal to tolb.
+                                    !! * `iterm=4`  -- if gmax is less than or equal to tolg.
+                                    !! * `iterm=11` -- if nit exceeded mit. iterm=12-if nfv exceeded mfv.
+                                    !! * `iterm=13` -- if nfg exceeded mfg. iterm<0-if the method failed.
+                                    !! * `iterm=-6` -- then the termination criterion has not been satisfied, but the point obtained if usually acceptable.
       procedure(obj_func)  :: obj  !! computation of the value of the objective function
       procedure(dobj_func) :: dobj !! computation of the gradient of the objective function
       procedure(con_func)  :: con  !! computation of the value of the constraint function
@@ -206,18 +200,21 @@ contains
       integer :: lcfd, lcfo, lcg, lcp, lcr, lcz, lg, lgc, lgf, lgo, lh, lia, ls, lxo
       integer, dimension(:), allocatable :: ia
       real(wp), dimension(:), allocatable :: ra
-      integer,dimension(nc) :: ic !! local copy of `constraint_type` since it is modified
+      integer,dimension(:),allocatable :: ic !! local copy of `constraint_type` since it is modified
+      integer,dimension(:),allocatable :: ix !! local copy of `bound_type` since it is modified
 
       ! set the functions:
-      me%obj => obj
+      me%obj  => obj
       me%dobj => dobj
-      me%con => con
+      me%con  => con
       me%dcon => dcon
 
-      ic = constraint_type
-
       allocate (ia(nf), ra((nf + nc + 8)*nf + 3*nc + 1))
+      allocate (ic(nc))
+      allocate (ix(nf))
 
+      ic = constraint_type ! make a copy of input
+      ix = bound_type ! make a copy of input
       lcg = 1
       lcfo = lcg + nf*nc
       lcfd = lcfo + nc + 1
@@ -238,7 +235,7 @@ contains
                    rpar(5), cmax, gmax, f, ipar(1), ipar(2), ipar(5), ipar(6), &
                    iprnt, iterm)
 
-      deallocate (ia, ra)
+      deallocate (ia, ra, ic, ix)
 
    end subroutine psqpn
 !***********************************************************************
@@ -328,21 +325,21 @@ contains
       real(wp) :: xl(*)     !! xl(nf)  vector containing lower bounds for variables.
       real(wp) :: xu(*)     !! xu(nf)  vector containing upper bounds for variables.
       real(wp) :: xo(*)     !! xo(nf)  vectors of variables difference.
-      integer :: ic(*)      !! ic(nc)  vector containing types of constraints.
-                            !!
-                            !! * ic(kc)=0 - constraint cf(kc) is not used.
-                            !! * ic(kc)=1 - lower constraint cl(kc)<=cf(kc).
-                            !! * ic(kc)=2 - upper constraint cf(kc)<=cu(kc).
-                            !! * ic(kc)=3 - two side constraint cl(kc)<=cf(kc)<=cu(kc).
-                            !! * ic(kc)=5 - equality constraint cf(kc)==cl(kc).
+      integer,intent(inout) :: ic(*) !! ic(nc)  vector containing types of constraints.
+                                     !!
+                                     !! * ic(kc)=0 - constraint cf(kc) is not used.
+                                     !! * ic(kc)=1 - lower constraint cl(kc)<=cf(kc).
+                                     !! * ic(kc)=2 - upper constraint cf(kc)<=cu(kc).
+                                     !! * ic(kc)=3 - two side constraint cl(kc)<=cf(kc)<=cu(kc).
+                                     !! * ic(kc)=5 - equality constraint cf(kc)==cl(kc).
       integer :: ica(*)     !! ica(nf)  vector containing indices of active constraints.
-      integer :: ix(*)      !! ix(nf)  vector containing types of bounds.
-                            !!
-                            !! * ix(i)=0 - variable x(i) is unbounded.
-                            !! * ix(i)=1 - lover bound xl(i)<=x(i).
-                            !! * ix(i)=2 - upper bound x(i)<=xu(i).
-                            !! * ix(i)=3 - two side bound xl(i)<=x(i)<=xu(i).
-                            !! * ix(i)=5 - variable x(i) is fixed.
+      integer,intent(inout) :: ix(*) !! ix(nf)  vector containing types of bounds.
+                                     !!
+                                     !! * ix(i)=0 - variable x(i) is unbounded.
+                                     !! * ix(i)=1 - lover bound xl(i)<=x(i).
+                                     !! * ix(i)=2 - upper bound x(i)<=xu(i).
+                                     !! * ix(i)=3 - two side bound xl(i)<=x(i)<=xu(i).
+                                     !! * ix(i)=5 - variable x(i) is fixed.
 
       real(wp) :: alf1, alf2, cmaxo, dmax, eps7, eps9, eta0, &
                   eta2, eta9, fmax, fmin, fo, gnorm, p, po, &
@@ -1699,7 +1696,7 @@ contains
       real(wp), parameter :: tol = 1.0d-4
 
       if (isys /= 1) then
-!      go to (1,3) isys+1
+         ! go to (1,3) isys+1
          me%mes1 = 2
          me%mes2 = 2
          iters = 0
@@ -1714,9 +1711,7 @@ contains
             isys = 0
             return
          end if
-!
-!     initial stepsize selection
-!
+         ! initial stepsize selection
          if (inits > 0) then
             rtemp = fmin - f
          elseif (iest == 0) then
@@ -1766,9 +1761,7 @@ contains
             maxst = 0
             if (l2) maxst = 1
          end if
-!
-!     test on termination
-!
+         ! test on termination
          if (l1 .and. .not. l3) then
             iters = 0
             isys = 0
@@ -1806,9 +1799,7 @@ contains
             if (f >= fmax) me%mtyp = 1
          end if
          if (me%mode == 1) then
-!
-!     interval change after extrapolation
-!
+            ! interval change after extrapolation
             me%rl = me%ri
             me%fl = me%fi
             me%ri = me%ru
@@ -1821,9 +1812,7 @@ contains
             elseif (me%mes1 == 1) then
                me%mtyp = 1
             end if
-!
-!     interval change after interpolation
-!
+            ! interval change after interpolation
          elseif (r <= me%ri) then
             if (f <= me%fi) then
                me%ru = me%ri
@@ -1844,9 +1833,7 @@ contains
             me%fu = f
          end if
       end if
-!
-!     new stepsize selection (extrapolation or interpolation)
-!
+      ! new stepsize selection (extrapolation or interpolation)
       call line_search_interpolation(ro, me%rl, me%ru, me%ri, fo, me%fl, me%fu, &
                                      me%fi, po, r, me%mode, me%mtyp, merr)
       if (merr > 0) then
@@ -1859,9 +1846,7 @@ contains
       elseif (me%mode == 2) then
          nred = nred + 1
       end if
-!
-!     computation of the new function value
-!
+      ! computation of the new function value
       kd = 0
       ld = -1
       isys = 1
@@ -1912,9 +1897,8 @@ contains
 
       l1 = met1 >= 3 .or. met1 == 2 .and. nit == kit
       l3 = .not. l1
-!
-!     determination of the parameters b, c
-!
+
+      ! determination of the parameters b, c
       b = mxvdot(n, xo, go)
       a = 0.0_wp
       if (l1) then
@@ -1935,9 +1919,7 @@ contains
       end if
       if (mec > 1) then
          if (b <= 1.0e-4_wp*c) then
-!
-!     powell's correction
-!
+            ! powell's correction
             dis = (1.0_wp - 0.1_wp)*c/(c - b)
             call mxvdif(n, go, s, go)
             call mxvdir(n, dis, go, s, go)
@@ -1949,9 +1931,7 @@ contains
          return
       end if
       if (l1) then
-!
-!     determination of the parameter gam (self scaling)
-!
+         ! determination of the parameter gam (self scaling)
          if (met == 1) then
             par = c/b
          elseif (a <= 0.0_wp) then
@@ -1969,15 +1949,11 @@ contains
          par = gam
       end if
       if (met == 1) then
-!
-!     bfgs update
-!
+         ! bfgs update
          call mxdpgu(n, h, par/b, go, xo)
          call mxdpgu(n, h, -1.0_wp/c, s, xo)
       else
-!
-!     hoshino update
-!
+         ! hoshino update
          den = par*b + c
          dis = 0.5_wp*b
          call mxvdir(n, par, go, s, s)
