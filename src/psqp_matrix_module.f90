@@ -4,6 +4,8 @@
 !
 !### History
 ! * Original version: LU, 1991
+!
+!@note Some of these could just be replaced with normal array operations.
 
    module psqp_matrix_module
 
@@ -13,6 +15,8 @@
 
       public
 
+      private :: wp
+
    contains
 !***********************************************************************
 
@@ -20,33 +24,30 @@
 !> date: 91/12/01
 !
 ! solution of a system of linear equations with a dense symmetric
-! positive definite matrix a+e using the factorization a+e=l*d*trans(l)
-! obtained by the subroutine mxdpgf.
+! positive definite matrix a+e using the factorization `a+e=l*d*trans(l)`
+! obtained by the subroutine [[mxdpgf]].
 !
 !### Method
 ! back substitution
 
-      subroutine mxdpgb(n,a,x,job)
+      pure subroutine mxdpgb(n,a,x,job)
 
-      implicit none
-
-      integer :: job  !! option
-                      !!
-                      !! * if job=0 then x:=(a+e)**(-1)*x.
-                      !! * if job>0 then x:=l**(-1)*x.
-                      !! * if job<0 then x:=trans(l)**(-1)*x.
-      integer :: n  !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
-                                !! obtained by the subroutine mxdpgf.
-      real(wp) :: x(*)  !! x(n)  on input the right hand side of a
-                                !! system of linear equations. on output the
-                                !! solution of a system of linear equations.
+      integer,intent(in) :: job  !! option
+                                 !!
+                                 !! * if `job=0` then `x:=(a+e)**(-1)*x`.
+                                 !! * if `job>0` then `x:=l**(-1)*x`.
+                                 !! * if `job<0` then `x:=trans(l)**(-1)*x`.
+      integer,intent(in) :: n  !! order of the matrix a.
+      real(wp),intent(in) :: a(*)  !! `a(n*(n+1)/2)` factorization `a+e=l*d*trans(l)`
+                                   !! obtained by the subroutine [[mxdpgf]].
+      real(wp),intent(inout) :: x(*)  !! x(n)  on input the right hand side of a
+                                      !! system of linear equations. on output the
+                                      !! solution of a system of linear equations.
 
       integer :: i , ii , ij , j
+
       if ( job>=0 ) then
-!
-!     phase 1 : x:=l**(-1)*x
-!
+         ! phase 1 : x:=l**(-1)*x
          ij = 0
          do i = 1 , n
             do j = 1 , i - 1
@@ -57,9 +58,7 @@
          end do
       endif
       if ( job==0 ) then
-!
-!     phase 2 : x:=d**(-1)*x
-!
+         ! phase 2 : x:=d**(-1)*x
          ii = 0
          do i = 1 , n
             ii = ii + i
@@ -67,9 +66,7 @@
          end do
       endif
       if ( job<=0 ) then
-!
-!     phase 3 : x:=trans(l)**(-1)*x
-!
+         ! phase 3 : x:=trans(l)**(-1)*x
          ii = n*(n-1)/2
          do i = n - 1 , 1 , -1
             ij = ii
@@ -85,7 +82,7 @@
 !***********************************************************************
 !> date: 89/12/01
 !
-! factorization a+e=l*d*trans(l) of a dense symmetric positive definite
+! factorization `a+e=l*d*trans(l)` of a dense symmetric positive definite
 ! matrix a+e where d and e are diagonal positive definite matrices and
 ! l is a lower triangular matrix. if a is sufficiently positive
 ! definite then e=0.
@@ -95,24 +92,23 @@
 !    linearly constrained optimization, math. programming 28 (1974)
 !    pp. 311-350.
 
-      subroutine mxdpgf(n,a,inf,alf,tau)
+      pure subroutine mxdpgf(n,a,inf,alf,tau)
 
-      implicit none
-
-      real(wp) :: alf  !! on input a desired tolerance for positive definiteness. on
-                       !! output the most negative diagonal element used in the
-                       !! factorization process (if inf>0).
-      real(wp) :: tau  !! maximum diagonal element of the matrix e.
-      integer :: inf  !! an information obtained in the factorization process. if
-                      !! inf=0 then a is sufficiently positive definite and e=0. if
-                      !! inf<0 then a is not sufficiently positive definite and e>0. if
-                      !! inf>0 then a is indefinite and inf is an index of the
-                      !! most negative diagonal element used in the factorization
-                      !! process.
-      integer :: n  !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2)  on input a given dense symmetric (usually positive
-                        !! definite) matrix a stored in the packed form. on output the
-                        !! computed factorization a+e=l*d*trans(l).
+      real(wp),intent(inout) :: alf  !! on input a desired tolerance for positive definiteness. on
+                                     !! output the most negative diagonal element used in the
+                                     !! factorization process (if inf>0).
+      real(wp),intent(out) :: tau  !! maximum diagonal element of the matrix e.
+      integer,intent(out) :: inf  !! an information obtained in the factorization process. if:
+                                  !!
+                                  !!  * `inf=0` then a is sufficiently positive definite and e=0. if
+                                  !!  * `inf<0` then a is not sufficiently positive definite and e>0. if
+                                  !!  * `inf>0` then a is indefinite and inf is an index of the
+                                  !!    most negative diagonal element used in the factorization
+                                  !!    process.
+      integer,intent(in) :: n  !! order of the matrix a.
+      real(wp),intent(inout) :: a(*)  !! `a(n*(n+1)/2)`  on input a given dense symmetric (usually positive
+                                      !! definite) matrix a stored in the packed form. on output the
+                                      !! computed factorization `a+e=l*d*trans(l)`.
 
       real(wp) :: bet , del , gam , rho , sig , tol
       integer :: i , ij , ik , j , k , kj , kk , l
@@ -120,9 +116,9 @@
       l = 0
       inf = 0
       tol = alf
-!
-!     estimation of the matrix norm
-!
+
+      ! estimation of the matrix norm
+
       alf = 0.0_wp
       bet = 0.0_wp
       gam = 0.0_wp
@@ -138,14 +134,12 @@
          end do
       end do
       bet = max(tol,bet,gam/n)
-!      del = tol*bet
+      ! del = tol*bet
       del = tol*max(bet,1.0_wp)
       kk = 0
       do k = 1 , n
          kk = kk + k
-!
-!     determination of a diagonal correction
-!
+         ! determination of a diagonal correction
          sig = a(kk)
          if ( alf>sig ) then
             alf = sig
@@ -163,9 +157,7 @@
             tau = rho - sig
             inf = -1
          endif
-!
-!     gaussian elimination
-!
+         ! gaussian elimination
          a(kk) = rho
          kj = kk
          do j = k + 1 , n
@@ -187,20 +179,18 @@
 !***********************************************************************
 !> date: 91/12/01
 !
-! computation of the number mxdpgp=trans(x)*d**(-1)*y where d is a
-! diagonal matrix in the factorization a+e=l*d*trans(l) obtained by the
-! subroutine mxdpgf.
+! computation of the number `mxdpgp=trans(x)*d**(-1)*y` where d is a
+! diagonal matrix in the factorization `a+e=l*d*trans(l)` obtained by the
+! subroutine [[mxdpgf]].
 
-      function mxdpgp(n,a,x,y)
+      pure function mxdpgp(n,a,x,y)
 
-      implicit none
-
-      integer :: n  !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
-                        !! obtained by the subroutine mxdpgf.
-      real(wp) :: x(*)  !! input vector.
-      real(wp) :: y(*)  !! input vector.
-      real(wp) :: mxdpgp  !! computed number mxdpgp=trans(x)*d**(-1)*y.
+      integer,intent(in) :: n  !! order of the matrix a.
+      real(wp),intent(in) :: a(*)  !! `a(n*(n+1)/2)` factorization `a+e=l*d*trans(l)`
+                                   !! obtained by the subroutine [[mxdpgf]].
+      real(wp),intent(in) :: x(*)  !! input vector.
+      real(wp),intent(in) :: y(*)  !! input vector.
+      real(wp) :: mxdpgp  !! computed number `mxdpgp=trans(x)*d**(-1)*y`.
 
       real(wp) :: temp
       integer :: i , j
@@ -218,16 +208,14 @@
 !> date: 91/12/01
 !
 ! scaling of a dense symmetric positive definite matrix a+e using the
-! factorization a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
+! factorization `a+e=l*d*trans(l)` obtained by the subroutine [[mxdpgf]].
 
-      subroutine mxdpgs(n,a,alf)
+      pure subroutine mxdpgs(n,a,alf)
 
-      implicit none
-
-      real(wp) :: alf  !! scaling factor.
-      integer :: n  !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
-                        !! obtained by the subroutine mxdpgf.
+      real(wp),intent(in) :: alf  !! scaling factor.
+      integer,intent(in) :: n  !! order of the matrix a.
+      real(wp),intent(inout) :: a(*)  !! `a(n*(n+1)/2)` factorization `a+e=l*d*trans(l)`
+                                      !! obtained by the subroutine [[mxdpgf]].
 
       integer :: i , j
 
@@ -242,25 +230,23 @@
 !***********************************************************************
 !> date: 89/12/01
 !
-! correction of a dense symmetric positive definite matrix a+e in the
-! factored form a+e=l*d*trans(l) obtained by the subroutine mxdpgf.
-! the correction is defined as a+e:=a+e+alf*x*trans(x) where alf is a
-! given scaling factor and x is a given vector.
+! correction of a dense symmetric positive definite matrix `a+e` in the
+! factored form `a+e=l*d*trans(l)` obtained by the subroutine [[mxdpgf]].
+! the correction is defined as `a+e:=a+e+alf*x*trans(x)` where `alf` is a
+! given scaling factor and `x` is a given vector.
 !
 !### Method
 !  * p.e.gill, w.murray, m.saunders: methods for computing and modifying
 !    the ldv factors of a matrix, math. of comp. 29 (1974) pp. 1051-1077.
 
-      subroutine mxdpgu(n,a,alf,x,y)
+      pure subroutine mxdpgu(n,a,alf,x,y)
 
-      implicit none
-
-      real(wp) :: alf  !! scaling factor in the correction term.
-      integer :: n  !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a+e=l*d*trans(l)
-                        !! obtained by the subroutine mxdpgf.
-      real(wp) :: x(*)  !! vector in the correction term.
-      real(wp) :: y(*)  !! auxiliary vector.
+      integer,intent(in) :: n  !! order of the matrix a.
+      real(wp),intent(in) :: alf  !! scaling factor in the correction term.
+      real(wp),intent(inout) :: a(*)  !! `a(n*(n+1)/2)` factorization `a+e=l*d*trans(l)`
+                                      !! obtained by the subroutine [[mxdpgf]].
+      real(wp),intent(in) :: x(*)  !! vector in the correction term.
+      real(wp),intent(out) :: y(*)  !! auxiliary vector.
 
       real(wp) :: alfr
       real(wp) :: b , d , p , r , t , to
@@ -272,9 +258,7 @@
       real(wp), parameter :: con = 1.0e-8_wp
 
       if ( alf>=zero ) then
-!
-!     forward correction in case when the scaling factor is nonnegative
-!
+         ! forward correction in case when the scaling factor is nonnegative
          alfr = sqrt(alf)
          call mxvscl(n,alfr,x,y)
          to = one
@@ -288,9 +272,7 @@
             a(ii) = d/r
             b = p/(d*t)
             if ( a(ii)<=four*d ) then
-!
-!     an easy formula for limited diagonal element
-!
+               ! an easy formula for limited diagonal element
                ij = ii
                do j = i + 1 , n
                   ij = ij + j - 1
@@ -299,10 +281,8 @@
                   a(ij) = d + b*y(j)
                end do
             else
-!
-!     a more complicate but numerically stable formula for unlimited
-!     diagonal element
-!
+               ! a more complicate but numerically stable formula for unlimited
+               ! diagonal element
                ij = ii
                do j = i + 1 , n
                   ij = ij + j - 1
@@ -314,9 +294,7 @@
             to = t
          end do
       else
-!
-!     backward correction in case when the scaling factor is negative
-!
+         ! backward correction in case when the scaling factor is negative
          alfr = sqrt(-alf)
          call mxvscl(n,alfr,x,y)
          to = one
@@ -361,27 +339,23 @@
 !### Method
 ! back substitution
 
-      subroutine mxdprb(n,a,x,job)
+      pure subroutine mxdprb(n,a,x,job)
 
-      implicit none
-
-      integer :: job    !! option
-                        !!
-                        !! * if job=0 then x:=a**(-1)*x.
-                        !! * if job>0 then x:=trans(r)**(-1)*x.
-                        !! * if job<0 then x:=r**(-1)*x.
-      integer :: n  !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2) factorization a=trans(r)*r.
-      real(wp) :: x(*)  !! x(n)  on input the right hand side of a system of linear
-                        !! equations. on output the solution of a system of linear
-                        !! equations.
+      integer,intent(in) :: job  !! option
+                                 !!
+                                 !! * if job=0 then x:=a**(-1)*x.
+                                 !! * if job>0 then x:=trans(r)**(-1)*x.
+                                 !! * if job<0 then x:=r**(-1)*x.
+      integer,intent(in) :: n  !! order of the matrix a.
+      real(wp),intent(in) :: a(*)  !! a(n*(n+1)/2) factorization a=trans(r)*r.
+      real(wp),intent(inout) :: x(*)  !! x(n)  on input the right hand side of a system of linear
+                                      !! equations. on output the solution of a system of linear
+                                      !! equations.
 
       integer :: i , ii , ij , j
 
       if ( job>=0 ) then
-!
-!     phase 1 : x:=trans(r)**(-1)*x
-!
+         ! phase 1 : x:=trans(r)**(-1)*x
          ij = 0
          do i = 1 , n
             do j = 1 , i - 1
@@ -393,9 +367,7 @@
          end do
       endif
       if ( job<=0 ) then
-!
-!     phase 2 : x:=r**(-1)*x
-!
+         ! phase 2 : x:=r**(-1)*x
          ii = n*(n+1)/2
          do i = n , 1 , -1
             ij = ii
@@ -415,14 +387,12 @@
 ! dense symmetric matrix a is set to the unit matrix with the same
 ! order.
 
-      subroutine mxdsmi(n,a)
+      pure subroutine mxdsmi(n,a)
 
-      implicit none
-
-      integer :: n  !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix
-                        !! stored in the packed form which is set
-                        !! to the unit matrix (i.e. a:=i).
+      integer,intent(in) :: n  !! order of the matrix a.
+      real(wp),intent(out) :: a(*)  !! `a(n*(n+1)/2)`  dense symmetric matrix
+                                    !! stored in the packed form which is set
+                                    !! to the unit matrix (i.e. `a:=i`).
 
       integer :: i , m
 
@@ -443,14 +413,12 @@
 !
 ! multiplication of a dense symmetric matrix a by a vector x.
 
-      subroutine mxdsmm(n,a,x,y)
+      pure subroutine mxdsmm(n,a,x,y)
 
-      implicit none
-
-      integer :: n      !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix stored in the packed form.
-      real(wp) :: x(*)  !! x(n)  input vector.
-      real(wp) :: y(*)  !! y(n)  output vector equal to  a*x.
+      integer,intent(in) :: n      !! order of the matrix a.
+      real(wp),intent(in) :: a(*)  !! `a(n*(n+1)/2)`  dense symmetric matrix stored in the packed form.
+      real(wp),intent(in) :: x(*)  !! x(n)  input vector.
+      real(wp),intent(out) :: y(*)  !! y(n)  output vector equal to ` a*x`.
 
       real(wp) :: temp
       integer :: i , j , k , l
@@ -478,15 +446,13 @@
 !
 ! k-th row of a dense symmetric matrix a is copied to the vector x.
 
-      subroutine mxdsmv(n,a,x,k)
+      pure subroutine mxdsmv(n,a,x,k)
 
-      implicit none
-
-      integer :: k      !! index of copied row.
-      integer :: n      !! order of the matrix a.
-      real(wp) :: a(*)  !! a(n*(n+1)/2)  dense symmetric matrix
-                        !! stored in the packed form.
-      real(wp) :: x(*)  !! x(n)  output vector.
+      integer,intent(in) :: k      !! index of copied row.
+      integer,intent(in) :: n      !! order of the matrix a.
+      real(wp),intent(in) :: a(*)  !! `a(n*(n+1)/2)`  dense symmetric matrix
+                                   !! stored in the packed form.
+      real(wp),intent(out) :: x(*)  !! x(n)  output vector.
 
       integer :: i , l
 
@@ -507,13 +473,11 @@
 !
 ! copying of a vector.
 
-      subroutine mxvcop(n,x,y)
+      pure subroutine mxvcop(n,x,y)
 
-      implicit none
-
-      integer :: n  !! vector dimension.
-      real(wp) :: x(*)  !! x(n)  input vector.
-      real(wp) :: y(*)  !! y(n)  output vector where y:= x.
+      integer,intent(in) :: n  !! vector dimension.
+      real(wp),intent(in) :: x(*)  !! x(n)  input vector.
+      real(wp),intent(out) :: y(*)  !! y(n)  output vector where `y:= x`.
 
       integer :: i
 
@@ -528,14 +492,12 @@
 !
 ! vector difference.
 
-      subroutine mxvdif(n,x,y,z)
+      pure subroutine mxvdif(n,x,y,z)
 
-      implicit none
-
-      integer :: n  !! vector dimension.
-      real(wp) :: x(*)  !! x(n)  input vector.
-      real(wp) :: y(*)  !! y(n)  input vector.
-      real(wp) :: z(*)  !! z(n)  output vector where z:= x - y.
+      integer,intent(in) :: n  !! vector dimension.
+      real(wp),intent(in) :: x(*)  !! x(n)  input vector.
+      real(wp),intent(in) :: y(*)  !! y(n)  input vector.
+      real(wp),intent(out) :: z(*)  !! z(n)  output vector where `z:= x - y`.
 
       integer :: i
 
@@ -550,15 +512,13 @@
 !
 ! vector augmented by the scaled vector.
 
-      subroutine mxvdir(n,a,x,y,z)
+      pure subroutine mxvdir(n,a,x,y,z)
 
-      implicit none
-
-      integer :: n !! vector dimension.
-      real(wp) :: a !! scaling factor.
-      real(wp) :: x(*) !! x(n)  input vector.
-      real(wp) :: y(*) !! y(n)  input vector.
-      real(wp) :: z(*) !! z(n)  output vector where z:= y + a*x.
+      integer,intent(in) :: n !! vector dimension.
+      real(wp),intent(in) :: a !! scaling factor.
+      real(wp),intent(in) :: x(*) !! x(n)  input vector.
+      real(wp),intent(in) :: y(*) !! y(n)  input vector.
+      real(wp),intent(out) :: z(*) !! z(n)  output vector where `z:= y + a*x`.
 
       integer :: i
 
@@ -572,24 +532,17 @@
 !> date: 91/12/01
 !
 ! dot product of two vectors.
+!
+! JW: rewrote this routine.
 
-      function mxvdot(n,x,y)
+      pure function mxvdot(n,x,y)
 
-      implicit none
+      integer,intent(in) :: n  !!vector dimension.
+      real(wp),intent(in) :: x(*)  !! x(n)  input vector.
+      real(wp),intent(in) :: y(*)  !! y(n)  input vector.
+      real(wp) :: mxvdot  !! value of dot product `mxvdot=trans(x)*y`.
 
-      integer :: n  !!vector dimension.
-      real(wp) :: x(*)  !! x(n)  input vector.
-      real(wp) :: y(*)  !! y(n)  input vector.
-      real(wp) :: mxvdot  !! value of dot product mxvdot=trans(x)*y.
-
-      real(wp) :: temp
-      integer :: i
-
-      temp = 0.0_wp
-      do i = 1 , n
-         temp = temp + x(i)*y(i)
-      end do
-      mxvdot = temp
+      mxvdot = dot_product(x(1:n),y(1:n))
 
       end function mxvdot
 
@@ -597,14 +550,15 @@
 !> date: 90/12/01
 !
 ! elements of the integer vector are replaced by their absolute values.
+!
+! Note that this function also subtracts 10 from `ix` if the absolute value
+! is greater than 10.
 
-      subroutine mxvina(n,ix)
+      pure subroutine mxvina(n,ix)
 
-      implicit none
-
-      integer :: n  !! dimension of the integer vector.
-      integer :: ix(*)  !! vector which is updated so that
-                        !! ix(i):=abs(ix(i)) for all i.
+      integer,intent(in) :: n  !! dimension of the integer vector.
+      integer,intent(inout) :: ix(*)  !! vector which is updated so that
+                                      !! `ix(i):=abs(ix(i))` for all i.
 
       integer :: i
 
@@ -620,13 +574,11 @@
 !
 ! change of the integer vector element for the constraint addition.
 
-      subroutine mxvinv(ix,i,job)
+      pure subroutine mxvinv(ix,i,job)
 
-      implicit none
-
-      integer :: i      !! index of the changed element.
-      integer :: job    !! change specification
-      integer :: ix(*)  !! ix(n)  integer vector.
+      integer,intent(in) :: i      !! index of the changed element.
+      integer,intent(in) :: job    !! change specification
+      integer,intent(inout) :: ix(*)  !! ix(n)  integer vector.
 
       if ( (ix(i)==3 .or. ix(i)==5) .and. job<0 ) ix(i) = ix(i) + 1
       if ( (ix(i)==4 .or. ix(i)==6) .and. job>0 ) ix(i) = ix(i) - 1
@@ -639,12 +591,10 @@
 !
 ! l-infinity norm of a vector.
 
-      function mxvmax(n,x)
+      pure function mxvmax(n,x)
 
-      implicit none
-
-      integer :: n  !! vector dimension.
-      real(wp) :: x(*)  !! x(n)  input vector.
+      integer,intent(in) :: n  !! vector dimension.
+      real(wp),intent(in) :: x(*)  !! x(n)  input vector.
       real(wp) :: mxvmax  !! l-infinity norm of the vector x.
 
       integer :: i
@@ -661,13 +611,11 @@
 !
 ! change the signs of vector elements.
 
-      subroutine mxvneg(n,x,y)
+      pure subroutine mxvneg(n,x,y)
 
-      implicit none
-
-      integer :: n  !! vector dimension.
-      real(wp) :: x(*)  !! x(n)  input vector.
-      real(wp) :: y(*)  !! y(n)  output vector where y:= - x.
+      integer,intent(in) :: n  !! vector dimension.
+      real(wp),intent(in) :: x(*)  !! x(n)  input vector.
+      real(wp),intent(out) :: y(*)  !! y(n)  output vector where `y:= - x`.
 
       integer :: i
 
@@ -682,21 +630,19 @@
 !
 ! determination of an elementary orthogonal matrix for plane rotation.
 
-      subroutine mxvort(xk,xl,ck,cl,ier)
+      pure subroutine mxvort(xk,xl,ck,cl,ier)
 
-      implicit none
-
-      real(wp) :: ck !! diagonal element of the elementary orthogonal matrix.
-      real(wp) :: cl !! off-diagonal element of the elementary orthogonal matrix.
-      real(wp) :: xk !! first value for plane rotation
-                     !! (xk is transformed to sqrt(xk**2+xl**2))
-      real(wp) :: xl !! second value for plane rotation
-                     !! (xl is transformed to zero)
-      integer :: ier !! information on the transformation.
-                     !!
-                     !! * ier=0-general plane rotation.
-                     !! * ier=1-permutation.
-                     !! * ier=2-transformation suppressed.
+      real(wp),intent(inout) :: xk !! first value for plane rotation
+                                   !! (xk is transformed to sqrt(xk**2+xl**2))
+      real(wp),intent(inout) :: xl !! second value for plane rotation
+                                   !! (xl is transformed to zero)
+      real(wp),intent(out) :: ck !! diagonal element of the elementary orthogonal matrix.
+      real(wp),intent(out) :: cl !! off-diagonal element of the elementary orthogonal matrix.
+      integer,intent(out) :: ier !! information on the transformation.
+                                 !!
+                                 !! * `ier=0` -- general plane rotation.
+                                 !! * `ier=1` -- permutation.
+                                 !! * `ier=2` -- transformation suppressed.
 
       real(wp) :: den , pom
 
@@ -731,19 +677,17 @@
 !
 ! plane rotation is applied to two values.
 
-      subroutine mxvrot(xk,xl,ck,cl,ier)
+      pure subroutine mxvrot(xk,xl,ck,cl,ier)
 
-      implicit none
-
-      real(wp) :: ck  !! diagonal element of the elementary orthogonal matrix.
-      real(wp) :: cl  !! off-diagonal element of the elementary orthogonal matrix.
-      real(wp) :: xk  !! first value for plane rotation.
-      real(wp) :: xl  !! second value for plane rotation.
-      integer :: ier  !! information on the transformation:
-                      !!
-                      !! * ier=0-general plane rotation.
-                      !! * ier=1-permutation.
-                      !! * ier=2-transformation suppressed.
+      real(wp),intent(in) :: ck  !! diagonal element of the elementary orthogonal matrix.
+      real(wp),intent(in) :: cl  !! off-diagonal element of the elementary orthogonal matrix.
+      real(wp),intent(inout) :: xk  !! first value for plane rotation.
+      real(wp),intent(inout) :: xl  !! second value for plane rotation.
+      integer,intent(in) :: ier  !! information on the transformation:
+                                 !!
+                                 !! * ier=0-general plane rotation.
+                                 !! * ier=1-permutation.
+                                 !! * ier=2-transformation suppressed.
 
       real(wp) :: yk , yl
 
@@ -765,13 +709,11 @@
 !
 ! difference of two vectors returned in the subtracted one.
 
-      subroutine mxvsav(n,x,y)
+      pure subroutine mxvsav(n,x,y)
 
-      implicit none
-
-      integer :: n  !! vector dimension.
-      real(wp) :: x(*)  !! x(n)  input vector.
-      real(wp) :: y(*)  !! y(n)  update vector where y:= x - y.
+      integer,intent(in) :: n  !! vector dimension.
+      real(wp),intent(inout) :: x(*)  !! x(n)  input vector.
+      real(wp),intent(inout) :: y(*)  !! y(n)  update vector where `y:= x - y`.
 
       real(wp) :: temp
       integer :: i
@@ -789,14 +731,12 @@
 !
 ! scaling of a vector.
 
-      subroutine mxvscl(n,a,x,y)
+      pure subroutine mxvscl(n,a,x,y)
 
-      implicit none
-
-      integer :: n  !! vector dimension.
-      real(wp) :: a  !! scaling factor.
-      real(wp) :: x(*)  !! x(n)  input vector.
-      real(wp) :: y(*)  !! y(n)  output vector where y:= a*x.
+      integer,intent(in) :: n  !! vector dimension.
+      real(wp),intent(in) :: a  !! scaling factor.
+      real(wp),intent(in) :: x(*)  !! x(n)  input vector.
+      real(wp),intent(out) :: y(*)  !! y(n)  output vector where `y:= a*x`.
 
       integer :: i
 
@@ -811,15 +751,14 @@
 !
 ! a scalar is set to all the elements of a vector.
 
-      subroutine mxvset(n,a,x)
+      pure subroutine mxvset(n,a,x)
 
-      implicit none
-
-      real(wp) :: a  !! initial value.
-      integer :: n  !! vector dimension.
-      real(wp) :: x(*)  !! x(n)  output vector such that x(i)=a for all i.
+      real(wp),intent(in) :: a  !! initial value.
+      integer,intent(in) :: n  !! vector dimension.
+      real(wp),intent(out) :: x(*)  !! x(n)  output vector such that `x(i)=a` for all i.
 
       integer :: i
+
       do i = 1 , n
          x(i) = a
       end do
