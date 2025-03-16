@@ -345,7 +345,7 @@ contains
                   eta2, eta9, fmax, fmin, fo, gnorm, p, po, &
                   r, rmax, rmin, ro, snorm, tolb, tolf, &
                   umax, rp, fp, pp, ff, fc
-      integer :: i, idecf, iext, irest, iterd, iterl, iterh, iterq, &
+      integer :: i, idecf, iext, irest, iterd, iterh, iterq, &
                  iters, kbc, kbf, kc, kd, kit, ld, mred, mtesf, &
                  mtesx, n, k, ntesx, iest, inits, kters, maxst, &
                  isys, mfp, nred, ipom, lds
@@ -447,7 +447,7 @@ contains
             elseif ((ix(i) == 2 .or. ix(i) == 3) .and. x(i) >= xu(i)) then
                x(i) = xu(i)
             end if
-            call test_simple_bound(x, ix, xl, xu, eps9, i, iterl)
+            call test_simple_bound(x, ix, xl, xu, eps9, i)
             if (ix(i) > 10) ix(i) = 10 - ix(i)
          end do
       end if
@@ -612,10 +612,8 @@ contains
                      call me%compute_con_and_dcon(nf, nc, x, fc, cf, cl, cu, ic, gc, cg, cmax, kd, ld)
                      cf(nc + 1) = f
                      call compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc, f)
-                     cycle line_search
                   end if
 
-                  exit line_search
                end do line_search
 
             end if
@@ -1233,15 +1231,14 @@ contains
 !
 !@note This routine was formerly called `plnews`.
 
-   subroutine test_simple_bound(x, ix, xl, xu, eps9, i, inew)
+   subroutine test_simple_bound(x, ix, xl, xu, eps9, i)
 
-      integer :: ix(*)   !! ix(nf)  vector containing types of bounds.
-      integer :: i       !! index of tested simple bound.
-      integer :: inew    !! index of the new active constraint.
-      real(wp) :: x(*)   !! x(nf)  vector of variables.
-      real(wp) :: xl(*)  !! xl(nf)  vector containing lower bounds for variables.
-      real(wp) :: xu(*)  !! xu(nf)  vector containing upper bounds for variables.
-      real(wp) :: eps9   !! tolerance for active constraints.
+      real(wp),intent(in) :: x(*)    !! x(nf)  vector of variables.
+      integer,intent(inout) :: ix(*) !! ix(nf)  vector containing types of bounds.
+      real(wp),intent(in) :: xl(*)   !! xl(nf)  vector containing lower bounds for variables.
+      real(wp),intent(in) :: xu(*)   !! xu(nf)  vector containing upper bounds for variables.
+      real(wp),intent(in) :: eps9    !! tolerance for active constraints.
+      integer,intent(in) :: i        !! index of tested simple bound.
 
       real(wp) :: temp
 
@@ -1250,21 +1247,17 @@ contains
       elseif (ix(i) == 1) then
          if (x(i) <= xl(i) + eps9*max(abs(xl(i)), temp)) then
             ix(i) = 11
-            inew = -i
          end if
       elseif (ix(i) == 2) then
          if (x(i) >= xu(i) - eps9*max(abs(xu(i)), temp)) then
             ix(i) = 12
-            inew = -i
          end if
       elseif (ix(i) == 3 .or. ix(i) == 4) then
          if (x(i) <= xl(i) + eps9*max(abs(xl(i)), temp)) then
             ix(i) = 13
-            inew = -i
          end if
          if (x(i) >= xu(i) - eps9*max(abs(xu(i)), temp)) then
             ix(i) = 14
-            inew = -i
          end if
       end if
 
@@ -1536,20 +1529,20 @@ contains
 !
 !@note This routine was formerly called `pp0af8`.
 
-   subroutine compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc, f)
+   pure subroutine compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc, f)
 
-      integer :: nf      !! number of variables.
-      integer :: n       !! dimension of the constraint null space.
-      integer :: nc      !! number of constraints.
-      integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
-      integer :: ica(*)  !! ica(nf)  vector containing indices of active constraints.
-      real(wp) :: cf(*)  !! cf(nc+1)  vector containing values of the constraints.
-      real(wp) :: cl(*)  !! cl(nc)  vector containing lower bounds for constraint functions.
-      real(wp) :: cu(*)  !! cu(nc)  vector containing upper bounds for constraint functions.
-      real(wp) :: cz(*)  !! cz(nc)  vector of lagrange multipliers.
-      real(wp) :: rpf    !! penalty coefficient.
-      real(wp) :: fc     !! value of the penalty term.
-      real(wp) :: f      !! value of the penalty function.
+      integer,intent(in) :: nf      !! number of variables.
+      integer,intent(in) :: n       !! dimension of the constraint null space.
+      integer,intent(in) :: nc      !! number of constraints.
+      integer,intent(in) :: ic(*)   !! ic(nc)  vector containing types of constraints.
+      integer,intent(in) :: ica(*)  !! ica(nf)  vector containing indices of active constraints.
+      real(wp),intent(in) :: cf(*)  !! cf(nc+1)  vector containing values of the constraints.
+      real(wp),intent(in) :: cl(*)  !! cl(nc)  vector containing lower bounds for constraint functions.
+      real(wp),intent(in) :: cu(*)  !! cu(nc)  vector containing upper bounds for constraint functions.
+      real(wp),intent(in) :: cz(*)  !! cz(nc)  vector of lagrange multipliers.
+      real(wp),intent(in) :: rpf    !! penalty coefficient.
+      real(wp),intent(out) :: fc    !! value of the penalty term.
+      real(wp),intent(out) :: f     !! value of the penalty function.
 
       real(wp) :: pom, temp
       integer :: j, kc
@@ -1587,14 +1580,14 @@ contains
 !
 !@note This routine was formerly called `ppset2`.
 
-   subroutine compute_new_penalty_parameters(nf, n, nc, ica, cz, cp)
+   pure subroutine compute_new_penalty_parameters(nf, n, nc, ica, cz, cp)
 
-      integer :: nf      !! declared number of variables.
-      integer :: n       !! actual number of variables.
-      integer :: nc      !! number of constraints.
-      integer :: ica(*)  !! vector containing indices of active constraints.
-      real(wp) :: cz(*)  !! vector of lagrange multipliers.
-      real(wp) :: cp(*)  !! vector containing penalty parameters.
+      integer,intent(in) :: nf         !! declared number of variables.
+      integer,intent(in) :: n          !! actual number of variables.
+      integer,intent(in) :: nc         !! number of constraints.
+      integer,intent(in) :: ica(*)     !! vector containing indices of active constraints.
+      real(wp),intent(in) :: cz(*)     !! vector of lagrange multipliers.
+      real(wp),intent(inout) :: cp(*)  !! vector containing penalty parameters.
 
       real(wp) :: temp
       integer :: j, l, kc
@@ -1892,8 +1885,8 @@ contains
       real(wp) :: s(*)   !! s(nf)  auxiliary vector.
       real(wp) :: xo(*)  !! xo(nf)  vectors of variables difference.
 
-      real(wp) a, b, c, gam, par, den, dis
-      logical l1, l3
+      real(wp) :: a, b, c, gam, par, den, dis
+      logical :: l1, l3
 
       l1 = met1 >= 3 .or. met1 == 2 .and. nit == kit
       l3 = .not. l1
