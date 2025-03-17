@@ -53,6 +53,8 @@ module psqp_module
       procedure(con_func), pointer  :: con  => null() !! constraint function
       procedure(dcon_func), pointer :: dcon => null() !! gradient of the constraint function
 
+      procedure(report_f),pointer :: report => null() !! iteration report function
+
    contains
 
       private
@@ -112,6 +114,17 @@ module psqp_module
          real(wp) :: gc(nf) !! the gradient of the constraint function
       end subroutine dcon_func
 
+      subroutine report_f(me,iter,x,j,f)
+         !! Report function to call once per iteration to report the solution.
+         import :: wp, psqp_class
+         implicit none
+         class(psqp_class), intent(inout) :: me
+         integer, intent(in) :: iter           !! Iteration number
+         real(wp),dimension(:),intent(in) :: x !! optimization variables
+         real(wp),intent(in) :: j              !! Objective function value
+         real(wp),dimension(:),intent(in) :: f !! Constraint functions
+      end subroutine report_f
+
    end interface
 
 contains
@@ -124,7 +137,7 @@ contains
 
    subroutine psqpn(me, nf, nb, nc, x, bound_type, xl, xu, cf, constraint_type, &
                     cl, cu, ipar, rpar, f, gmax, &
-                    cmax, iprnt, iterm, obj, dobj, con, dcon)
+                    cmax, iprnt, iterm, obj, dobj, con, dcon, report)
 
       class(psqp_class), intent(inout) :: me
       integer, intent(in) :: nf  !! number of variables
@@ -196,6 +209,8 @@ contains
       procedure(dobj_func) :: dobj !! computation of the gradient of the objective function
       procedure(con_func)  :: con  !! computation of the value of the constraint function
       procedure(dcon_func) :: dcon !! computation of the gradient of the constraint function
+      procedure(report_f),optional :: report !! iteration report function. Note: this is independent of `iprnt`. 
+                                             !! If this function is associated, each iteration will be reported
 
       integer :: lcfd, lcfo, lcg, lcp, lcr, lcz, lg, lgc, lgf, lgo, lh, lia, ls, lxo
       integer, dimension(:), allocatable :: ia
@@ -208,6 +223,8 @@ contains
       me%dobj => dobj
       me%con  => con
       me%dcon => dcon
+
+      if (present(report)) me%report => report
 
       allocate (ia(nf), ra((nf + nc + 8)*nf + 3*nc + 1))
       allocate (ic(nc))
@@ -462,6 +479,8 @@ contains
          ld = lds
          call me%compute_con_and_dcon(nf, nc, x, fc, cf, cl, cu, ic, gc, cg, cmax, kd, ld)
          cf(nc + 1) = f
+         ! JW : seems to start with iter 0, so add 1 to iterations for report output
+         if (associated(me%report)) call me%report(me%nit+1,x(1:nf),j=f,f=cf(1:nc))    
          if (abs(iprnt) > 1) &
             write (6, '(1x,"nit=",i9,2x,"nfv=",i9,2x,"nfg=",i9,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1)') &
             me%nit, me%nfv, me%nfg, f, cmax, gmax
@@ -1970,9 +1989,9 @@ contains
    subroutine dual_range_space_qp(nf, n, x, xo, ica, cg, cz, g, go, r, f, fo, &
                                   p, po, cmax, cmaxo, dmax, kd, ld, iters)
 
-      integer :: nf  !! declared number of variables.
-      integer :: n  !! actual number of variables.
-      integer :: ica(*)  !! ica(nf)  vector containing indices of active constraints.
+      integer,intent(in) :: nf  !! declared number of variables.
+      integer,intent(inout) :: n  !! actual number of variables.
+      integer,intent(in) :: ica(*)  !! ica(nf)  vector containing indices of active constraints.
       real(wp) :: x(*)  !! x(nf)  vector of variables.
       real(wp) :: xo(*)  !! xo(nf)  saved vector of variables.
       real(wp) :: cg(*)  !! cg(nf*nc)  matrix whose columns are normals of the linear constraints.
@@ -1986,7 +2005,7 @@ contains
       real(wp) :: po  !! old value of the directional derivative.
       real(wp) :: cmax  !! value of the constraint violation.
       real(wp) :: cmaxo  !! saved value of the constraint violation.
-      real(wp) :: dmax  !! maximum relative difference of variables.
+      real(wp),intent(out) :: dmax  !! maximum relative difference of variables.
       integer :: kd  !!
       integer :: ld  !!
       integer :: iters  !! termination indicator for steplength determination.

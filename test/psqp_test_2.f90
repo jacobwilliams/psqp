@@ -33,7 +33,7 @@
                                                                                 !! * rpar(3)  tolerance for constraint violations.
                                                                                 !! * rpar(4)  tolerance for the gradient of the lagrangian function.
                                                                                 !! * rpar(5)  penalty coefficient.
-    integer,parameter :: iprnt = 2  !! print specification:
+    integer,parameter :: iprnt = 1  !! print specification:
                                     !!
                                     !! * iprnt=0      - no print.
                                     !! * abs(iprnt)=1 - print of final results.
@@ -62,7 +62,7 @@
 
     call solver%psqpn(nf,nb,nc,x,ix,xl,xu,cf,ic,cl,cu,&
                         ipar,rpar,f,cmax,gmax,iprnt,iterm,&
-                        obj,dobj,con,dcon)
+                        obj,dobj,con,dcon,report_func)
 
     write(*,*) ''
     write(*,*) 'iterm = ', iterm
@@ -145,6 +145,22 @@
         end select
 
     end subroutine dcon
+
+    subroutine report_func(me,iter,x,j,f)
+        !! Report function to call once per iteration to report the solution.
+
+        class(psqp_class), intent(inout) :: me
+        integer, intent(in) :: iter           !! Iteration number
+        real(wp),dimension(:),intent(in) :: x !! optimization variables
+        real(wp),intent(in) :: j              !! Objective function value
+        real(wp),dimension(:),intent(in) :: f !! Constraint functions
+
+        write(*,'(a,i3,a,3(f10.6),a,2(f10.6),a,1(f15.10))') &
+                                'iter:', iter, &
+                                ' | x: ', x, &
+                                ' | f: ', f, &
+                                ' | j: ', j 
+     end subroutine report_func
 
     end program psqp_test_2
 !*******************************************************************************
