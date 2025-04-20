@@ -1,0 +1,1583 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Modern Fortran edition of PSQP">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>psqpn &ndash; psqp</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">psqp </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+  <div class="row">
+    <h1>psqpn
+      <small>Subroutine</small>
+      
+    </h1>
+      <div class="container p-2 mb-4 bg-light border rounded-3">
+    <div class="row align-items-center justify-content-between" id="info-bar">
+      <div class="col">
+        <ul class="list-inline" style="margin-bottom:0px;display:inline">
+            <li class="list-inline-item" id="meta-date"><i class="fa fa-calendar-o"></i> 97/01/22</li>
+
+            <li class="list-inline-item" id="statements"><i class="fa fa-list-ol"></i>
+              <a data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true"
+                 title=" 3.2% of total for procedures.">57 statements</a>
+            </li>
+
+            <li class="list-inline-item" id="source-file">
+              <i class="fa fa-code"></i>
+              <a href="../src/psqp_module.f90"> Source File</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-end mb-0">
+                <li class="breadcrumb-item"><a href='../sourcefile/psqp_module.f90.html'>psqp_module.f90</a></li>
+                <li class="breadcrumb-item"><a href='../module/psqp_module.html'>psqp_module</a></li>
+            <li class="breadcrumb-item active" aria-current="page">psqpn</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Enable Bootstrap tooltips
+    (function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    })();
+  </script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <div id="sidebar">
+      <h3>Contents</h3>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    <div class="card card-primary">
+      <div class="card-header text-left"><h3 class="card-title">Source Code</h3></div>
+      <div class="list-group">
+        <a class="list-group-item" href="../proc/psqpn.html#src">psqpn</a>
+      </div>
+    </div>
+
+
+  </div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>private  subroutine psqpn(me, nf, nb, nc, x, bound_type, xl, xu, cf, constraint_type, cl, cu, ipar, rpar, f, gmax, cmax, iprnt, iterm, obj, dobj, con, dcon, report)  
+</h2>
+    
+
+    <p>easy to use subroutine for general nonlinear programming problems.</p>
+
+    <h3>Type Bound</h3>
+    <p><a href='../type/psqp_class.html'>psqp_class</a></p>
+
+    <h3>Arguments</h3>
+        <table class="table table-striped varlist">
+    <thead>
+      <tr>
+        <th scope="col">Type</th>
+<th scope="col">Intent</th><th scope="col">Optional</th>        <th scope="col">Attributes</th>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-me~6"></span>
+              class(<a href='../type/psqp_class.html'>psqp_class</a>),
+            </td>
+<td>intent(inout)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>me</strong></td>
+            <td>
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nf~5"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nf</strong></td>
+            <td>
+                <p>number of variables</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nb"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nb</strong></td>
+            <td>
+                <p>choice of simple bounds.</p>
+<ul>
+<li><code>nb=0</code> -- simple bounds suppressed.</li>
+<li><code>nb&gt;0</code> -- simple bounds accepted.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-nc"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>nc</strong></td>
+            <td>
+                <p>number of general nonlinear constraints.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-x~6"></span>
+              real(kind=wp),
+            </td>
+<td>intent(inout),</td>
+              <td></td>            <td>
+              dimension(nf)
+            </td>
+            <td>::</td>
+            <td><strong>x</strong></td>
+            <td>
+                <p>x(nf) vector of variables.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-bound_type"></span>
+              integer,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(nf)
+            </td>
+            <td>::</td>
+            <td><strong>bound_type</strong></td>
+            <td>
+                <p>ix(nf) vector containing types of bounds.</p>
+<ul>
+<li><code>ix(i) = 0</code> -- variable x(i) is unbounded.</li>
+<li><code>ix(i) = 1</code> -- lower bound xl(i) &lt;= x(i).</li>
+<li><code>ix(i) = 2</code> -- upper bound x(i) &lt;= xu(i).</li>
+<li><code>ix(i) = 3</code> -- two side bound xl(i) &lt;= x(i) &lt;= xu(i).</li>
+<li><code>ix(i) = 5</code> -- variable x(i) is fixed.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xl"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(nf)
+            </td>
+            <td>::</td>
+            <td><strong>xl</strong></td>
+            <td>
+                <p>xl(nf) vector containing lower bounds for variables.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-xu"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(nf)
+            </td>
+            <td>::</td>
+            <td><strong>xu</strong></td>
+            <td>
+                <p>xu(nf) vector containing upper bounds for variables.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cf"></span>
+              real(kind=wp),
+            </td>
+<td>intent(out),</td>
+              <td></td>            <td>
+              dimension(nc+1)
+            </td>
+            <td>::</td>
+            <td><strong>cf</strong></td>
+            <td>
+                <p>cf(nc+1) vector containing values of the constraint functions.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-constraint_type"></span>
+              integer,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(nc)
+            </td>
+            <td>::</td>
+            <td><strong>constraint_type</strong></td>
+            <td>
+                <p>ic(nc) vector containing types of constraints:</p>
+<ul>
+<li><code>ic(kc) = 0</code> -- constraint cf(kc) is not used.</li>
+<li><code>ic(kc) = 1</code> -- lower constraint cl(kc) &lt;= cf(kc).</li>
+<li><code>ic(kc) = 2</code> -- upper constraint cf(kc) &lt;= cu(kc).</li>
+<li><code>ic(kc) = 3</code> -- two side constraint cl(kc) &lt;= cf(kc) &lt;= cu(kc).</li>
+<li><code>ic(kc) = 5</code> -- equality constraint cf(kc) == cl(kc).</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cl"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(nc)
+            </td>
+            <td>::</td>
+            <td><strong>cl</strong></td>
+            <td>
+                <p>cl(nc) vector containing lower bounds for constraint functions.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cu"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(nc)
+            </td>
+            <td>::</td>
+            <td><strong>cu</strong></td>
+            <td>
+                <p>cu(nc) vector containing upper bounds for constraint functions.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-ipar"></span>
+              integer,
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(6)
+            </td>
+            <td>::</td>
+            <td><strong>ipar</strong></td>
+            <td>
+                <p>integer paremeters:</p>
+<ul>
+<li><code>ipar(1)</code>  maximum number of iterations.</li>
+<li><code>ipar(2)</code>  maximum number of function evaluations.</li>
+<li><code>ipar(3)</code>  this parameter is not used in the subroutine psqp.</li>
+<li><code>ipar(4)</code>  this parameter is not used in the subroutine psqp.</li>
+<li><code>ipar(5)</code>  variable metric update used.
+  <code>ipar(5)=1</code> - the bfgs update.
+  <code>ipar(5)=2</code> - the hoshino update.</li>
+<li><code>ipar(6)</code>  correction of the variable metric update if a negative
+  curvature occurs.
+  <code>ipar(6)=1</code> - no correction.
+  <code>ipar(6)=2</code> - powell's correction.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-rpar"></span>
+              real(kind=wp),
+            </td>
+<td>intent(in),</td>
+              <td></td>            <td>
+              dimension(5)
+            </td>
+            <td>::</td>
+            <td><strong>rpar</strong></td>
+            <td>
+                <p>real parameters:</p>
+<ul>
+<li><code>rpar(1)</code> -- maximum stepsize.</li>
+<li><code>rpar(2)</code> -- tolerance for change of variables.</li>
+<li><code>rpar(3)</code> -- tolerance for constraint violations.</li>
+<li><code>rpar(4)</code> -- tolerance for the gradient of the lagrangian function.</li>
+<li><code>rpar(5)</code> -- penalty coefficient.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-f~2"></span>
+              real(kind=wp),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>f</strong></td>
+            <td>
+                <p>value of the objective function.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-gmax"></span>
+              real(kind=wp),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>gmax</strong></td>
+            <td>
+                <p>maximum partial derivative of the lagrangian function.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-cmax"></span>
+              real(kind=wp),
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>cmax</strong></td>
+            <td>
+                <p>maximum constraint violation.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iprnt"></span>
+              integer,
+            </td>
+<td>intent(in)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iprnt</strong></td>
+            <td>
+                <p>print specification:</p>
+<ul>
+<li><code>iprnt=0</code>      -- no print.</li>
+<li><code>abs(iprnt)=1</code> -- print of final results.</li>
+<li><code>abs(iprnt)=2</code> -- print of final results and iterations.</li>
+<li><code>iprnt&gt;0</code>      -- basic final results.</li>
+<li><code>iprnt&lt;0</code>      -- extended final results.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-iterm"></span>
+              integer,
+            </td>
+<td>intent(out)</td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>iterm</strong></td>
+            <td>
+                <p>variable that indicates the cause of termination.</p>
+<ul>
+<li><code>iterm=1</code>  -- if abs(x-xo) was less than or equal to tolx in mtesx (usually two) subsequent iterations.</li>
+<li><code>iterm=2</code>  -- if abs(f-fo) was less than or equal to tolf in mtesf (usually two) subsequent iterations.</li>
+<li><code>iterm=3</code>  -- if f is less than or equal to tolb.</li>
+<li><code>iterm=4</code>  -- if gmax is less than or equal to tolg.</li>
+<li><code>iterm=11</code> -- if nit exceeded mit. iterm=12 - if nfv exceeded mfv.</li>
+<li><code>iterm=13</code> -- if nfg exceeded mfg. iterm&lt;0 - if the method failed.</li>
+<li><code>iterm=-6</code> -- then the termination criterion has not been satisfied, but the point obtained if usually acceptable.</li>
+</ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-obj~2"></span>
+              procedure(<a href='../interface/obj_func.html'>obj_func</a>)
+            </td>
+<td></td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>obj</strong></td>
+            <td>
+                <p>computation of the value of the objective function</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dobj~2"></span>
+              procedure(<a href='../interface/dobj_func.html'>dobj_func</a>)
+            </td>
+<td></td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dobj</strong></td>
+            <td>
+                <p>computation of the gradient of the objective function</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-con~2"></span>
+              procedure(<a href='../interface/con_func.html'>con_func</a>)
+            </td>
+<td></td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>con</strong></td>
+            <td>
+                <p>computation of the value of the constraint function</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-dcon~2"></span>
+              procedure(<a href='../interface/dcon_func.html'>dcon_func</a>)
+            </td>
+<td></td>
+              <td></td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>dcon</strong></td>
+            <td>
+                <p>computation of the gradient of the constraint function</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span class="anchor" id="variable-report~2"></span>
+              procedure(<a href='../interface/report_f.html'>report_f</a>),
+            </td>
+<td></td>
+              <td>optional</td>            <td>
+              
+            </td>
+            <td>::</td>
+            <td><strong>report</strong></td>
+            <td>
+                <p>iteration report function. Note: this is independent of <code>iprnt</code>. 
+If this function is associated, each iteration will be reported</p>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+
+    <br>
+    <div class="card">
+      <div class="card-header">
+  <h3 class="card-title">Calls</h3>
+      </div>
+      <div class="card-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: proc~~psqpn~~CallsGraph Pages: 1 -->
+<svg id="procpsqpnCallsGraph" width="641pt" height="659pt"
+ viewBox="0.00 0.00 641.00 658.71" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~psqpn~~CallsGraph" class="graph" transform="scale(0.57 0.57) rotate(0) translate(4 1149)">
+<title>proc~~psqpn~~CallsGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1149 1118,-1149 1118,4 -4,4"/>
+<!-- proc~psqpn -->
+<g id="proc~~psqpn~~CallsGraph_node1" class="node">
+<title>proc~psqpn</title>
+<polygon fill="none" stroke="black" points="112,-408 0,-408 0,-384 112,-384 112,-408"/>
+<text text-anchor="middle" x="56" y="-393.6" font-family="Helvetica,sans-Serif" font-size="10.50">psqp_class%psqpn</text>
+</g>
+<!-- proc~psqp -->
+<g id="proc~~psqpn~~CallsGraph_node2" class="node">
+<title>proc~psqp</title>
+<g id="a_proc~~psqpn~~CallsGraph_node2"><a xlink:href="../proc/psqp.html" xlink:title="psqp_class%psqp">
+<polygon fill="#d9534f" stroke="#d9534f" points="253,-408 148,-408 148,-384 253,-384 253,-408"/>
+<text text-anchor="middle" x="200.5" y="-393.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%psqp</text>
+</a>
+</g>
+</g>
+<!-- proc~psqpn&#45;&gt;proc~psqp -->
+<g id="proc~~psqpn~~CallsGraph_edge1" class="edge">
+<title>proc~psqpn&#45;&gt;proc~psqp</title>
+<path fill="none" stroke="#000000" d="M112.09,-396C120.45,-396 129.11,-396 137.6,-396"/>
+<polygon fill="#000000" stroke="#000000" points="137.82,-399.5 147.82,-396 137.82,-392.5 137.82,-399.5"/>
+</g>
+<!-- proc~bfgs_variable_metric_update -->
+<g id="proc~~psqpn~~CallsGraph_node3" class="node">
+<title>proc~bfgs_variable_metric_update</title>
+<g id="a_proc~~psqpn~~CallsGraph_node3"><a xlink:href="../proc/bfgs_variable_metric_update.html" xlink:title="bfgs_variable_metric_update">
+<polygon fill="#d9534f" stroke="#d9534f" points="491,-914 325,-914 325,-890 491,-890 491,-914"/>
+<text text-anchor="middle" x="408" y="-899.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bfgs_variable_metric_update</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~bfgs_variable_metric_update -->
+<g id="proc~~psqpn~~CallsGraph_edge2" class="edge">
+<title>proc~psqp&#45;&gt;proc~bfgs_variable_metric_update</title>
+<path fill="none" stroke="#000000" d="M201.34,-408.01C201.18,-459.5 206.01,-665.26 289,-803 310.33,-838.4 348.9,-867.13 376.13,-884.35"/>
+<polygon fill="#000000" stroke="#000000" points="374.54,-887.48 384.89,-889.74 378.21,-881.52 374.54,-887.48"/>
+</g>
+<!-- proc~compute_augmented_lagrangian -->
+<g id="proc~~psqpn~~CallsGraph_node4" class="node">
+<title>proc~compute_augmented_lagrangian</title>
+<g id="a_proc~~psqpn~~CallsGraph_node4"><a xlink:href="../proc/compute_augmented_lagrangian.html" xlink:title="compute_augmented_lagrangian">
+<polygon fill="#d9534f" stroke="#d9534f" points="503,-956 313,-956 313,-932 503,-932 503,-956"/>
+<text text-anchor="middle" x="408" y="-941.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_augmented_lagrangian</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_augmented_lagrangian -->
+<g id="proc~~psqpn~~CallsGraph_edge3" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_augmented_lagrangian</title>
+<path fill="none" stroke="#000000" d="M201.69,-408.38C203.09,-480.61 213.86,-846.98 289,-923 293.36,-927.41 298.3,-931.08 303.63,-934.11"/>
+<polygon fill="#000000" stroke="#000000" points="302.41,-937.41 312.93,-938.65 305.48,-931.12 302.41,-937.41"/>
+</g>
+<!-- proc~compute_con_and_dcon -->
+<g id="proc~~psqpn~~CallsGraph_node5" class="node">
+<title>proc~compute_con_and_dcon</title>
+<g id="a_proc~~psqpn~~CallsGraph_node5"><a xlink:href="../proc/compute_con_and_dcon.html" xlink:title="psqp_class%compute_con_and_dcon">
+<polygon fill="#d9534f" stroke="#d9534f" points="1023,-1145 815,-1145 815,-1121 1023,-1121 1023,-1145"/>
+<text text-anchor="middle" x="919" y="-1130.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%compute_con_and_dcon</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_con_and_dcon -->
+<g id="proc~~psqpn~~CallsGraph_edge4" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_con_and_dcon</title>
+<path fill="none" stroke="#000000" d="M201.9,-408.05C204.59,-481.67 221.8,-870.83 289,-965 404.28,-1126.56 657.34,-1145.53 804.93,-1141.51"/>
+<polygon fill="#000000" stroke="#000000" points="805.05,-1145 814.94,-1141.19 804.83,-1138.01 805.05,-1145"/>
+</g>
+<!-- proc~compute_new_penalty_parameters -->
+<g id="proc~~psqpn~~CallsGraph_node6" class="node">
+<title>proc~compute_new_penalty_parameters</title>
+<g id="a_proc~~psqpn~~CallsGraph_node6"><a xlink:href="../proc/compute_new_penalty_parameters.html" xlink:title="compute_new_penalty_parameters">
+<polygon fill="#d9534f" stroke="#d9534f" points="507.5,-794 308.5,-794 308.5,-770 507.5,-770 507.5,-794"/>
+<text text-anchor="middle" x="408" y="-779.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_new_penalty_parameters</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_new_penalty_parameters -->
+<g id="proc~~psqpn~~CallsGraph_edge5" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_new_penalty_parameters</title>
+<path fill="none" stroke="#000000" d="M202.65,-408.16C208.37,-465.78 235.53,-710.61 289,-761 292.19,-764.01 295.66,-766.67 299.34,-769.01"/>
+<polygon fill="#000000" stroke="#000000" points="297.82,-772.16 308.26,-773.92 301.19,-766.03 297.82,-772.16"/>
+</g>
+<!-- proc~compute_obj_and_dobj -->
+<g id="proc~~psqpn~~CallsGraph_node7" class="node">
+<title>proc~compute_obj_and_dobj</title>
+<g id="a_proc~~psqpn~~CallsGraph_node7"><a xlink:href="../proc/compute_obj_and_dobj.html" xlink:title="psqp_class%compute_obj_and_dobj">
+<polygon fill="#d9534f" stroke="#d9534f" points="509,-568 307,-568 307,-544 509,-544 509,-568"/>
+<text text-anchor="middle" x="408" y="-553.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%compute_obj_and_dobj</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_obj_and_dobj -->
+<g id="proc~~psqpn~~CallsGraph_edge6" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_obj_and_dobj</title>
+<path fill="none" stroke="#000000" d="M209.09,-408.04C222.83,-429.05 253.69,-472.76 289,-500 311.17,-517.11 339.41,-530.74 362.7,-540.27"/>
+<polygon fill="#000000" stroke="#000000" points="361.43,-543.53 372.02,-543.97 364.02,-537.03 361.43,-543.53"/>
+</g>
+<!-- proc~dual_range_space_qp -->
+<g id="proc~~psqpn~~CallsGraph_node8" class="node">
+<title>proc~dual_range_space_qp</title>
+<g id="a_proc~~psqpn~~CallsGraph_node8"><a xlink:href="../proc/dual_range_space_qp.html" xlink:title="dual_range_space_qp">
+<polygon fill="#d9534f" stroke="#d9534f" points="472,-752 344,-752 344,-728 472,-728 472,-752"/>
+<text text-anchor="middle" x="408" y="-737.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dual_range_space_qp</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~dual_range_space_qp -->
+<g id="proc~~psqpn~~CallsGraph_edge7" class="edge">
+<title>proc~psqp&#45;&gt;proc~dual_range_space_qp</title>
+<path fill="none" stroke="#000000" d="M202,-408.03C204.37,-450.24 217.55,-593.61 289,-679 306.5,-699.91 332.99,-714.51 356.45,-724.18"/>
+<polygon fill="#000000" stroke="#000000" points="355.35,-727.51 365.94,-727.9 357.91,-720.99 355.35,-727.51"/>
+</g>
+<!-- proc~dual_range_space_quad_prog -->
+<g id="proc~~psqpn~~CallsGraph_node9" class="node">
+<title>proc~dual_range_space_quad_prog</title>
+<g id="a_proc~~psqpn~~CallsGraph_node9"><a xlink:href="../proc/dual_range_space_quad_prog.html" xlink:title="psqp_class%dual_range_space_quad_prog">
+<polygon fill="#d9534f" stroke="#d9534f" points="527,-491 289,-491 289,-467 527,-467 527,-491"/>
+<text text-anchor="middle" x="408" y="-476.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%dual_range_space_quad_prog</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~dual_range_space_quad_prog -->
+<g id="proc~~psqpn~~CallsGraph_edge8" class="edge">
+<title>proc~psqp&#45;&gt;proc~dual_range_space_quad_prog</title>
+<path fill="none" stroke="#000000" d="M231.38,-408.07C267.38,-422.61 327.95,-447.07 367.7,-463.13"/>
+<polygon fill="#000000" stroke="#000000" points="366.5,-466.42 377.08,-466.92 369.12,-459.93 366.5,-466.42"/>
+</g>
+<!-- proc~extended_line_search -->
+<g id="proc~~psqpn~~CallsGraph_node10" class="node">
+<title>proc~extended_line_search</title>
+<g id="a_proc~~psqpn~~CallsGraph_node10"><a xlink:href="../proc/extended_line_search.html" xlink:title="psqp_class%extended_line_search">
+<polygon fill="#d9534f" stroke="#d9534f" points="505,-188 311,-188 311,-164 505,-164 505,-188"/>
+<text text-anchor="middle" x="408" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%extended_line_search</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~extended_line_search -->
+<g id="proc~~psqpn~~CallsGraph_edge9" class="edge">
+<title>proc~psqp&#45;&gt;proc~extended_line_search</title>
+<path fill="none" stroke="#000000" d="M203.2,-383.71C208.67,-349.18 229.05,-250.67 289,-202 293.43,-198.41 298.25,-195.28 303.32,-192.57"/>
+<polygon fill="#000000" stroke="#000000" points="305.17,-195.56 312.71,-188.11 302.17,-189.24 305.17,-195.56"/>
+</g>
+<!-- proc~mxdsmi -->
+<g id="proc~~psqpn~~CallsGraph_node11" class="node">
+<title>proc~mxdsmi</title>
+<g id="a_proc~~psqpn~~CallsGraph_node11"><a xlink:href="../proc/mxdsmi.html" xlink:title="mxdsmi">
+<polygon fill="#d9534f" stroke="#d9534f" points="435.5,-408 380.5,-408 380.5,-384 435.5,-384 435.5,-408"/>
+<text text-anchor="middle" x="408" y="-393.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdsmi</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxdsmi -->
+<g id="proc~~psqpn~~CallsGraph_edge10" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxdsmi</title>
+<path fill="none" stroke="#000000" d="M253.09,-396C289.57,-396 337.59,-396 370.23,-396"/>
+<polygon fill="#000000" stroke="#000000" points="370.25,-399.5 380.25,-396 370.25,-392.5 370.25,-399.5"/>
+</g>
+<!-- proc~mxvcop -->
+<g id="proc~~psqpn~~CallsGraph_node12" class="node">
+<title>proc~mxvcop</title>
+<g id="a_proc~~psqpn~~CallsGraph_node12"><a xlink:href="../proc/mxvcop.html" xlink:title="mxvcop">
+<polygon fill="#d9534f" stroke="#d9534f" points="1114,-531 1059,-531 1059,-507 1114,-507 1114,-531"/>
+<text text-anchor="middle" x="1086.5" y="-516.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvcop</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvcop -->
+<g id="proc~~psqpn~~CallsGraph_edge11" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M203.83,-383.75C210.56,-352.08 233.24,-267.35 289,-230 334.3,-199.66 727.86,-185.09 779,-204 912.93,-253.52 931.27,-303.57 1023,-413 1045.26,-439.55 1064.39,-475 1075.43,-497.42"/>
+<polygon fill="#000000" stroke="#000000" points="1072.42,-499.23 1079.92,-506.72 1078.73,-496.19 1072.42,-499.23"/>
+</g>
+<!-- proc~mxvdir -->
+<g id="proc~~psqpn~~CallsGraph_node13" class="node">
+<title>proc~mxvdir</title>
+<g id="a_proc~~psqpn~~CallsGraph_node13"><a xlink:href="../proc/mxvdir.html" xlink:title="mxvdir">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-752 644,-752 644,-728 698,-728 698,-752"/>
+<text text-anchor="middle" x="671" y="-737.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvdir</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvdir -->
+<g id="proc~~psqpn~~CallsGraph_edge12" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M204.47,-408.12C212.76,-439.66 238.87,-525.46 289,-577 384.63,-675.33 433.51,-673.78 563,-719 585.93,-727.01 612.76,-732.26 633.82,-735.52"/>
+<polygon fill="#000000" stroke="#000000" points="633.55,-739.01 643.95,-737 634.56,-732.09 633.55,-739.01"/>
+</g>
+<!-- proc~mxvdot -->
+<g id="proc~~psqpn~~CallsGraph_node14" class="node">
+<title>proc~mxvdot</title>
+<g id="a_proc~~psqpn~~CallsGraph_node14"><a xlink:href="../proc/mxvdot.html" xlink:title="mxvdot">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="946,-470 892,-470 892,-446 946,-446 946,-470"/>
+<text text-anchor="middle" x="919" y="-455.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvdot</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvdot -->
+<g id="proc~~psqpn~~CallsGraph_edge13" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M206.9,-383.76C218.26,-359.57 247.08,-305.74 289,-280 394.42,-215.26 439.77,-241.93 563,-231 658.62,-222.52 695.25,-184.08 779,-231 859.23,-275.95 898.72,-388.18 912.33,-435.93"/>
+<polygon fill="#000000" stroke="#000000" points="909.03,-437.14 915.04,-445.86 915.78,-435.29 909.03,-437.14"/>
+</g>
+<!-- proc~mxvina -->
+<g id="proc~~psqpn~~CallsGraph_node15" class="node">
+<title>proc~mxvina</title>
+<g id="a_proc~~psqpn~~CallsGraph_node15"><a xlink:href="../proc/mxvina.html" xlink:title="mxvina">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-264 644,-264 644,-240 698,-240 698,-264"/>
+<text text-anchor="middle" x="671" y="-249.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvina</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvina -->
+<g id="proc~~psqpn~~CallsGraph_edge14" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvina</title>
+<path fill="none" stroke="#000000" d="M232.5,-383.87C294.47,-359.98 438.42,-306.26 563,-273 586.31,-266.78 612.94,-261.54 633.8,-257.86"/>
+<polygon fill="#000000" stroke="#000000" points="634.57,-261.28 643.83,-256.13 633.38,-254.38 634.57,-261.28"/>
+</g>
+<!-- proc~mxvmax -->
+<g id="proc~~psqpn~~CallsGraph_node16" class="node">
+<title>proc~mxvmax</title>
+<g id="a_proc~~psqpn~~CallsGraph_node16"><a xlink:href="../proc/mxvmax.html" xlink:title="mxvmax">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="437,-146 379,-146 379,-122 437,-122 437,-146"/>
+<text text-anchor="middle" x="408" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvmax</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvmax -->
+<g id="proc~~psqpn~~CallsGraph_edge15" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvmax</title>
+<path fill="none" stroke="#000000" d="M201.89,-383.9C203.88,-344.12 215.93,-216.46 289,-155 310.97,-136.52 343.54,-131.86 368.9,-131.49"/>
+<polygon fill="#000000" stroke="#000000" points="368.9,-134.99 378.92,-131.56 368.95,-127.99 368.9,-134.99"/>
+</g>
+<!-- proc~mxvset -->
+<g id="proc~~psqpn~~CallsGraph_node17" class="node">
+<title>proc~mxvset</title>
+<g id="a_proc~~psqpn~~CallsGraph_node17"><a xlink:href="../proc/mxvset.html" xlink:title="mxvset">
+<polygon fill="#d9534f" stroke="#d9534f" points="1113.5,-108 1059.5,-108 1059.5,-84 1113.5,-84 1113.5,-108"/>
+<text text-anchor="middle" x="1086.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvset</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvset -->
+<g id="proc~~psqpn~~CallsGraph_edge16" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvset</title>
+<path fill="none" stroke="#000000" d="M203.36,-383.83C211.24,-334.11 243.53,-147.29 289,-113 350.07,-66.94 900.34,-87.79 1048.76,-94.31"/>
+<polygon fill="#000000" stroke="#000000" points="1048.99,-97.82 1059.13,-94.77 1049.3,-90.83 1048.99,-97.82"/>
+</g>
+<!-- proc~test_simple_bound -->
+<g id="proc~~psqpn~~CallsGraph_node18" class="node">
+<title>proc~test_simple_bound</title>
+<g id="a_proc~~psqpn~~CallsGraph_node18"><a xlink:href="../proc/test_simple_bound.html" xlink:title="test_simple_bound">
+<polygon fill="#d9534f" stroke="#d9534f" points="464,-66 352,-66 352,-42 464,-42 464,-66"/>
+<text text-anchor="middle" x="408" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">test_simple_bound</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~test_simple_bound -->
+<g id="proc~~psqpn~~CallsGraph_edge17" class="edge">
+<title>proc~psqp&#45;&gt;proc~test_simple_bound</title>
+<path fill="none" stroke="#000000" d="M203.19,-383.78C210.73,-331.04 242.94,-123.67 289,-80 303.26,-66.48 322.88,-59.37 342.03,-55.8"/>
+<polygon fill="#000000" stroke="#000000" points="342.64,-59.24 351.98,-54.23 341.55,-52.33 342.64,-59.24"/>
+</g>
+<!-- proc~transform_incompatible_qp_subproblem -->
+<g id="proc~~psqpn~~CallsGraph_node19" class="node">
+<title>proc~transform_incompatible_qp_subproblem</title>
+<g id="a_proc~~psqpn~~CallsGraph_node19"><a xlink:href="../proc/transform_incompatible_qp_subproblem.html" xlink:title="transform_incompatible_qp_subproblem">
+<polygon fill="#d9534f" stroke="#d9534f" points="521.5,-24 294.5,-24 294.5,0 521.5,0 521.5,-24"/>
+<text text-anchor="middle" x="408" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">transform_incompatible_qp_subproblem</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~transform_incompatible_qp_subproblem -->
+<g id="proc~~psqpn~~CallsGraph_edge18" class="edge">
+<title>proc~psqp&#45;&gt;proc~transform_incompatible_qp_subproblem</title>
+<path fill="none" stroke="#000000" d="M202.66,-383.9C208.43,-326.59 235.78,-83.1 289,-33 290.14,-31.93 291.31,-30.91 292.51,-29.92"/>
+<polygon fill="#000000" stroke="#000000" points="294.7,-32.66 300.88,-24.05 290.68,-26.93 294.7,-32.66"/>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvcop -->
+<g id="proc~~psqpn~~CallsGraph_edge23" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M491.17,-910.85C583.69,-919.64 727.77,-929.52 779,-912 908.79,-867.61 945.04,-835.86 1023,-723 1062.94,-665.18 1078.01,-581.02 1083.13,-541.32"/>
+<polygon fill="#000000" stroke="#000000" points="1086.64,-541.49 1084.35,-531.14 1079.69,-540.65 1086.64,-541.49"/>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdir -->
+<g id="proc~~psqpn~~CallsGraph_edge25" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M424.98,-889.96C448.35,-872.05 492.78,-836.86 527,-803 544.48,-785.71 541.76,-773.39 563,-761 584.36,-748.54 611.78,-743.33 633.52,-741.21"/>
+<polygon fill="#000000" stroke="#000000" points="633.99,-744.69 643.68,-740.4 633.43,-737.71 633.99,-744.69"/>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdot -->
+<g id="proc~~psqpn~~CallsGraph_edge26" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M485.76,-889.99C510.42,-886.15 537.86,-881.88 563,-878 610.99,-870.59 745.6,-880.24 779,-845 835.22,-785.68 760.27,-539.69 815,-479 831.46,-460.75 859.11,-455.89 881.61,-455.38"/>
+<polygon fill="#000000" stroke="#000000" points="881.84,-458.88 891.86,-455.43 881.87,-451.88 881.84,-458.88"/>
+</g>
+<!-- proc~mxdpgb -->
+<g id="proc~~psqpn~~CallsGraph_node23" class="node">
+<title>proc~mxdpgb</title>
+<g id="a_proc~~psqpn~~CallsGraph_node23"><a xlink:href="../proc/mxdpgb.html" xlink:title="mxdpgb">
+<polygon fill="#d9534f" stroke="#d9534f" points="947,-714 891,-714 891,-690 947,-690 947,-714"/>
+<text text-anchor="middle" x="919" y="-699.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgb</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgb -->
+<g id="proc~~psqpn~~CallsGraph_edge19" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgb</title>
+<path fill="none" stroke="#000000" d="M482.51,-914.03C560.74,-923.15 685.82,-926.93 779,-878 844.82,-843.44 889.78,-762.52 908.38,-723.63"/>
+<polygon fill="#000000" stroke="#000000" points="911.69,-724.81 912.73,-714.27 905.34,-721.86 911.69,-724.81"/>
+</g>
+<!-- proc~mxdpgp -->
+<g id="proc~~psqpn~~CallsGraph_node25" class="node">
+<title>proc~mxdpgp</title>
+<g id="a_proc~~psqpn~~CallsGraph_node25"><a xlink:href="../proc/mxdpgp.html" xlink:title="mxdpgp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="699,-1034 643,-1034 643,-1010 699,-1010 699,-1034"/>
+<text text-anchor="middle" x="671" y="-1019.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgp</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgp -->
+<g id="proc~~psqpn~~CallsGraph_edge20" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgp</title>
+<path fill="none" stroke="#000000" d="M491.08,-906.07C504.01,-909.57 516.54,-914.93 527,-923 557.23,-946.33 532.98,-977.41 563,-1001 582.53,-1016.35 610.15,-1021.48 632.44,-1022.84"/>
+<polygon fill="#000000" stroke="#000000" points="632.45,-1026.34 642.57,-1023.22 632.71,-1019.34 632.45,-1026.34"/>
+</g>
+<!-- proc~mxdpgs -->
+<g id="proc~~psqpn~~CallsGraph_node26" class="node">
+<title>proc~mxdpgs</title>
+<g id="a_proc~~psqpn~~CallsGraph_node26"><a xlink:href="../proc/mxdpgs.html" xlink:title="mxdpgs">
+<polygon fill="#d9534f" stroke="#d9534f" points="698.5,-992 643.5,-992 643.5,-968 698.5,-968 698.5,-992"/>
+<text text-anchor="middle" x="671" y="-977.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgs</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgs -->
+<g id="proc~~psqpn~~CallsGraph_edge21" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgs</title>
+<path fill="none" stroke="#000000" d="M491.07,-910.73C503.46,-913.71 515.82,-917.69 527,-923 546.07,-932.06 544.22,-944.35 563,-954 584.92,-965.26 611.89,-971.77 633.28,-975.47"/>
+<polygon fill="#000000" stroke="#000000" points="632.85,-978.94 643.28,-977.06 633.95,-972.03 632.85,-978.94"/>
+</g>
+<!-- proc~mxdpgu -->
+<g id="proc~~psqpn~~CallsGraph_node27" class="node">
+<title>proc~mxdpgu</title>
+<g id="a_proc~~psqpn~~CallsGraph_node27"><a xlink:href="../proc/mxdpgu.html" xlink:title="mxdpgu">
+<polygon fill="#d9534f" stroke="#d9534f" points="699,-1076 643,-1076 643,-1052 699,-1052 699,-1076"/>
+<text text-anchor="middle" x="671" y="-1061.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgu</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgu -->
+<g id="proc~~psqpn~~CallsGraph_edge22" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgu</title>
+<path fill="none" stroke="#000000" d="M491.18,-904.6C504.32,-908.22 516.9,-914 527,-923 568.58,-960.04 521.75,-1005.6 563,-1043 581.73,-1059.98 610.04,-1064.96 632.83,-1065.84"/>
+<polygon fill="#000000" stroke="#000000" points="632.81,-1069.34 642.86,-1065.98 632.91,-1062.34 632.81,-1069.34"/>
+</g>
+<!-- proc~mxvdif -->
+<g id="proc~~psqpn~~CallsGraph_node30" class="node">
+<title>proc~mxvdif</title>
+<g id="a_proc~~psqpn~~CallsGraph_node30"><a xlink:href="../proc/mxvdif.html" xlink:title="mxvdif">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-836 644,-836 644,-812 698,-812 698,-836"/>
+<text text-anchor="middle" x="671" y="-821.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvdif</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdif -->
+<g id="proc~~psqpn~~CallsGraph_edge24" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdif</title>
+<path fill="none" stroke="#000000" d="M442.08,-889.9C473.09,-878.77 520.85,-862.21 563,-850 586.4,-843.22 613.03,-836.74 633.87,-831.95"/>
+<polygon fill="#000000" stroke="#000000" points="634.91,-835.3 643.89,-829.68 633.36,-828.48 634.91,-835.3"/>
+</g>
+<!-- proc~mxvscl -->
+<g id="proc~~psqpn~~CallsGraph_node34" class="node">
+<title>proc~mxvscl</title>
+<g id="a_proc~~psqpn~~CallsGraph_node34"><a xlink:href="../proc/mxvscl.html" xlink:title="mxvscl">
+<polygon fill="#d9534f" stroke="#d9534f" points="946,-1094 892,-1094 892,-1070 946,-1070 946,-1094"/>
+<text text-anchor="middle" x="919" y="-1079.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvscl</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvscl -->
+<g id="proc~~psqpn~~CallsGraph_edge27" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvscl</title>
+<path fill="none" stroke="#000000" d="M491.13,-903.83C504.44,-907.5 517.08,-913.5 527,-923 580.25,-974.03 505.47,-1038.85 563,-1085 611.14,-1123.62 801.2,-1099.98 881.68,-1087.86"/>
+<polygon fill="#000000" stroke="#000000" points="882.49,-1091.28 891.84,-1086.3 881.42,-1084.36 882.49,-1091.28"/>
+</g>
+<!-- proc~compute_con_and_dcon&#45;&gt;proc~mxvcop -->
+<g id="proc~~psqpn~~CallsGraph_edge28" class="edge">
+<title>proc~compute_con_and_dcon&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M998.87,-1120.97C1008.07,-1116.61 1016.48,-1110.78 1023,-1103 1059.75,-1059.1 1080.12,-642.78 1084.57,-541.25"/>
+<polygon fill="#000000" stroke="#000000" points="1088.07,-541.33 1085,-531.19 1081.07,-541.03 1088.07,-541.33"/>
+</g>
+<!-- proc~mxvneg -->
+<g id="proc~~psqpn~~CallsGraph_node32" class="node">
+<title>proc~mxvneg</title>
+<g id="a_proc~~psqpn~~CallsGraph_node32"><a xlink:href="../proc/mxvneg.html" xlink:title="mxvneg">
+<polygon fill="#d9534f" stroke="#d9534f" points="698.5,-710 643.5,-710 643.5,-686 698.5,-686 698.5,-710"/>
+<text text-anchor="middle" x="671" y="-695.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvneg</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_obj_and_dobj&#45;&gt;proc~mxvneg -->
+<g id="proc~~psqpn~~CallsGraph_edge29" class="edge">
+<title>proc~compute_obj_and_dobj&#45;&gt;proc~mxvneg</title>
+<path fill="none" stroke="#000000" d="M423.54,-568.17C455.77,-594.94 532.74,-657.68 563,-672 585.27,-682.54 612.25,-689.06 633.54,-692.93"/>
+<polygon fill="#000000" stroke="#000000" points="633.04,-696.4 643.49,-694.63 634.22,-689.5 633.04,-696.4"/>
+</g>
+<!-- proc~dual_range_space_qp&#45;&gt;proc~mxvdir -->
+<g id="proc~~psqpn~~CallsGraph_edge31" class="edge">
+<title>proc~dual_range_space_qp&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M472.18,-740C522.7,-740 591.75,-740 633.49,-740"/>
+<polygon fill="#000000" stroke="#000000" points="633.73,-743.5 643.73,-740 633.73,-736.5 633.73,-743.5"/>
+</g>
+<!-- proc~dual_range_space_qp&#45;&gt;proc~mxvdif -->
+<g id="proc~~psqpn~~CallsGraph_edge30" class="edge">
+<title>proc~dual_range_space_qp&#45;&gt;proc~mxvdif</title>
+<path fill="none" stroke="#000000" d="M472.08,-743.17C490.68,-746.18 510.47,-751.55 527,-761 548.35,-773.2 541.76,-790.61 563,-803 584.36,-815.46 611.78,-820.67 633.52,-822.79"/>
+<polygon fill="#000000" stroke="#000000" points="633.43,-826.29 643.68,-823.6 633.99,-819.31 633.43,-826.29"/>
+</g>
+<!-- proc~mxvsav -->
+<g id="proc~~psqpn~~CallsGraph_node33" class="node">
+<title>proc~mxvsav</title>
+<g id="a_proc~~psqpn~~CallsGraph_node33"><a xlink:href="../proc/mxvsav.html" xlink:title="mxvsav">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-794 644,-794 644,-770 698,-770 698,-794"/>
+<text text-anchor="middle" x="671" y="-779.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvsav</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_qp&#45;&gt;proc~mxvsav -->
+<g id="proc~~psqpn~~CallsGraph_edge32" class="edge">
+<title>proc~dual_range_space_qp&#45;&gt;proc~mxvsav</title>
+<path fill="none" stroke="#000000" d="M472.18,-750.17C522.81,-758.31 592.04,-769.46 633.75,-776.17"/>
+<polygon fill="#000000" stroke="#000000" points="633.3,-779.64 643.73,-777.77 634.42,-772.73 633.3,-779.64"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvcop -->
+<g id="proc~~psqpn~~CallsGraph_edge39" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M527.34,-467.1C599.97,-459.73 694.89,-449.99 779,-441 795.01,-439.29 798.93,-437.89 815,-437 907.3,-431.89 940.16,-395.98 1023,-437 1048.39,-449.57 1066.27,-477.94 1076.23,-497.77"/>
+<polygon fill="#000000" stroke="#000000" points="1073.14,-499.43 1080.59,-506.97 1079.47,-496.43 1073.14,-499.43"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvdir -->
+<g id="proc~~psqpn~~CallsGraph_edge40" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M458.2,-491.01C482.43,-499.41 510.03,-513.15 527,-535 578.12,-600.81 504.1,-660.06 563,-719 581.22,-737.23 610.32,-742.01 633.58,-742.49"/>
+<polygon fill="#000000" stroke="#000000" points="633.81,-745.99 643.8,-742.44 633.78,-738.99 633.81,-745.99"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvina -->
+<g id="proc~~psqpn~~CallsGraph_edge41" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvina</title>
+<path fill="none" stroke="#000000" d="M450.51,-466.9C476.17,-457.35 507.77,-441.47 527,-417 567.76,-365.13 515.17,-318.44 563,-273 581.57,-255.36 610.39,-250.5 633.45,-249.84"/>
+<polygon fill="#000000" stroke="#000000" points="633.59,-253.34 643.58,-249.8 633.56,-246.34 633.59,-253.34"/>
+</g>
+<!-- proc~determine_new_active_linear_constr -->
+<g id="proc~~psqpn~~CallsGraph_node20" class="node">
+<title>proc~determine_new_active_linear_constr</title>
+<g id="a_proc~~psqpn~~CallsGraph_node20"><a xlink:href="../proc/determine_new_active_linear_constr.html" xlink:title="determine_new_active_linear_constr">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-390 567.5,-390 567.5,-366 774.5,-366 774.5,-390"/>
+<text text-anchor="middle" x="671" y="-375.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">determine_new_active_linear_constr</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_linear_constr -->
+<g id="proc~~psqpn~~CallsGraph_edge33" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_linear_constr</title>
+<path fill="none" stroke="#000000" d="M431.78,-466.95C472.96,-445.19 556.17,-401.39 563,-399 569.88,-396.59 577.11,-394.44 584.43,-392.51"/>
+<polygon fill="#000000" stroke="#000000" points="585.58,-395.83 594.44,-390.02 583.89,-389.03 585.58,-395.83"/>
+</g>
+<!-- proc~determine_new_active_simple_bound -->
+<g id="proc~~psqpn~~CallsGraph_node21" class="node">
+<title>proc~determine_new_active_simple_bound</title>
+<g id="a_proc~~psqpn~~CallsGraph_node21"><a xlink:href="../proc/determine_new_active_simple_bound.html" xlink:title="determine_new_active_simple_bound">
+<polygon fill="#d9534f" stroke="#d9534f" points="777,-348 565,-348 565,-324 777,-324 777,-348"/>
+<text text-anchor="middle" x="671" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">determine_new_active_simple_bound</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_simple_bound -->
+<g id="proc~~psqpn~~CallsGraph_edge34" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_simple_bound</title>
+<path fill="none" stroke="#000000" d="M443.09,-466.92C468.47,-456.64 502.78,-439.89 527,-417 549.6,-395.64 537.55,-374.87 563,-357 565.17,-355.48 567.42,-354.06 569.74,-352.74"/>
+<polygon fill="#000000" stroke="#000000" points="571.61,-355.71 578.99,-348.1 568.48,-349.45 571.61,-355.71"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgb -->
+<g id="proc~~psqpn~~CallsGraph_edge35" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgb</title>
+<path fill="none" stroke="#000000" d="M453.95,-491.08C478.46,-499.72 507.65,-513.67 527,-535 558.73,-569.99 527.05,-604.36 563,-635 566.05,-637.6 790.03,-678.67 880.61,-695.19"/>
+<polygon fill="#000000" stroke="#000000" points="880.25,-698.68 890.72,-697.03 881.51,-691.8 880.25,-698.68"/>
+</g>
+<!-- proc~mxdpgf -->
+<g id="proc~~psqpn~~CallsGraph_node24" class="node">
+<title>proc~mxdpgf</title>
+<g id="a_proc~~psqpn~~CallsGraph_node24"><a xlink:href="../proc/mxdpgf.html" xlink:title="mxdpgf">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-550 644,-550 644,-526 698,-526 698,-550"/>
+<text text-anchor="middle" x="671" y="-535.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgf</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgf -->
+<g id="proc~~psqpn~~CallsGraph_edge36" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgf</title>
+<path fill="none" stroke="#000000" d="M462.13,-491.01C513.43,-502.61 589.7,-519.85 634.18,-529.9"/>
+<polygon fill="#000000" stroke="#000000" points="633.44,-533.32 643.97,-532.12 634.99,-526.5 633.44,-533.32"/>
+</g>
+<!-- proc~mxdprb -->
+<g id="proc~~psqpn~~CallsGraph_node28" class="node">
+<title>proc~mxdprb</title>
+<g id="a_proc~~psqpn~~CallsGraph_node28"><a xlink:href="../proc/mxdprb.html" xlink:title="mxdprb">
+<polygon fill="#d9534f" stroke="#d9534f" points="946,-672 892,-672 892,-648 946,-648 946,-672"/>
+<text text-anchor="middle" x="919" y="-657.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdprb</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdprb -->
+<g id="proc~~psqpn~~CallsGraph_edge37" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdprb</title>
+<path fill="none" stroke="#000000" d="M449.37,-491.01C474.09,-499.98 505.08,-514.28 527,-535 551.28,-557.95 535.77,-581.64 563,-601 588.85,-619.38 796.99,-645.72 882.02,-655.83"/>
+<polygon fill="#000000" stroke="#000000" points="881.65,-659.31 891.99,-657.01 882.47,-652.36 881.65,-659.31"/>
+</g>
+<!-- proc~mxdsmm -->
+<g id="proc~~psqpn~~CallsGraph_node29" class="node">
+<title>proc~mxdsmm</title>
+<g id="a_proc~~psqpn~~CallsGraph_node29"><a xlink:href="../proc/mxdsmm.html" xlink:title="mxdsmm">
+<polygon fill="#d9534f" stroke="#d9534f" points="950,-512 888,-512 888,-488 950,-488 950,-512"/>
+<text text-anchor="middle" x="919" y="-497.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdsmm</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdsmm -->
+<g id="proc~~psqpn~~CallsGraph_edge38" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdsmm</title>
+<path fill="none" stroke="#000000" d="M527.05,-483.87C639.58,-488.51 802.63,-495.24 877.57,-498.33"/>
+<polygon fill="#000000" stroke="#000000" points="877.83,-501.85 887.97,-498.76 878.12,-494.85 877.83,-501.85"/>
+</g>
+<!-- proc~mxvinv -->
+<g id="proc~~psqpn~~CallsGraph_node31" class="node">
+<title>proc~mxvinv</title>
+<g id="a_proc~~psqpn~~CallsGraph_node31"><a xlink:href="../proc/mxvinv.html" xlink:title="mxvinv">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-432 644,-432 644,-408 698,-408 698,-432"/>
+<text text-anchor="middle" x="671" y="-417.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvinv</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvinv -->
+<g id="proc~~psqpn~~CallsGraph_edge42" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvinv</title>
+<path fill="none" stroke="#000000" d="M462.13,-466.99C513.43,-455.39 589.7,-438.15 634.18,-428.1"/>
+<polygon fill="#000000" stroke="#000000" points="634.99,-431.5 643.97,-425.88 633.44,-424.68 634.99,-431.5"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvneg -->
+<g id="proc~~psqpn~~CallsGraph_edge43" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvneg</title>
+<path fill="none" stroke="#000000" d="M456.45,-491.05C480.81,-499.54 509.05,-513.36 527,-535 567.19,-583.46 518.07,-627.9 563,-672 581.34,-690 609.92,-696.27 632.93,-698.16"/>
+<polygon fill="#000000" stroke="#000000" points="632.87,-701.66 643.05,-698.74 633.27,-694.67 632.87,-701.66"/>
+</g>
+<!-- proc~ops_after_constr_deletion -->
+<g id="proc~~psqpn~~CallsGraph_node35" class="node">
+<title>proc~ops_after_constr_deletion</title>
+<g id="a_proc~~psqpn~~CallsGraph_node35"><a xlink:href="../proc/ops_after_constr_deletion.html" xlink:title="psqp_class%ops_after_constr_deletion">
+<polygon fill="#d9534f" stroke="#d9534f" points="779,-306 563,-306 563,-282 779,-282 779,-306"/>
+<text text-anchor="middle" x="671" y="-291.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%ops_after_constr_deletion</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~ops_after_constr_deletion -->
+<g id="proc~~psqpn~~CallsGraph_edge44" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~ops_after_constr_deletion</title>
+<path fill="none" stroke="#000000" d="M448.06,-466.91C473.69,-457.17 506.18,-441.07 527,-417 558.45,-380.64 526.63,-346.43 563,-315 564.38,-313.81 565.8,-312.68 567.27,-311.6"/>
+<polygon fill="#000000" stroke="#000000" points="569.5,-314.34 576.1,-306.05 565.77,-308.41 569.5,-314.34"/>
+</g>
+<!-- proc~update_tri_decomp_general -->
+<g id="proc~~psqpn~~CallsGraph_node36" class="node">
+<title>proc~update_tri_decomp_general</title>
+<g id="a_proc~~psqpn~~CallsGraph_node36"><a xlink:href="../proc/update_tri_decomp_general.html" xlink:title="update_tri_decomp_general">
+<polygon fill="#d9534f" stroke="#d9534f" points="752,-592 590,-592 590,-568 752,-568 752,-592"/>
+<text text-anchor="middle" x="671" y="-577.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_tri_decomp_general</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~update_tri_decomp_general -->
+<g id="proc~~psqpn~~CallsGraph_edge45" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~update_tri_decomp_general</title>
+<path fill="none" stroke="#000000" d="M437.23,-491.01C461.51,-501.67 497.21,-518.12 527,-535 543.73,-544.48 545.22,-551.67 563,-559 568.49,-561.26 574.25,-563.29 580.12,-565.1"/>
+<polygon fill="#000000" stroke="#000000" points="579.51,-568.56 590.08,-567.95 581.43,-561.83 579.51,-568.56"/>
+</g>
+<!-- proc~line_search_interpolation -->
+<g id="proc~~psqpn~~CallsGraph_node22" class="node">
+<title>proc~line_search_interpolation</title>
+<g id="a_proc~~psqpn~~CallsGraph_node22"><a xlink:href="../proc/line_search_interpolation.html" xlink:title="line_search_interpolation">
+<polygon fill="#d9534f" stroke="#d9534f" points="744,-146 598,-146 598,-122 744,-122 744,-146"/>
+<text text-anchor="middle" x="671" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_search_interpolation</text>
+</a>
+</g>
+</g>
+<!-- proc~extended_line_search&#45;&gt;proc~line_search_interpolation -->
+<g id="proc~~psqpn~~CallsGraph_edge46" class="edge">
+<title>proc~extended_line_search&#45;&gt;proc~line_search_interpolation</title>
+<path fill="none" stroke="#000000" d="M483.79,-163.96C516.28,-158.74 554.44,-152.6 587.73,-147.24"/>
+<polygon fill="#000000" stroke="#000000" points="588.58,-150.65 597.9,-145.6 587.47,-143.74 588.58,-150.65"/>
+</g>
+<!-- proc~determine_new_active_linear_constr&#45;&gt;proc~mxvdot -->
+<g id="proc~~psqpn~~CallsGraph_edge47" class="edge">
+<title>proc~determine_new_active_linear_constr&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M744.17,-390.03C755.91,-392.6 767.87,-395.59 779,-399 816.22,-410.42 857.03,-428.44 884.74,-441.56"/>
+<polygon fill="#000000" stroke="#000000" points="883.44,-444.82 893.97,-445.98 886.46,-438.51 883.44,-444.82"/>
+</g>
+<!-- proc~mxdpgu&#45;&gt;proc~mxvscl -->
+<g id="proc~~psqpn~~CallsGraph_edge48" class="edge">
+<title>proc~mxdpgu&#45;&gt;proc~mxvscl</title>
+<path fill="none" stroke="#000000" d="M699.27,-1066C743.76,-1069.25 832,-1075.71 881.73,-1079.35"/>
+<polygon fill="#000000" stroke="#000000" points="881.5,-1082.84 891.73,-1080.08 882.01,-1075.86 881.5,-1082.84"/>
+</g>
+<!-- proc~update_tri_decomp_orthogonal -->
+<g id="proc~~psqpn~~CallsGraph_node38" class="node">
+<title>proc~update_tri_decomp_orthogonal</title>
+<g id="a_proc~~psqpn~~CallsGraph_node38"><a xlink:href="../proc/update_tri_decomp_orthogonal.html" xlink:title="update_tri_decomp_orthogonal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1008.5,-66 829.5,-66 829.5,-42 1008.5,-42 1008.5,-66"/>
+<text text-anchor="middle" x="919" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_tri_decomp_orthogonal</text>
+</a>
+</g>
+</g>
+<!-- proc~ops_after_constr_deletion&#45;&gt;proc~update_tri_decomp_orthogonal -->
+<g id="proc~~psqpn~~CallsGraph_edge49" class="edge">
+<title>proc~ops_after_constr_deletion&#45;&gt;proc~update_tri_decomp_orthogonal</title>
+<path fill="none" stroke="#000000" d="M762.38,-281.98C768.24,-279.49 773.84,-276.52 779,-273 852.14,-223.01 894.96,-120.52 910.86,-75.74"/>
+<polygon fill="#000000" stroke="#000000" points="914.22,-76.74 914.17,-66.14 907.6,-74.46 914.22,-76.74"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxvcop -->
+<g id="proc~~psqpn~~CallsGraph_edge54" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M740.43,-592.04C828.27,-606.13 975.06,-624.74 1023,-601 1048.39,-588.43 1066.27,-560.06 1076.23,-540.23"/>
+<polygon fill="#000000" stroke="#000000" points="1079.47,-541.57 1080.59,-531.03 1073.14,-538.57 1079.47,-541.57"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxvdot -->
+<g id="proc~~psqpn~~CallsGraph_edge55" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M752.04,-573.19C761.78,-569.88 771.07,-565.3 779,-559 809.54,-534.76 784.55,-503.35 815,-479 833.74,-464.01 860.4,-458.88 881.9,-457.44"/>
+<polygon fill="#000000" stroke="#000000" points="882.15,-460.93 891.99,-456.99 881.84,-453.93 882.15,-460.93"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxvset -->
+<g id="proc~~psqpn~~CallsGraph_edge56" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxvset</title>
+<path fill="none" stroke="#000000" d="M750.71,-567.94C852.72,-552.14 1018.22,-525.88 1023,-521 1079.58,-463.24 1085.15,-198.42 1085.53,-118.74"/>
+<polygon fill="#000000" stroke="#000000" points="1089.03,-118.38 1085.56,-108.38 1082.03,-118.37 1089.03,-118.38"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdpgb -->
+<g id="proc~~psqpn~~CallsGraph_edge50" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdpgb</title>
+<path fill="none" stroke="#000000" d="M696.1,-592.08C718.57,-603.87 752.51,-623.06 779,-644 797,-658.23 794.87,-670 815,-681 835.05,-691.95 860.12,-697.22 880.5,-699.74"/>
+<polygon fill="#000000" stroke="#000000" points="880.37,-703.24 890.69,-700.82 881.11,-696.28 880.37,-703.24"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdprb -->
+<g id="proc~~psqpn~~CallsGraph_edge51" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdprb</title>
+<path fill="none" stroke="#000000" d="M740.29,-592.02C753.49,-595.6 766.95,-600.18 779,-606 797.25,-614.81 796.78,-625.11 815,-634 835.89,-644.2 861.17,-650.66 881.46,-654.58"/>
+<polygon fill="#000000" stroke="#000000" points="881.1,-658.08 891.57,-656.42 882.35,-651.19 881.1,-658.08"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdsmm -->
+<g id="proc~~psqpn~~CallsGraph_edge52" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdsmm</title>
+<path fill="none" stroke="#000000" d="M752.22,-569.3C761.51,-566.6 770.64,-563.23 779,-559 798.37,-549.21 795.9,-536.3 815,-526 834.35,-515.56 858.02,-509.21 877.78,-505.4"/>
+<polygon fill="#000000" stroke="#000000" points="878.49,-508.83 887.72,-503.63 877.26,-501.94 878.49,-508.83"/>
+</g>
+<!-- proc~mxdsmv -->
+<g id="proc~~psqpn~~CallsGraph_node37" class="node">
+<title>proc~mxdsmv</title>
+<g id="a_proc~~psqpn~~CallsGraph_node37"><a xlink:href="../proc/mxdsmv.html" xlink:title="mxdsmv">
+<polygon fill="#d9534f" stroke="#d9534f" points="948,-592 890,-592 890,-568 948,-568 948,-592"/>
+<text text-anchor="middle" x="919" y="-577.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdsmv</text>
+</a>
+</g>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdsmv -->
+<g id="proc~~psqpn~~CallsGraph_edge53" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdsmv</title>
+<path fill="none" stroke="#000000" d="M752.21,-580C794.97,-580 845.62,-580 879.58,-580"/>
+<polygon fill="#000000" stroke="#000000" points="879.99,-583.5 889.99,-580 879.99,-576.5 879.99,-583.5"/>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvcop -->
+<g id="proc~~psqpn~~CallsGraph_edge57" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M937.08,-66.19C960.56,-83.96 1002.25,-119.31 1023,-160 1082.28,-276.21 1086.61,-438.14 1086.05,-496.73"/>
+<polygon fill="#000000" stroke="#000000" points="1082.55,-496.68 1085.9,-506.73 1089.55,-496.79 1082.55,-496.68"/>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvset -->
+<g id="proc~~psqpn~~CallsGraph_edge60" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvset</title>
+<path fill="none" stroke="#000000" d="M967.7,-66.01C985.11,-70.4 1004.95,-75.41 1023,-80 1031.58,-82.18 1040.83,-84.54 1049.5,-86.76"/>
+<polygon fill="#000000" stroke="#000000" points="1048.8,-90.19 1059.35,-89.29 1050.53,-83.41 1048.8,-90.19"/>
+</g>
+<!-- proc~mxvort -->
+<g id="proc~~psqpn~~CallsGraph_node39" class="node">
+<title>proc~mxvort</title>
+<g id="a_proc~~psqpn~~CallsGraph_node39"><a xlink:href="../proc/mxvort.html" xlink:title="mxvort">
+<polygon fill="#d9534f" stroke="#d9534f" points="1113.5,-66 1059.5,-66 1059.5,-42 1113.5,-42 1113.5,-66"/>
+<text text-anchor="middle" x="1086.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvort</text>
+</a>
+</g>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvort -->
+<g id="proc~~psqpn~~CallsGraph_edge58" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvort</title>
+<path fill="none" stroke="#000000" d="M1008.56,-54C1022.95,-54 1037.1,-54 1049.26,-54"/>
+<polygon fill="#000000" stroke="#000000" points="1049.4,-57.5 1059.4,-54 1049.4,-50.5 1049.4,-57.5"/>
+</g>
+<!-- proc~mxvrot -->
+<g id="proc~~psqpn~~CallsGraph_node40" class="node">
+<title>proc~mxvrot</title>
+<g id="a_proc~~psqpn~~CallsGraph_node40"><a xlink:href="../proc/mxvrot.html" xlink:title="mxvrot">
+<polygon fill="#d9534f" stroke="#d9534f" points="1113.5,-24 1059.5,-24 1059.5,0 1113.5,0 1113.5,-24"/>
+<text text-anchor="middle" x="1086.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvrot</text>
+</a>
+</g>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvrot -->
+<g id="proc~~psqpn~~CallsGraph_edge59" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvrot</title>
+<path fill="none" stroke="#000000" d="M967.43,-41.96C993.5,-35.35 1025.34,-27.27 1049.38,-21.17"/>
+<polygon fill="#000000" stroke="#000000" points="1050.34,-24.53 1059.17,-18.68 1048.61,-17.75 1050.34,-24.53"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var panprocpsqpnCallsGraph = svgPanZoom('#procpsqpnCallsGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallsGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallsGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+
+    
+    
+
+    
+    
+
+
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl codehilite"><pre><span></span><span class="w">   </span><span class="k">subroutine </span><span class="n">psqpn</span><span class="p">(</span><span class="n">me</span><span class="p">,</span><span class="w"> </span><span class="n">nf</span><span class="p">,</span><span class="w"> </span><span class="n">nb</span><span class="p">,</span><span class="w"> </span><span class="n">nc</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">bound_type</span><span class="p">,</span><span class="w"> </span><span class="n">xl</span><span class="p">,</span><span class="w"> </span><span class="n">xu</span><span class="p">,</span><span class="w"> </span><span class="n">cf</span><span class="p">,</span><span class="w"> </span><span class="n">constraint_type</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">cl</span><span class="p">,</span><span class="w"> </span><span class="n">cu</span><span class="p">,</span><span class="w"> </span><span class="n">ipar</span><span class="p">,</span><span class="w"> </span><span class="n">rpar</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">gmax</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                    </span><span class="n">cmax</span><span class="p">,</span><span class="w"> </span><span class="n">iprnt</span><span class="p">,</span><span class="w"> </span><span class="n">iterm</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">dobj</span><span class="p">,</span><span class="w"> </span><span class="n">con</span><span class="p">,</span><span class="w"> </span><span class="n">dcon</span><span class="p">,</span><span class="w"> </span><span class="n">report</span><span class="p">)</span>
+
+<span class="w">      </span><span class="k">class</span><span class="p">(</span><span class="n">psqp_class</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">me</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nf</span><span class="w">  </span><span class="c">!! number of variables</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nb</span><span class="w">  </span><span class="c">!! choice of simple bounds.</span>
+<span class="w">                                 </span><span class="c">!!</span>
+<span class="w">                                 </span><span class="c">!! * `nb=0` -- simple bounds suppressed.</span>
+<span class="w">                                 </span><span class="c">!! * `nb&gt;0` -- simple bounds accepted.</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nc</span><span class="w">  </span><span class="c">!! number of general nonlinear constraints.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="n">nf</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="c">!! x(nf) vector of variables.</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(</span><span class="n">nf</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">bound_type</span><span class="w"> </span><span class="c">!! ix(nf) vector containing types of bounds.</span>
+<span class="w">                                                       </span><span class="c">!!</span>
+<span class="w">                                                       </span><span class="c">!! * `ix(i) = 0` -- variable x(i) is unbounded.</span>
+<span class="w">                                                       </span><span class="c">!! * `ix(i) = 1` -- lower bound xl(i) &lt;= x(i).</span>
+<span class="w">                                                       </span><span class="c">!! * `ix(i) = 2` -- upper bound x(i) &lt;= xu(i).</span>
+<span class="w">                                                       </span><span class="c">!! * `ix(i) = 3` -- two side bound xl(i) &lt;= x(i) &lt;= xu(i).</span>
+<span class="w">                                                       </span><span class="c">!! * `ix(i) = 5` -- variable x(i) is fixed.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="n">nf</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xl</span><span class="w">   </span><span class="c">!! xl(nf) vector containing lower bounds for variables.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="n">nf</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xu</span><span class="w">   </span><span class="c">!! xu(nf) vector containing upper bounds for variables.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="n">nc</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cf</span><span class="w"> </span><span class="c">!! cf(nc+1) vector containing values of the constraint functions.</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(</span><span class="n">nc</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">constraint_type</span><span class="w">  </span><span class="c">!! ic(nc) vector containing types of constraints:</span>
+<span class="w">                                                           </span><span class="c">!!</span>
+<span class="w">                                                           </span><span class="c">!! * `ic(kc) = 0` -- constraint cf(kc) is not used.</span>
+<span class="w">                                                           </span><span class="c">!! * `ic(kc) = 1` -- lower constraint cl(kc) &lt;= cf(kc).</span>
+<span class="w">                                                           </span><span class="c">!! * `ic(kc) = 2` -- upper constraint cf(kc) &lt;= cu(kc).</span>
+<span class="w">                                                           </span><span class="c">!! * `ic(kc) = 3` -- two side constraint cl(kc) &lt;= cf(kc) &lt;= cu(kc).</span>
+<span class="w">                                                           </span><span class="c">!! * `ic(kc) = 5` -- equality constraint cf(kc) == cl(kc).</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="n">nc</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cl</span><span class="w">  </span><span class="c">!! cl(nc) vector containing lower bounds for constraint functions.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="n">nc</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cu</span><span class="w">  </span><span class="c">!! cu(nc) vector containing upper bounds for constraint functions.</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ipar</span><span class="w">  </span><span class="c">!! integer paremeters:</span>
+<span class="w">                                               </span><span class="c">!!</span>
+<span class="w">                                               </span><span class="c">!! * `ipar(1)`  maximum number of iterations.</span>
+<span class="w">                                               </span><span class="c">!! * `ipar(2)`  maximum number of function evaluations.</span>
+<span class="w">                                               </span><span class="c">!! * `ipar(3)`  this parameter is not used in the subroutine psqp.</span>
+<span class="w">                                               </span><span class="c">!! * `ipar(4)`  this parameter is not used in the subroutine psqp.</span>
+<span class="w">                                               </span><span class="c">!! * `ipar(5)`  variable metric update used.</span>
+<span class="w">                                               </span><span class="c">!!   `ipar(5)=1` - the bfgs update.</span>
+<span class="w">                                               </span><span class="c">!!   `ipar(5)=2` - the hoshino update.</span>
+<span class="w">                                               </span><span class="c">!! * `ipar(6)`  correction of the variable metric update if a negative</span>
+<span class="w">                                               </span><span class="c">!!   curvature occurs.</span>
+<span class="w">                                               </span><span class="c">!!   `ipar(6)=1` - no correction.</span>
+<span class="w">                                               </span><span class="c">!!   `ipar(6)=2` - powell&#39;s correction.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rpar</span><span class="w">   </span><span class="c">!! real parameters:</span>
+<span class="w">                                                 </span><span class="c">!!</span>
+<span class="w">                                                 </span><span class="c">!! * `rpar(1)` -- maximum stepsize.</span>
+<span class="w">                                                 </span><span class="c">!! * `rpar(2)` -- tolerance for change of variables.</span>
+<span class="w">                                                 </span><span class="c">!! * `rpar(3)` -- tolerance for constraint violations.</span>
+<span class="w">                                                 </span><span class="c">!! * `rpar(4)` -- tolerance for the gradient of the lagrangian function.</span>
+<span class="w">                                                 </span><span class="c">!! * `rpar(5)` -- penalty coefficient.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f</span><span class="w">     </span><span class="c">!! value of the objective function.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">gmax</span><span class="w">  </span><span class="c">!! maximum partial derivative of the lagrangian function.</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">cmax</span><span class="w">  </span><span class="c">!! maximum constraint violation.</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iprnt</span><span class="w">  </span><span class="c">!! print specification:</span>
+<span class="w">                                   </span><span class="c">!!</span>
+<span class="w">                                   </span><span class="c">!! * `iprnt=0`      -- no print.</span>
+<span class="w">                                   </span><span class="c">!! * `abs(iprnt)=1` -- print of final results.</span>
+<span class="w">                                   </span><span class="c">!! * `abs(iprnt)=2` -- print of final results and iterations.</span>
+<span class="w">                                   </span><span class="c">!! * `iprnt&gt;0`      -- basic final results.</span>
+<span class="w">                                   </span><span class="c">!! * `iprnt&lt;0`      -- extended final results.</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iterm</span><span class="w"> </span><span class="c">!! variable that indicates the cause of termination.</span>
+<span class="w">                                    </span><span class="c">!!</span>
+<span class="w">                                    </span><span class="c">!! * `iterm=1`  -- if abs(x-xo) was less than or equal to tolx in mtesx (usually two) subsequent iterations.</span>
+<span class="w">                                    </span><span class="c">!! * `iterm=2`  -- if abs(f-fo) was less than or equal to tolf in mtesf (usually two) subsequent iterations.</span>
+<span class="w">                                    </span><span class="c">!! * `iterm=3`  -- if f is less than or equal to tolb.</span>
+<span class="w">                                    </span><span class="c">!! * `iterm=4`  -- if gmax is less than or equal to tolg.</span>
+<span class="w">                                    </span><span class="c">!! * `iterm=11` -- if nit exceeded mit. iterm=12 - if nfv exceeded mfv.</span>
+<span class="w">                                    </span><span class="c">!! * `iterm=13` -- if nfg exceeded mfg. iterm&lt;0 - if the method failed.</span>
+<span class="w">                                    </span><span class="c">!! * `iterm=-6` -- then the termination criterion has not been satisfied, but the point obtained if usually acceptable.</span>
+<span class="w">      </span><span class="k">procedure</span><span class="p">(</span><span class="n">obj_func</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">obj</span><span class="w">  </span><span class="c">!! computation of the value of the objective function</span>
+<span class="w">      </span><span class="k">procedure</span><span class="p">(</span><span class="n">dobj_func</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dobj</span><span class="w"> </span><span class="c">!! computation of the gradient of the objective function</span>
+<span class="w">      </span><span class="k">procedure</span><span class="p">(</span><span class="n">con_func</span><span class="p">)</span><span class="w">  </span><span class="kd">::</span><span class="w"> </span><span class="n">con</span><span class="w">  </span><span class="c">!! computation of the value of the constraint function</span>
+<span class="w">      </span><span class="k">procedure</span><span class="p">(</span><span class="n">dcon_func</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dcon</span><span class="w"> </span><span class="c">!! computation of the gradient of the constraint function</span>
+<span class="w">      </span><span class="k">procedure</span><span class="p">(</span><span class="n">report_f</span><span class="p">),</span><span class="k">optional</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">report</span><span class="w"> </span><span class="c">!! iteration report function. Note: this is independent of `iprnt`. </span>
+<span class="w">                                             </span><span class="c">!! If this function is associated, each iteration will be reported</span>
+
+<span class="w">      </span><span class="kt">integer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lcfd</span><span class="p">,</span><span class="w"> </span><span class="n">lcfo</span><span class="p">,</span><span class="w"> </span><span class="n">lcg</span><span class="p">,</span><span class="w"> </span><span class="n">lcp</span><span class="p">,</span><span class="w"> </span><span class="n">lcr</span><span class="p">,</span><span class="w"> </span><span class="n">lcz</span><span class="p">,</span><span class="w"> </span><span class="n">lg</span><span class="p">,</span><span class="w"> </span><span class="n">lgc</span><span class="p">,</span><span class="w"> </span><span class="n">lgf</span><span class="p">,</span><span class="w"> </span><span class="n">lgo</span><span class="p">,</span><span class="w"> </span><span class="n">lh</span><span class="p">,</span><span class="w"> </span><span class="n">lia</span><span class="p">,</span><span class="w"> </span><span class="n">ls</span><span class="p">,</span><span class="w"> </span><span class="n">lxo</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ia</span>
+<span class="w">      </span><span class="kt">real</span><span class="p">(</span><span class="n">wp</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ra</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ic</span><span class="w"> </span><span class="c">!! local copy of `constraint_type` since it is modified</span>
+<span class="w">      </span><span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(:),</span><span class="k">allocatable</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ix</span><span class="w"> </span><span class="c">!! local copy of `bound_type` since it is modified</span>
+
+<span class="w">      </span><span class="c">! set the functions:</span>
+<span class="w">      </span><span class="n">me</span><span class="p">%</span><span class="n">obj</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">obj</span>
+<span class="w">      </span><span class="n">me</span><span class="p">%</span><span class="n">dobj</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">dobj</span>
+<span class="w">      </span><span class="n">me</span><span class="p">%</span><span class="n">con</span><span class="w">  </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">con</span>
+<span class="w">      </span><span class="n">me</span><span class="p">%</span><span class="n">dcon</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">dcon</span>
+
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">report</span><span class="p">))</span><span class="w"> </span><span class="n">me</span><span class="p">%</span><span class="n">report</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">report</span>
+
+<span class="w">      </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">ia</span><span class="p">(</span><span class="n">nf</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">((</span><span class="n">nf</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nc</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">nf</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="o">*</span><span class="n">nc</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<span class="w">      </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">ic</span><span class="p">(</span><span class="n">nc</span><span class="p">))</span>
+<span class="w">      </span><span class="k">allocate</span><span class="w"> </span><span class="p">(</span><span class="n">ix</span><span class="p">(</span><span class="n">nf</span><span class="p">))</span>
+
+<span class="w">      </span><span class="n">ic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">constraint_type</span><span class="w"> </span><span class="c">! make a copy of input</span>
+<span class="w">      </span><span class="n">ix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bound_type</span><span class="w"> </span><span class="c">! make a copy of input</span>
+<span class="w">      </span><span class="n">lcg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">      </span><span class="n">lcfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lcg</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span><span class="o">*</span><span class="n">nc</span>
+<span class="w">      </span><span class="n">lcfd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lcfo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nc</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">      </span><span class="n">lgc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lcfd</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nc</span>
+<span class="w">      </span><span class="n">lcr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lgc</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span>
+<span class="w">      </span><span class="n">lcz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lcr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span><span class="o">*</span><span class="p">(</span><span class="n">nf</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="w">      </span><span class="n">lcp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lcz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span>
+<span class="w">      </span><span class="n">lgf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lcp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nc</span>
+<span class="w">      </span><span class="n">lg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lgf</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span>
+<span class="w">      </span><span class="n">lh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lg</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span>
+<span class="w">      </span><span class="n">ls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lh</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span><span class="o">*</span><span class="p">(</span><span class="n">nf</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="w">      </span><span class="n">lxo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ls</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span>
+<span class="w">      </span><span class="n">lgo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lxo</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nf</span>
+<span class="w">      </span><span class="n">lia</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">      </span><span class="k">call </span><span class="n">me</span><span class="p">%</span><span class="n">psqp</span><span class="p">(</span><span class="n">nf</span><span class="p">,</span><span class="w"> </span><span class="n">nb</span><span class="p">,</span><span class="w"> </span><span class="n">nc</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">xl</span><span class="p">,</span><span class="w"> </span><span class="n">xu</span><span class="p">,</span><span class="w"> </span><span class="n">cf</span><span class="p">,</span><span class="w"> </span><span class="n">ic</span><span class="p">,</span><span class="w"> </span><span class="n">cl</span><span class="p">,</span><span class="w"> </span><span class="n">cu</span><span class="p">,</span><span class="w"> </span><span class="n">ra</span><span class="p">,</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lcfo</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lcfd</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                   </span><span class="n">ra</span><span class="p">(</span><span class="n">lgc</span><span class="p">),</span><span class="w"> </span><span class="n">ia</span><span class="p">,</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lcr</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lcz</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lcp</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lgf</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lg</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lh</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                   </span><span class="n">ra</span><span class="p">(</span><span class="n">ls</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lxo</span><span class="p">),</span><span class="w"> </span><span class="n">ra</span><span class="p">(</span><span class="n">lgo</span><span class="p">),</span><span class="w"> </span><span class="n">rpar</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">rpar</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">rpar</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">rpar</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                   </span><span class="n">rpar</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="n">cmax</span><span class="p">,</span><span class="w"> </span><span class="n">gmax</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">ipar</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">ipar</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">ipar</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="n">ipar</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                   </span><span class="n">iprnt</span><span class="p">,</span><span class="w"> </span><span class="n">iterm</span><span class="p">)</span>
+
+<span class="w">      </span><span class="k">deallocate</span><span class="w"> </span><span class="p">(</span><span class="n">ia</span><span class="p">,</span><span class="w"> </span><span class="n">ra</span><span class="p">,</span><span class="w"> </span><span class="n">ic</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">)</span>
+
+<span class="w">   </span><span class="k">end subroutine </span><span class="n">psqpn</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    </div>
+  </div>
+
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              psqp
+ was developed by Jacob Williams<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,1187 @@
+<!-- -*- mode: jinja2 -*- -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Modern Fortran edition of PSQP">
+    <meta name="author" content="Jacob Williams" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>All Procedures &ndash; psqp
+</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="../css/fontawesome.min.css" rel="stylesheet">
+    <link href="../css/brands.min.css" rel="stylesheet">
+    <link href="../css/regular.min.css" rel="stylesheet">
+    <link href="../css/solid.min.css" rel="stylesheet">
+    <link href="../css/v4-font-face.min.css" rel="stylesheet">
+    <link href="../css/v4-shims.min.css" rel="stylesheet">
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { equationNumbers: { autoNumber: "AMS" } }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async
+            integrity="sha256-DViIOMYdwlM/axqoGDPeUyf0urLoHMN4QACBKyB58Uw=" crossorigin="anonymous"></script>
+    <!-- Other scripts and stylesheets -->
+    <link href="../css/local.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <script src="../js/svg-pan-zoom.min.js"></script>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="container-fluid mb-sm-4 mb-xl-2">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="../index.html">psqp </a>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar"
+                  aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon">
+          </button>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../lists/files.html">Source Files</a>
+                  </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/modules.html">Modules</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../lists/types.html">Derived Types</a>
+                </li>
+            </ul>
+              <div class="d-flex align-items-end flex-grow-1">
+                <form action="../search.html" role="search" class="ms-auto">
+                  <input type="text" class="form-control" aria-label="Search" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+                </form>
+              </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12" id='text'>
+			 <h1>Procedures</h1>
+			 <table class="table table-striped">
+			 <thead><tr><th>Procedure</th><th>Location</th><th>Procedure Type</th><th>Description</th></tr></thead>
+			 <tbody>
+			   <tr>
+                 <td><a href='../proc/bfgs_variable_metric_update.html'>bfgs_variable_metric_update</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>variable metric update of a dense symmetric positive definite matrix
+ using the factorization b=l<em>d</em>trans(l).</p><a href="../proc/bfgs_variable_metric_update.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/compute_augmented_lagrangian.html'>compute_augmented_lagrangian</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>computation of value of the augmented lagrangian function.</p><a href="../proc/compute_augmented_lagrangian.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/compute_con_and_dcon.html'>compute_con_and_dcon</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>computation of the value and the gradient of the constraint function.</p><a href="../proc/compute_con_and_dcon.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/compute_new_penalty_parameters.html'>compute_new_penalty_parameters</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>computation of the new penalty parameters.</p><a href="../proc/compute_new_penalty_parameters.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/compute_obj_and_dobj.html'>compute_obj_and_dobj</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>computation of the value and the gradient of the objective function.</p><a href="../proc/compute_obj_and_dobj.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/determine_new_active_linear_constr.html'>determine_new_active_linear_constr</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>determination of the new active linear constraint.</p><a href="../proc/determine_new_active_linear_constr.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/determine_new_active_simple_bound.html'>determine_new_active_simple_bound</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>determination of the new active simple bound.</p><a href="../proc/determine_new_active_simple_bound.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/dual_range_space_qp.html'>dual_range_space_qp</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>dual range space quadratic programming method for minimax
+ approximation.</p><a href="../proc/dual_range_space_qp.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/dual_range_space_quad_prog.html'>dual_range_space_quad_prog</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>dual range space quadratic programming method.</p><a href="../proc/dual_range_space_quad_prog.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/extended_line_search.html'>extended_line_search</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>extended line search without directional derivatives.</p><a href="../proc/extended_line_search.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/line_search_interpolation.html'>line_search_interpolation</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>extrapolation or interpolation for line search without directional
+ derivatives.</p><a href="../proc/line_search_interpolation.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdpgb.html'>mxdpgb</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>solution of a system of linear equations with a dense symmetric
+ positive definite matrix a+e using the factorization <code>a+e=l*d*trans(l)</code>
+ obtained by the subroutine <a href="../proc/mxdpgf.html">mxdpgf</a>.</p><a href="../proc/mxdpgb.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdpgf.html'>mxdpgf</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>factorization <code>a+e=l*d*trans(l)</code> of a dense symmetric positive definite
+ matrix a+e where d and e are diagonal positive definite matrices and
+ l is a lower triangular matrix. if a is sufficiently positive
+ definite then e=0.</p><a href="../proc/mxdpgf.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdpgp.html'>mxdpgp</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Function</td>
+                 <td><p>computation of the number <code>mxdpgp=trans(x)*d**(-1)*y</code> where d is a
+diagonal matrix in the factorization <code>a+e=l*d*trans(l)</code> obtained by the
+subroutine <a href="../proc/mxdpgf.html">mxdpgf</a>.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdpgs.html'>mxdpgs</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>scaling of a dense symmetric positive definite matrix a+e using the
+factorization <code>a+e=l*d*trans(l)</code> obtained by the subroutine <a href="../proc/mxdpgf.html">mxdpgf</a>.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdpgu.html'>mxdpgu</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>correction of a dense symmetric positive definite matrix <code>a+e</code> in the
+ factored form <code>a+e=l*d*trans(l)</code> obtained by the subroutine <a href="../proc/mxdpgf.html">mxdpgf</a>.
+ the correction is defined as <code>a+e:=a+e+alf*x*trans(x)</code> where <code>alf</code> is a
+ given scaling factor and <code>x</code> is a given vector.</p><a href="../proc/mxdpgu.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdprb.html'>mxdprb</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>solution of a system of linear equations with a dense symmetric
+ positive definite matrix a using the factorization a=trans(r)*r.</p><a href="../proc/mxdprb.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdsmi.html'>mxdsmi</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>dense symmetric matrix a is set to the unit matrix with the same
+order.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdsmm.html'>mxdsmm</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>multiplication of a dense symmetric matrix a by a vector x.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxdsmv.html'>mxdsmv</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>k-th row of a dense symmetric matrix a is copied to the vector x.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvcop.html'>mxvcop</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>copying of a vector.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvdif.html'>mxvdif</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>vector difference.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvdir.html'>mxvdir</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>vector augmented by the scaled vector.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvdot.html'>mxvdot</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Function</td>
+                 <td><p>dot product of two vectors.</p><a href="../proc/mxvdot.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvina.html'>mxvina</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>elements of the integer vector are replaced by their absolute values.</p><a href="../proc/mxvina.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvinv.html'>mxvinv</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>change of the integer vector element for the constraint addition.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvmax.html'>mxvmax</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Function</td>
+                 <td><p>l-infinity norm of a vector.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvneg.html'>mxvneg</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>change the signs of vector elements.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvort.html'>mxvort</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>determination of an elementary orthogonal matrix for plane rotation.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvrot.html'>mxvrot</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>plane rotation is applied to two values.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvsav.html'>mxvsav</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>difference of two vectors returned in the subtracted one.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvscl.html'>mxvscl</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>scaling of a vector.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/mxvset.html'>mxvset</a></td>
+                 <td><a href='../module/psqp_matrix_module.html'>psqp_matrix_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>a scalar is set to all the elements of a vector.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/ops_after_constr_deletion.html'>ops_after_constr_deletion</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>operations after constraint deletion.</p><a href="../proc/ops_after_constr_deletion.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/psqp.html'>psqp</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>recursive quadratic programming method with the bfgs variable metric
+  update for general nonlinear programming problems.</p><a href="../proc/psqp.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/psqpn.html'>psqpn</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>easy to use subroutine for general nonlinear programming problems.</p></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/test_simple_bound.html'>test_simple_bound</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>test on activity of a given simple bound.</p><a href="../proc/test_simple_bound.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/transform_incompatible_qp_subproblem.html'>transform_incompatible_qp_subproblem</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>transformation of the incompatible quadratic programming subproblem.</p><a href="../proc/transform_incompatible_qp_subproblem.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/update_tri_decomp_general.html'>update_tri_decomp_general</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>triangular decomposition of kernel of the general projection
+ is updated after constraint addition.</p><a href="../proc/update_tri_decomp_general.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			   <tr>
+                 <td><a href='../proc/update_tri_decomp_orthogonal.html'>update_tri_decomp_orthogonal</a></td>
+                 <td><a href='../module/psqp_module.html'>psqp_module</a></td>
+                 <td>Subroutine</td>
+                 <td><p>triangular decomposition of kernel of the orthogonal projection is
+ updated after constraint deletion.</p><a href="../proc/update_tri_decomp_orthogonal.html" class="pull-right"><emph>Read more&hellip;</emph></a></td>
+               </tr>
+			 </tbody></table>
+             <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: call~~graph~~CallGraph Pages: 1 -->
+<svg id="callgraphCallGraph" width="855pt" height="948pt"
+ viewBox="0.00 0.00 855.00 947.78" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="call~~graph~~CallGraph" class="graph" transform="scale(0.76 0.76) rotate(0) translate(4 1239.76)">
+<title>call~~graph~~CallGraph</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-1239.76 1118,-1239.76 1118,4 -4,4"/>
+<!-- proc~bfgs_variable_metric_update -->
+<g id="call~~graph~~CallGraph_node1" class="node">
+<title>proc~bfgs_variable_metric_update</title>
+<g id="a_call~~graph~~CallGraph_node1"><a xlink:href="../proc/bfgs_variable_metric_update.html" xlink:title="bfgs_variable_metric_update">
+<polygon fill="#d9534f" stroke="#d9534f" points="491,-876 325,-876 325,-852 491,-852 491,-876"/>
+<text text-anchor="middle" x="408" y="-861.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bfgs_variable_metric_update</text>
+</a>
+</g>
+</g>
+<!-- proc~mxdpgb -->
+<g id="call~~graph~~CallGraph_node12" class="node">
+<title>proc~mxdpgb</title>
+<g id="a_call~~graph~~CallGraph_node12"><a xlink:href="../proc/mxdpgb.html" xlink:title="mxdpgb">
+<polygon fill="#d9534f" stroke="#d9534f" points="947,-592 891,-592 891,-568 947,-568 947,-592"/>
+<text text-anchor="middle" x="919" y="-577.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgb</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgb -->
+<g id="call~~graph~~CallGraph_edge1" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgb</title>
+<path fill="none" stroke="#000000" d="M485.76,-851.99C510.42,-848.15 537.86,-843.88 563,-840 610.99,-832.59 743.1,-839.7 779,-807 827.77,-762.58 779.47,-718.58 815,-663 832.91,-634.98 863.5,-612.11 886.71,-597.52"/>
+<polygon fill="#000000" stroke="#000000" points="888.79,-600.35 895.51,-592.16 885.15,-594.37 888.79,-600.35"/>
+</g>
+<!-- proc~mxdpgp -->
+<g id="call~~graph~~CallGraph_node14" class="node">
+<title>proc~mxdpgp</title>
+<g id="a_call~~graph~~CallGraph_node14"><a xlink:href="../proc/mxdpgp.html" xlink:title="mxdpgp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="699,-916 643,-916 643,-892 699,-892 699,-916"/>
+<text text-anchor="middle" x="671" y="-901.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgp</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgp -->
+<g id="call~~graph~~CallGraph_edge2" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgp</title>
+<path fill="none" stroke="#000000" d="M487.31,-876C535.48,-883.38 595.02,-892.51 632.76,-898.29"/>
+<polygon fill="#000000" stroke="#000000" points="632.39,-901.78 642.8,-899.83 633.45,-894.86 632.39,-901.78"/>
+</g>
+<!-- proc~mxdpgs -->
+<g id="call~~graph~~CallGraph_node15" class="node">
+<title>proc~mxdpgs</title>
+<g id="a_call~~graph~~CallGraph_node15"><a xlink:href="../proc/mxdpgs.html" xlink:title="mxdpgs">
+<polygon fill="#d9534f" stroke="#d9534f" points="698.5,-1034 643.5,-1034 643.5,-1010 698.5,-1010 698.5,-1034"/>
+<text text-anchor="middle" x="671" y="-1019.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgs</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgs -->
+<g id="call~~graph~~CallGraph_edge3" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgs</title>
+<path fill="none" stroke="#000000" d="M491.01,-866.79C504.18,-870.39 516.8,-876.12 527,-885 566.11,-919.07 524.97,-960.73 563,-996 581.84,-1013.47 610.39,-1019.77 633.27,-1021.8"/>
+<polygon fill="#000000" stroke="#000000" points="633.11,-1025.3 643.32,-1022.46 633.57,-1018.31 633.11,-1025.3"/>
+</g>
+<!-- proc~mxdpgu -->
+<g id="call~~graph~~CallGraph_node16" class="node">
+<title>proc~mxdpgu</title>
+<g id="a_call~~graph~~CallGraph_node16"><a xlink:href="../proc/mxdpgu.html" xlink:title="mxdpgu">
+<polygon fill="#d9534f" stroke="#d9534f" points="699,-1076 643,-1076 643,-1052 699,-1052 699,-1076"/>
+<text text-anchor="middle" x="671" y="-1061.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgu</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgu -->
+<g id="call~~graph~~CallGraph_edge4" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxdpgu</title>
+<path fill="none" stroke="#000000" d="M491.09,-865.87C504.4,-869.54 517.06,-875.52 527,-885 579.13,-934.69 511.31,-992.85 563,-1043 581.14,-1060.6 609.48,-1065.56 632.43,-1066.27"/>
+<polygon fill="#000000" stroke="#000000" points="632.52,-1069.77 642.54,-1066.32 632.56,-1062.77 632.52,-1069.77"/>
+</g>
+<!-- proc~mxvcop -->
+<g id="call~~graph~~CallGraph_node21" class="node">
+<title>proc~mxvcop</title>
+<g id="a_call~~graph~~CallGraph_node21"><a xlink:href="../proc/mxvcop.html" xlink:title="mxvcop">
+<polygon fill="#d9534f" stroke="#d9534f" points="1114,-754 1059,-754 1059,-730 1114,-730 1114,-754"/>
+<text text-anchor="middle" x="1086.5" y="-739.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvcop</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvcop -->
+<g id="call~~graph~~CallGraph_edge5" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M491.09,-871.34C503.6,-874.49 516,-878.89 527,-885 547.91,-896.61 541.15,-915.27 563,-925 650.7,-964.06 686.46,-950.53 779,-925 897.64,-892.28 1016.64,-800.21 1064.06,-760.55"/>
+<polygon fill="#000000" stroke="#000000" points="1066.44,-763.13 1071.81,-754 1061.92,-757.78 1066.44,-763.13"/>
+</g>
+<!-- proc~mxvdif -->
+<g id="call~~graph~~CallGraph_node22" class="node">
+<title>proc~mxvdif</title>
+<g id="a_call~~graph~~CallGraph_node22"><a xlink:href="../proc/mxvdif.html" xlink:title="mxvdif">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-798 644,-798 644,-774 698,-774 698,-798"/>
+<text text-anchor="middle" x="671" y="-783.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvdif</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdif -->
+<g id="call~~graph~~CallGraph_edge6" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdif</title>
+<path fill="none" stroke="#000000" d="M442.08,-851.9C473.09,-840.77 520.85,-824.21 563,-812 586.4,-805.22 613.03,-798.74 633.87,-793.95"/>
+<polygon fill="#000000" stroke="#000000" points="634.91,-797.3 643.89,-791.68 633.36,-790.48 634.91,-797.3"/>
+</g>
+<!-- proc~mxvdir -->
+<g id="call~~graph~~CallGraph_node23" class="node">
+<title>proc~mxvdir</title>
+<g id="a_call~~graph~~CallGraph_node23"><a xlink:href="../proc/mxvdir.html" xlink:title="mxvdir">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-676 644,-676 644,-652 698,-652 698,-676"/>
+<text text-anchor="middle" x="671" y="-661.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvdir</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdir -->
+<g id="call~~graph~~CallGraph_edge7" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M419.43,-851.91C440.01,-828.05 487.31,-773.19 527,-727 543.02,-708.35 541.76,-697.39 563,-685 584.36,-672.54 611.78,-667.33 633.52,-665.21"/>
+<polygon fill="#000000" stroke="#000000" points="633.99,-668.69 643.68,-664.4 633.43,-661.71 633.99,-668.69"/>
+</g>
+<!-- proc~mxvdot -->
+<g id="call~~graph~~CallGraph_node24" class="node">
+<title>proc~mxvdot</title>
+<g id="a_call~~graph~~CallGraph_node24"><a xlink:href="../proc/mxvdot.html" xlink:title="mxvdot">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="946,-696 892,-696 892,-672 946,-672 946,-696"/>
+<text text-anchor="middle" x="919" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvdot</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdot -->
+<g id="call~~graph~~CallGraph_edge8" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M491.08,-875.85C569.21,-883.29 688.02,-884.38 779,-840 840.09,-810.2 886.22,-740.44 906.56,-705.19"/>
+<polygon fill="#000000" stroke="#000000" points="909.75,-706.66 911.61,-696.23 903.65,-703.22 909.75,-706.66"/>
+</g>
+<!-- proc~mxvscl -->
+<g id="call~~graph~~CallGraph_node32" class="node">
+<title>proc~mxvscl</title>
+<g id="a_call~~graph~~CallGraph_node32"><a xlink:href="../proc/mxvscl.html" xlink:title="mxvscl">
+<polygon fill="#d9534f" stroke="#d9534f" points="946,-1036 892,-1036 892,-1012 946,-1012 946,-1036"/>
+<text text-anchor="middle" x="919" y="-1021.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvscl</text>
+</a>
+</g>
+</g>
+<!-- proc~bfgs_variable_metric_update&#45;&gt;proc~mxvscl -->
+<g id="call~~graph~~CallGraph_edge9" class="edge">
+<title>proc~bfgs_variable_metric_update&#45;&gt;proc~mxvscl</title>
+<path fill="none" stroke="#000000" d="M491.21,-868.38C504.05,-871.85 516.52,-877.13 527,-885 555.92,-906.73 534.16,-936.16 563,-958 569.4,-962.85 792.95,-1002.21 881.96,-1017.74"/>
+<polygon fill="#000000" stroke="#000000" points="881.43,-1021.2 891.88,-1019.47 882.63,-1014.3 881.43,-1021.2"/>
+</g>
+<!-- proc~compute_augmented_lagrangian -->
+<g id="call~~graph~~CallGraph_node2" class="node">
+<title>proc~compute_augmented_lagrangian</title>
+<g id="a_call~~graph~~CallGraph_node2"><a xlink:href="../proc/compute_augmented_lagrangian.html" xlink:title="compute_augmented_lagrangian">
+<polygon fill="#d9534f" stroke="#d9534f" points="503,-1146 313,-1146 313,-1122 503,-1122 503,-1146"/>
+<text text-anchor="middle" x="408" y="-1131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_augmented_lagrangian</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_con_and_dcon -->
+<g id="call~~graph~~CallGraph_node3" class="node">
+<title>proc~compute_con_and_dcon</title>
+<g id="a_call~~graph~~CallGraph_node3"><a xlink:href="../proc/compute_con_and_dcon.html" xlink:title="psqp_class%compute_con_and_dcon">
+<polygon fill="#d9534f" stroke="#d9534f" points="1023,-1166 815,-1166 815,-1142 1023,-1142 1023,-1166"/>
+<text text-anchor="middle" x="919" y="-1151.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%compute_con_and_dcon</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_con_and_dcon&#45;&gt;proc~mxvcop -->
+<g id="call~~graph~~CallGraph_edge10" class="edge">
+<title>proc~compute_con_and_dcon&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M987.41,-1141.97C1000.89,-1136.66 1013.73,-1129.01 1023,-1118 1068.6,-1063.82 1081.64,-837.38 1084.69,-764.62"/>
+<polygon fill="#000000" stroke="#000000" points="1088.2,-764.44 1085.1,-754.31 1081.2,-764.16 1088.2,-764.44"/>
+</g>
+<!-- proc~compute_new_penalty_parameters -->
+<g id="call~~graph~~CallGraph_node4" class="node">
+<title>proc~compute_new_penalty_parameters</title>
+<g id="a_call~~graph~~CallGraph_node4"><a xlink:href="../proc/compute_new_penalty_parameters.html" xlink:title="compute_new_penalty_parameters">
+<polygon fill="#d9534f" stroke="#d9534f" points="507.5,-918 308.5,-918 308.5,-894 507.5,-894 507.5,-918"/>
+<text text-anchor="middle" x="408" y="-903.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">compute_new_penalty_parameters</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_obj_and_dobj -->
+<g id="call~~graph~~CallGraph_node5" class="node">
+<title>proc~compute_obj_and_dobj</title>
+<g id="a_call~~graph~~CallGraph_node5"><a xlink:href="../proc/compute_obj_and_dobj.html" xlink:title="psqp_class%compute_obj_and_dobj">
+<polygon fill="#d9534f" stroke="#d9534f" points="509,-595 307,-595 307,-571 509,-571 509,-595"/>
+<text text-anchor="middle" x="408" y="-580.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%compute_obj_and_dobj</text>
+</a>
+</g>
+</g>
+<!-- proc~mxvneg -->
+<g id="call~~graph~~CallGraph_node28" class="node">
+<title>proc~mxvneg</title>
+<g id="a_call~~graph~~CallGraph_node28"><a xlink:href="../proc/mxvneg.html" xlink:title="mxvneg">
+<polygon fill="#d9534f" stroke="#d9534f" points="698.5,-634 643.5,-634 643.5,-610 698.5,-610 698.5,-634"/>
+<text text-anchor="middle" x="671" y="-619.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvneg</text>
+</a>
+</g>
+</g>
+<!-- proc~compute_obj_and_dobj&#45;&gt;proc~mxvneg -->
+<g id="call~~graph~~CallGraph_edge11" class="edge">
+<title>proc~compute_obj_and_dobj&#45;&gt;proc~mxvneg</title>
+<path fill="none" stroke="#000000" d="M489.44,-595.02C537.29,-602.17 595.72,-610.9 632.9,-616.46"/>
+<polygon fill="#000000" stroke="#000000" points="632.85,-619.99 643.26,-618 633.89,-613.07 632.85,-619.99"/>
+</g>
+<!-- proc~determine_new_active_linear_constr -->
+<g id="call~~graph~~CallGraph_node6" class="node">
+<title>proc~determine_new_active_linear_constr</title>
+<g id="a_call~~graph~~CallGraph_node6"><a xlink:href="../proc/determine_new_active_linear_constr.html" xlink:title="determine_new_active_linear_constr">
+<polygon fill="#d9534f" stroke="#d9534f" points="774.5,-592 567.5,-592 567.5,-568 774.5,-568 774.5,-592"/>
+<text text-anchor="middle" x="671" y="-577.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">determine_new_active_linear_constr</text>
+</a>
+</g>
+</g>
+<!-- proc~determine_new_active_linear_constr&#45;&gt;proc~mxvdot -->
+<g id="call~~graph~~CallGraph_edge12" class="edge">
+<title>proc~determine_new_active_linear_constr&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M750.04,-592.04C759.94,-594.52 769.81,-597.48 779,-601 821.91,-617.45 866.72,-646.75 893.49,-665.77"/>
+<polygon fill="#000000" stroke="#000000" points="891.69,-668.79 901.84,-671.79 895.78,-663.11 891.69,-668.79"/>
+</g>
+<!-- proc~determine_new_active_simple_bound -->
+<g id="call~~graph~~CallGraph_node7" class="node">
+<title>proc~determine_new_active_simple_bound</title>
+<g id="a_call~~graph~~CallGraph_node7"><a xlink:href="../proc/determine_new_active_simple_bound.html" xlink:title="determine_new_active_simple_bound">
+<polygon fill="#d9534f" stroke="#d9534f" points="777,-550 565,-550 565,-526 777,-526 777,-550"/>
+<text text-anchor="middle" x="671" y="-535.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">determine_new_active_simple_bound</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_qp -->
+<g id="call~~graph~~CallGraph_node8" class="node">
+<title>proc~dual_range_space_qp</title>
+<g id="a_call~~graph~~CallGraph_node8"><a xlink:href="../proc/dual_range_space_qp.html" xlink:title="dual_range_space_qp">
+<polygon fill="#d9534f" stroke="#d9534f" points="472,-718 344,-718 344,-694 472,-694 472,-718"/>
+<text text-anchor="middle" x="408" y="-703.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dual_range_space_qp</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_qp&#45;&gt;proc~mxvdif -->
+<g id="call~~graph~~CallGraph_edge13" class="edge">
+<title>proc~dual_range_space_qp&#45;&gt;proc~mxvdif</title>
+<path fill="none" stroke="#000000" d="M448.36,-718.06C498.75,-733.51 585.34,-760.05 634.04,-774.98"/>
+<polygon fill="#000000" stroke="#000000" points="633.24,-778.39 643.83,-777.98 635.29,-771.7 633.24,-778.39"/>
+</g>
+<!-- proc~dual_range_space_qp&#45;&gt;proc~mxvdir -->
+<g id="call~~graph~~CallGraph_edge14" class="edge">
+<title>proc~dual_range_space_qp&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M472.18,-695.83C522.81,-687.69 592.04,-676.54 633.75,-669.83"/>
+<polygon fill="#000000" stroke="#000000" points="634.42,-673.27 643.73,-668.23 633.3,-666.36 634.42,-673.27"/>
+</g>
+<!-- proc~mxvsav -->
+<g id="call~~graph~~CallGraph_node31" class="node">
+<title>proc~mxvsav</title>
+<g id="a_call~~graph~~CallGraph_node31"><a xlink:href="../proc/mxvsav.html" xlink:title="mxvsav">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-718 644,-718 644,-694 698,-694 698,-718"/>
+<text text-anchor="middle" x="671" y="-703.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvsav</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_qp&#45;&gt;proc~mxvsav -->
+<g id="call~~graph~~CallGraph_edge15" class="edge">
+<title>proc~dual_range_space_qp&#45;&gt;proc~mxvsav</title>
+<path fill="none" stroke="#000000" d="M472.18,-706C522.7,-706 591.75,-706 633.49,-706"/>
+<polygon fill="#000000" stroke="#000000" points="633.73,-709.5 643.73,-706 633.73,-702.5 633.73,-709.5"/>
+</g>
+<!-- proc~dual_range_space_quad_prog -->
+<g id="call~~graph~~CallGraph_node9" class="node">
+<title>proc~dual_range_space_quad_prog</title>
+<g id="a_call~~graph~~CallGraph_node9"><a xlink:href="../proc/dual_range_space_quad_prog.html" xlink:title="psqp_class%dual_range_space_quad_prog">
+<polygon fill="#d9534f" stroke="#d9534f" points="527,-470 289,-470 289,-446 527,-446 527,-470"/>
+<text text-anchor="middle" x="408" y="-455.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%dual_range_space_quad_prog</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_linear_constr -->
+<g id="call~~graph~~CallGraph_edge16" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_linear_constr</title>
+<path fill="none" stroke="#000000" d="M423.21,-470.1C449.16,-491.54 506.75,-536.06 563,-559 568.69,-561.32 574.67,-563.39 580.75,-565.24"/>
+<polygon fill="#000000" stroke="#000000" points="579.82,-568.61 590.39,-567.96 581.72,-561.87 579.82,-568.61"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_simple_bound -->
+<g id="call~~graph~~CallGraph_edge17" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~determine_new_active_simple_bound</title>
+<path fill="none" stroke="#000000" d="M440.55,-470.1C471.47,-481.7 520.08,-499.29 563,-512 576.85,-516.1 591.85,-520.05 606.11,-523.57"/>
+<polygon fill="#000000" stroke="#000000" points="605.29,-526.97 615.84,-525.94 606.95,-520.17 605.29,-526.97"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgb -->
+<g id="call~~graph~~CallGraph_edge18" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgb</title>
+<path fill="none" stroke="#000000" d="M492.89,-470.01C598.11,-485.28 766.37,-510.45 779,-517 799.37,-527.57 795.13,-542.54 815,-554 835.09,-565.59 860.3,-572.07 880.75,-575.66"/>
+<polygon fill="#000000" stroke="#000000" points="880.23,-579.12 890.66,-577.24 881.33,-572.21 880.23,-579.12"/>
+</g>
+<!-- proc~mxdpgf -->
+<g id="call~~graph~~CallGraph_node13" class="node">
+<title>proc~mxdpgf</title>
+<g id="a_call~~graph~~CallGraph_node13"><a xlink:href="../proc/mxdpgf.html" xlink:title="mxdpgf">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-428 644,-428 644,-404 698,-404 698,-428"/>
+<text text-anchor="middle" x="671" y="-413.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdpgf</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgf -->
+<g id="call~~graph~~CallGraph_edge19" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdpgf</title>
+<path fill="none" stroke="#000000" d="M483.79,-445.96C532.95,-438.05 595.08,-428.06 633.69,-421.84"/>
+<polygon fill="#000000" stroke="#000000" points="634.6,-425.24 643.92,-420.2 633.49,-418.33 634.6,-425.24"/>
+</g>
+<!-- proc~mxdprb -->
+<g id="call~~graph~~CallGraph_node17" class="node">
+<title>proc~mxdprb</title>
+<g id="a_call~~graph~~CallGraph_node17"><a xlink:href="../proc/mxdprb.html" xlink:title="mxdprb">
+<polygon fill="#d9534f" stroke="#d9534f" points="946,-432 892,-432 892,-408 946,-408 946,-432"/>
+<text text-anchor="middle" x="919" y="-417.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdprb</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdprb -->
+<g id="call~~graph~~CallGraph_edge20" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdprb</title>
+<path fill="none" stroke="#000000" d="M492.81,-445.93C504.7,-442.41 516.46,-437.87 527,-432 547.05,-420.84 541.86,-403.93 563,-395 651.44,-357.66 683.38,-386.47 779,-395 814.19,-398.14 853.8,-405.66 881.71,-411.64"/>
+<polygon fill="#000000" stroke="#000000" points="881.28,-415.13 891.8,-413.85 882.78,-408.29 881.28,-415.13"/>
+</g>
+<!-- proc~mxdsmm -->
+<g id="call~~graph~~CallGraph_node19" class="node">
+<title>proc~mxdsmm</title>
+<g id="a_call~~graph~~CallGraph_node19"><a xlink:href="../proc/mxdsmm.html" xlink:title="mxdsmm">
+<polygon fill="#d9534f" stroke="#d9534f" points="950,-390 888,-390 888,-366 950,-366 950,-390"/>
+<text text-anchor="middle" x="919" y="-375.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdsmm</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxdsmm -->
+<g id="call~~graph~~CallGraph_edge21" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxdsmm</title>
+<path fill="none" stroke="#000000" d="M508.21,-445.88C515.15,-442.22 521.54,-437.66 527,-432 588.79,-367.94 494.64,-292 563,-235 599.87,-204.26 738.93,-208.58 779,-235 812.91,-257.36 787.98,-288.67 815,-319 832.24,-338.35 857.39,-352.92 878.53,-362.75"/>
+<polygon fill="#000000" stroke="#000000" points="877.35,-366.06 887.91,-366.93 880.2,-359.66 877.35,-366.06"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvcop -->
+<g id="call~~graph~~CallGraph_edge22" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M499.88,-445.98C509.53,-442.42 518.8,-437.85 527,-432 552,-414.15 536.7,-388.88 563,-373 606.78,-346.57 984.05,-323.86 1023,-357 1078.56,-404.27 1084.87,-644.65 1085.47,-719.63"/>
+<polygon fill="#000000" stroke="#000000" points="1081.98,-719.84 1085.53,-729.82 1088.98,-719.8 1081.98,-719.84"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvdir -->
+<g id="call~~graph~~CallGraph_edge23" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M427.18,-470.17C452.42,-487.84 498.23,-522.82 527,-562 550.31,-593.76 532.2,-618.44 563,-643 582.8,-658.79 611.14,-663.81 633.68,-665.01"/>
+<polygon fill="#000000" stroke="#000000" points="633.79,-668.51 643.89,-665.32 634,-661.52 633.79,-668.51"/>
+</g>
+<!-- proc~mxvina -->
+<g id="call~~graph~~CallGraph_node25" class="node">
+<title>proc~mxvina</title>
+<g id="a_call~~graph~~CallGraph_node25"><a xlink:href="../proc/mxvina.html" xlink:title="mxvina">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-188 644,-188 644,-164 698,-164 698,-188"/>
+<text text-anchor="middle" x="671" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvina</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvina -->
+<g id="call~~graph~~CallGraph_edge24" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvina</title>
+<path fill="none" stroke="#000000" d="M508.65,-445.89C515.44,-442.22 521.68,-437.65 527,-432 597.87,-356.62 492.94,-278.14 563,-202 580.82,-182.64 610.4,-176.58 633.95,-175.12"/>
+<polygon fill="#000000" stroke="#000000" points="634.09,-178.61 643.96,-174.74 633.83,-171.62 634.09,-178.61"/>
+</g>
+<!-- proc~mxvinv -->
+<g id="call~~graph~~CallGraph_node26" class="node">
+<title>proc~mxvinv</title>
+<g id="a_call~~graph~~CallGraph_node26"><a xlink:href="../proc/mxvinv.html" xlink:title="mxvinv">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-268 644,-268 644,-244 698,-244 698,-268"/>
+<text text-anchor="middle" x="671" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvinv</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvinv -->
+<g id="call~~graph~~CallGraph_edge25" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvinv</title>
+<path fill="none" stroke="#000000" d="M507.36,-445.88C514.57,-442.24 521.26,-437.68 527,-432 577.29,-382.28 512.14,-326.14 563,-277 581.54,-259.09 610.62,-254.29 633.79,-253.72"/>
+<polygon fill="#000000" stroke="#000000" points="633.96,-257.22 643.96,-253.73 633.96,-250.22 633.96,-257.22"/>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~mxvneg -->
+<g id="call~~graph~~CallGraph_edge26" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~mxvneg</title>
+<path fill="none" stroke="#000000" d="M423.59,-470.03C446.32,-488.94 491.26,-527.07 527,-562 543.87,-578.49 542.41,-589.49 563,-601 584.44,-612.98 611.64,-618.21 633.25,-620.46"/>
+<polygon fill="#000000" stroke="#000000" points="633.09,-623.96 643.36,-621.34 633.7,-616.98 633.09,-623.96"/>
+</g>
+<!-- proc~ops_after_constr_deletion -->
+<g id="call~~graph~~CallGraph_node34" class="node">
+<title>proc~ops_after_constr_deletion</title>
+<g id="a_call~~graph~~CallGraph_node34"><a xlink:href="../proc/ops_after_constr_deletion.html" xlink:title="psqp_class%ops_after_constr_deletion">
+<polygon fill="#d9534f" stroke="#d9534f" points="779,-310 563,-310 563,-286 779,-286 779,-310"/>
+<text text-anchor="middle" x="671" y="-295.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%ops_after_constr_deletion</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~ops_after_constr_deletion -->
+<g id="call~~graph~~CallGraph_edge27" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~ops_after_constr_deletion</title>
+<path fill="none" stroke="#000000" d="M505.36,-445.96C513.24,-442.33 520.61,-437.75 527,-432 564.6,-398.15 525.76,-358.25 563,-324 566.86,-320.45 571.12,-317.36 575.65,-314.68"/>
+<polygon fill="#000000" stroke="#000000" points="577.4,-317.72 584.66,-310 574.17,-311.5 577.4,-317.72"/>
+</g>
+<!-- proc~update_tri_decomp_general -->
+<g id="call~~graph~~CallGraph_node39" class="node">
+<title>proc~update_tri_decomp_general</title>
+<g id="a_call~~graph~~CallGraph_node39"><a xlink:href="../proc/update_tri_decomp_general.html" xlink:title="update_tri_decomp_general">
+<polygon fill="#d9534f" stroke="#d9534f" points="752,-470 590,-470 590,-446 752,-446 752,-470"/>
+<text text-anchor="middle" x="671" y="-455.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_tri_decomp_general</text>
+</a>
+</g>
+</g>
+<!-- proc~dual_range_space_quad_prog&#45;&gt;proc~update_tri_decomp_general -->
+<g id="call~~graph~~CallGraph_edge28" class="edge">
+<title>proc~dual_range_space_quad_prog&#45;&gt;proc~update_tri_decomp_general</title>
+<path fill="none" stroke="#000000" d="M527.28,-458C544.82,-458 562.65,-458 579.5,-458"/>
+<polygon fill="#000000" stroke="#000000" points="579.85,-461.5 589.85,-458 579.85,-454.5 579.85,-461.5"/>
+</g>
+<!-- proc~extended_line_search -->
+<g id="call~~graph~~CallGraph_node10" class="node">
+<title>proc~extended_line_search</title>
+<g id="a_call~~graph~~CallGraph_node10"><a xlink:href="../proc/extended_line_search.html" xlink:title="psqp_class%extended_line_search">
+<polygon fill="#d9534f" stroke="#d9534f" points="505,-390 311,-390 311,-366 505,-366 505,-390"/>
+<text text-anchor="middle" x="408" y="-375.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%extended_line_search</text>
+</a>
+</g>
+</g>
+<!-- proc~line_search_interpolation -->
+<g id="call~~graph~~CallGraph_node11" class="node">
+<title>proc~line_search_interpolation</title>
+<g id="a_call~~graph~~CallGraph_node11"><a xlink:href="../proc/line_search_interpolation.html" xlink:title="line_search_interpolation">
+<polygon fill="#d9534f" stroke="#d9534f" points="744,-146 598,-146 598,-122 744,-122 744,-146"/>
+<text text-anchor="middle" x="671" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_search_interpolation</text>
+</a>
+</g>
+</g>
+<!-- proc~extended_line_search&#45;&gt;proc~line_search_interpolation -->
+<g id="call~~graph~~CallGraph_edge29" class="edge">
+<title>proc~extended_line_search&#45;&gt;proc~line_search_interpolation</title>
+<path fill="none" stroke="#000000" d="M505.27,-371.59C513.32,-368.01 520.75,-363.25 527,-357 591.49,-292.53 499.08,-220.04 563,-155 570.07,-147.81 578.82,-142.7 588.26,-139.12"/>
+<polygon fill="#000000" stroke="#000000" points="589.43,-142.42 597.89,-136.03 587.29,-135.76 589.43,-142.42"/>
+</g>
+<!-- proc~mxdpgu&#45;&gt;proc~mxvscl -->
+<g id="call~~graph~~CallGraph_edge30" class="edge">
+<title>proc~mxdpgu&#45;&gt;proc~mxvscl</title>
+<path fill="none" stroke="#000000" d="M699.27,-1059.57C743.76,-1052.33 832,-1037.98 881.73,-1029.9"/>
+<polygon fill="#000000" stroke="#000000" points="882.42,-1033.33 891.73,-1028.27 881.3,-1026.42 882.42,-1033.33"/>
+</g>
+<!-- proc~mxdsmi -->
+<g id="call~~graph~~CallGraph_node18" class="node">
+<title>proc~mxdsmi</title>
+<g id="a_call~~graph~~CallGraph_node18"><a xlink:href="../proc/mxdsmi.html" xlink:title="mxdsmi">
+<polygon fill="#d9534f" stroke="#d9534f" points="435.5,-637 380.5,-637 380.5,-613 435.5,-613 435.5,-637"/>
+<text text-anchor="middle" x="408" y="-622.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdsmi</text>
+</a>
+</g>
+</g>
+<!-- proc~mxdsmv -->
+<g id="call~~graph~~CallGraph_node20" class="node">
+<title>proc~mxdsmv</title>
+<g id="a_call~~graph~~CallGraph_node20"><a xlink:href="../proc/mxdsmv.html" xlink:title="mxdsmv">
+<polygon fill="#d9534f" stroke="#d9534f" points="948,-512 890,-512 890,-488 948,-488 948,-512"/>
+<text text-anchor="middle" x="919" y="-497.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxdsmv</text>
+</a>
+</g>
+</g>
+<!-- proc~mxvmax -->
+<g id="call~~graph~~CallGraph_node27" class="node">
+<title>proc~mxvmax</title>
+<g id="a_call~~graph~~CallGraph_node27"><a xlink:href="../proc/mxvmax.html" xlink:title="mxvmax">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="437,-348 379,-348 379,-324 437,-324 437,-348"/>
+<text text-anchor="middle" x="408" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvmax</text>
+</a>
+</g>
+</g>
+<!-- proc~mxvort -->
+<g id="call~~graph~~CallGraph_node29" class="node">
+<title>proc~mxvort</title>
+<g id="a_call~~graph~~CallGraph_node29"><a xlink:href="../proc/mxvort.html" xlink:title="mxvort">
+<polygon fill="#d9534f" stroke="#d9534f" points="1113.5,-268 1059.5,-268 1059.5,-244 1113.5,-244 1113.5,-268"/>
+<text text-anchor="middle" x="1086.5" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvort</text>
+</a>
+</g>
+</g>
+<!-- proc~mxvrot -->
+<g id="call~~graph~~CallGraph_node30" class="node">
+<title>proc~mxvrot</title>
+<g id="a_call~~graph~~CallGraph_node30"><a xlink:href="../proc/mxvrot.html" xlink:title="mxvrot">
+<polygon fill="#d9534f" stroke="#d9534f" points="1113.5,-310 1059.5,-310 1059.5,-286 1113.5,-286 1113.5,-310"/>
+<text text-anchor="middle" x="1086.5" y="-295.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvrot</text>
+</a>
+</g>
+</g>
+<!-- proc~mxvset -->
+<g id="call~~graph~~CallGraph_node33" class="node">
+<title>proc~mxvset</title>
+<g id="a_call~~graph~~CallGraph_node33"><a xlink:href="../proc/mxvset.html" xlink:title="mxvset">
+<polygon fill="#d9534f" stroke="#d9534f" points="1113.5,-352 1059.5,-352 1059.5,-328 1113.5,-328 1113.5,-352"/>
+<text text-anchor="middle" x="1086.5" y="-337.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mxvset</text>
+</a>
+</g>
+</g>
+<!-- proc~update_tri_decomp_orthogonal -->
+<g id="call~~graph~~CallGraph_node40" class="node">
+<title>proc~update_tri_decomp_orthogonal</title>
+<g id="a_call~~graph~~CallGraph_node40"><a xlink:href="../proc/update_tri_decomp_orthogonal.html" xlink:title="update_tri_decomp_orthogonal">
+<polygon fill="#d9534f" stroke="#d9534f" points="1008.5,-310 829.5,-310 829.5,-286 1008.5,-286 1008.5,-310"/>
+<text text-anchor="middle" x="919" y="-295.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">update_tri_decomp_orthogonal</text>
+</a>
+</g>
+</g>
+<!-- proc~ops_after_constr_deletion&#45;&gt;proc~update_tri_decomp_orthogonal -->
+<g id="call~~graph~~CallGraph_edge31" class="edge">
+<title>proc~ops_after_constr_deletion&#45;&gt;proc~update_tri_decomp_orthogonal</title>
+<path fill="none" stroke="#000000" d="M779.18,-298C792.36,-298 805.79,-298 818.84,-298"/>
+<polygon fill="#000000" stroke="#000000" points="819.22,-301.5 829.22,-298 819.22,-294.5 819.22,-301.5"/>
+</g>
+<!-- proc~psqp -->
+<g id="call~~graph~~CallGraph_node35" class="node">
+<title>proc~psqp</title>
+<g id="a_call~~graph~~CallGraph_node35"><a xlink:href="../proc/psqp.html" xlink:title="psqp_class%psqp">
+<polygon fill="#d9534f" stroke="#d9534f" points="253,-637 148,-637 148,-613 253,-613 253,-637"/>
+<text text-anchor="middle" x="200.5" y="-622.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%psqp</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~bfgs_variable_metric_update -->
+<g id="call~~graph~~CallGraph_edge32" class="edge">
+<title>proc~psqp&#45;&gt;proc~bfgs_variable_metric_update</title>
+<path fill="none" stroke="#000000" d="M207.98,-637.32C221.28,-662.02 253.43,-718.76 289,-760 317.84,-793.44 357.33,-826.13 382.51,-845.68"/>
+<polygon fill="#000000" stroke="#000000" points="380.4,-848.47 390.46,-851.79 384.66,-842.92 380.4,-848.47"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_augmented_lagrangian -->
+<g id="call~~graph~~CallGraph_edge33" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_augmented_lagrangian</title>
+<path fill="none" stroke="#000000" d="M201.94,-637.19C204.63,-705.24 221.17,-1037.56 289,-1108 293.44,-1112.61 298.5,-1116.49 303.97,-1119.75"/>
+<polygon fill="#000000" stroke="#000000" points="302.37,-1122.87 312.86,-1124.38 305.6,-1116.66 302.37,-1122.87"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_con_and_dcon -->
+<g id="call~~graph~~CallGraph_edge34" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_con_and_dcon</title>
+<path fill="none" stroke="#000000" d="M201.49,-637.18C201.71,-709.85 206.86,-1085.31 289,-1155 462.2,-1301.95 769.21,-1209.44 878.23,-1169.59"/>
+<polygon fill="#000000" stroke="#000000" points="879.69,-1172.78 887.85,-1166.02 877.26,-1166.21 879.69,-1172.78"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_new_penalty_parameters -->
+<g id="call~~graph~~CallGraph_edge35" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_new_penalty_parameters</title>
+<path fill="none" stroke="#000000" d="M201.53,-637.14C202.35,-678.92 211.06,-817.85 289,-885 292.28,-887.83 295.81,-890.33 299.52,-892.55"/>
+<polygon fill="#000000" stroke="#000000" points="298,-895.71 308.49,-897.22 301.24,-889.5 298,-895.71"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~compute_obj_and_dobj -->
+<g id="call~~graph~~CallGraph_edge36" class="edge">
+<title>proc~psqp&#45;&gt;proc~compute_obj_and_dobj</title>
+<path fill="none" stroke="#000000" d="M249.52,-612.93C262.32,-609.87 276.15,-606.68 289,-604 300.7,-601.56 313.08,-599.15 325.26,-596.9"/>
+<polygon fill="#000000" stroke="#000000" points="326.22,-600.28 335.42,-595.04 324.95,-593.39 326.22,-600.28"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~dual_range_space_qp -->
+<g id="call~~graph~~CallGraph_edge37" class="edge">
+<title>proc~psqp&#45;&gt;proc~dual_range_space_qp</title>
+<path fill="none" stroke="#000000" d="M217.4,-637.06C234.31,-649.32 262.24,-668.03 289,-679 303.2,-684.82 318.89,-689.51 334.08,-693.25"/>
+<polygon fill="#000000" stroke="#000000" points="333.43,-696.7 343.96,-695.58 335.03,-689.88 333.43,-696.7"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~dual_range_space_quad_prog -->
+<g id="call~~graph~~CallGraph_edge38" class="edge">
+<title>proc~psqp&#45;&gt;proc~dual_range_space_quad_prog</title>
+<path fill="none" stroke="#000000" d="M216.28,-612.99C251.74,-584.17 341.84,-510.95 384.26,-476.48"/>
+<polygon fill="#000000" stroke="#000000" points="386.53,-479.15 392.08,-470.13 382.11,-473.72 386.53,-479.15"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~extended_line_search -->
+<g id="call~~graph~~CallGraph_edge39" class="edge">
+<title>proc~psqp&#45;&gt;proc~extended_line_search</title>
+<path fill="none" stroke="#000000" d="M202.44,-612.95C206.02,-575.6 222.23,-460.85 289,-404 293.24,-400.39 297.88,-397.24 302.77,-394.51"/>
+<polygon fill="#000000" stroke="#000000" points="304.43,-397.6 311.84,-390.03 301.33,-391.32 304.43,-397.6"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxdsmi -->
+<g id="call~~graph~~CallGraph_edge40" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxdsmi</title>
+<path fill="none" stroke="#000000" d="M253.09,-625C289.57,-625 337.59,-625 370.23,-625"/>
+<polygon fill="#000000" stroke="#000000" points="370.25,-628.5 380.25,-625 370.25,-621.5 370.25,-628.5"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvcop -->
+<g id="call~~graph~~CallGraph_edge41" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M201.87,-637.1C203.81,-680.9 215.75,-833.56 289,-927 375.73,-1037.63 427.21,-1048.65 563,-1085 662.12,-1111.53 948.98,-1116.05 1023,-1045 1063.67,-1005.96 1079.66,-827.25 1084.11,-764.14"/>
+<polygon fill="#000000" stroke="#000000" points="1087.6,-764.29 1084.78,-754.08 1080.62,-763.82 1087.6,-764.29"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvdir -->
+<g id="call~~graph~~CallGraph_edge42" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvdir</title>
+<path fill="none" stroke="#000000" d="M244.81,-637.1C258.8,-640.55 274.46,-643.93 289,-646 414.7,-663.89 565.84,-665.08 633.8,-664.55"/>
+<polygon fill="#000000" stroke="#000000" points="634.01,-668.05 643.97,-664.45 633.94,-661.05 634.01,-668.05"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvdot -->
+<g id="call~~graph~~CallGraph_edge43" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M207.36,-637.07C219.13,-659.77 248.09,-708.19 289,-727 387.94,-772.48 671.33,-743.27 779,-727 815.04,-721.55 854.61,-708.59 882.28,-698.31"/>
+<polygon fill="#000000" stroke="#000000" points="883.79,-701.48 891.91,-694.66 881.31,-694.93 883.79,-701.48"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvina -->
+<g id="call~~graph~~CallGraph_edge44" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvina</title>
+<path fill="none" stroke="#000000" d="M203.19,-612.9C208.63,-578.95 228.95,-482.34 289,-437 374.48,-372.45 450.13,-473.6 527,-399 588.36,-339.45 506.25,-273.97 563,-210 580.8,-189.93 610.39,-181.61 633.95,-178.21"/>
+<polygon fill="#000000" stroke="#000000" points="634.44,-181.68 643.95,-177 633.6,-174.73 634.44,-181.68"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvmax -->
+<g id="call~~graph~~CallGraph_edge45" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvmax</title>
+<path fill="none" stroke="#000000" d="M201.4,-612.79C201.74,-570.13 209.03,-426.53 289,-357 310.67,-338.16 343.26,-333.53 368.71,-333.26"/>
+<polygon fill="#000000" stroke="#000000" points="368.73,-336.76 378.77,-333.38 368.81,-329.76 368.73,-336.76"/>
+</g>
+<!-- proc~psqp&#45;&gt;proc~mxvset -->
+<g id="call~~graph~~CallGraph_edge46" class="edge">
+<title>proc~psqp&#45;&gt;proc~mxvset</title>
+<path fill="none" stroke="#000000" d="M202.15,-612.86C205.02,-568.85 219.79,-415.02 289,-315 375.09,-190.59 419.27,-160.25 563,-113 654.2,-83.02 687.17,-85.01 779,-113 903.99,-151.1 925.37,-190.16 1023,-277 1041.37,-293.34 1041.28,-301.95 1059,-319 1059.78,-319.75 1060.59,-320.51 1061.42,-321.26"/>
+<polygon fill="#000000" stroke="#000000" points="1059.23,-323.99 1069.11,-327.82 1063.77,-318.67 1059.23,-323.99"/>
+</g>
+<!-- proc~test_simple_bound -->
+<g id="call~~graph~~CallGraph_node37" class="node">
+<title>proc~test_simple_bound</title>
+<g id="a_call~~graph~~CallGraph_node37"><a xlink:href="../proc/test_simple_bound.html" xlink:title="test_simple_bound">
+<polygon fill="#d9534f" stroke="#d9534f" points="464,-66 352,-66 352,-42 464,-42 464,-66"/>
+<text text-anchor="middle" x="408" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">test_simple_bound</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~test_simple_bound -->
+<g id="call~~graph~~CallGraph_edge47" class="edge">
+<title>proc~psqp&#45;&gt;proc~test_simple_bound</title>
+<path fill="none" stroke="#000000" d="M201.67,-612.73C202.92,-539.47 213.02,-160.49 289,-80 302.61,-65.58 322.26,-58.26 341.63,-54.77"/>
+<polygon fill="#000000" stroke="#000000" points="342.32,-58.21 351.7,-53.28 341.29,-51.28 342.32,-58.21"/>
+</g>
+<!-- proc~transform_incompatible_qp_subproblem -->
+<g id="call~~graph~~CallGraph_node38" class="node">
+<title>proc~transform_incompatible_qp_subproblem</title>
+<g id="a_call~~graph~~CallGraph_node38"><a xlink:href="../proc/transform_incompatible_qp_subproblem.html" xlink:title="transform_incompatible_qp_subproblem">
+<polygon fill="#d9534f" stroke="#d9534f" points="521.5,-24 294.5,-24 294.5,0 521.5,0 521.5,-24"/>
+<text text-anchor="middle" x="408" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">transform_incompatible_qp_subproblem</text>
+</a>
+</g>
+</g>
+<!-- proc~psqp&#45;&gt;proc~transform_incompatible_qp_subproblem -->
+<g id="call~~graph~~CallGraph_edge48" class="edge">
+<title>proc~psqp&#45;&gt;proc~transform_incompatible_qp_subproblem</title>
+<path fill="none" stroke="#000000" d="M201.45,-612.65C201.4,-535.41 205.04,-119.46 289,-33 289.82,-32.16 290.65,-31.35 291.51,-30.56"/>
+<polygon fill="#000000" stroke="#000000" points="293.98,-33.07 299.71,-24.16 289.68,-27.55 293.98,-33.07"/>
+</g>
+<!-- proc~psqpn -->
+<g id="call~~graph~~CallGraph_node36" class="node">
+<title>proc~psqpn</title>
+<g id="a_call~~graph~~CallGraph_node36"><a xlink:href="../proc/psqpn.html" xlink:title="psqp_class%psqpn">
+<polygon fill="#d9534f" stroke="#d9534f" points="112,-637 0,-637 0,-613 112,-613 112,-637"/>
+<text text-anchor="middle" x="56" y="-622.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">psqp_class%psqpn</text>
+</a>
+</g>
+</g>
+<!-- proc~psqpn&#45;&gt;proc~psqp -->
+<g id="call~~graph~~CallGraph_edge49" class="edge">
+<title>proc~psqpn&#45;&gt;proc~psqp</title>
+<path fill="none" stroke="#000000" d="M112.09,-625C120.45,-625 129.11,-625 137.6,-625"/>
+<polygon fill="#000000" stroke="#000000" points="137.82,-628.5 147.82,-625 137.82,-621.5 137.82,-628.5"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdpgb -->
+<g id="call~~graph~~CallGraph_edge50" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdpgb</title>
+<path fill="none" stroke="#000000" d="M752.12,-469.29C761.79,-472.94 771.04,-477.73 779,-484 806.48,-505.64 787.61,-532.23 815,-554 833.61,-568.79 859.6,-575.28 880.81,-578.08"/>
+<polygon fill="#000000" stroke="#000000" points="880.46,-581.56 890.79,-579.17 881.23,-574.6 880.46,-581.56"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdprb -->
+<g id="call~~graph~~CallGraph_edge51" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdprb</title>
+<path fill="none" stroke="#000000" d="M749.84,-445.98C793.97,-439.16 847.12,-430.95 881.69,-425.61"/>
+<polygon fill="#000000" stroke="#000000" points="882.44,-429.03 891.79,-424.05 881.37,-422.12 882.44,-429.03"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdsmm -->
+<g id="call~~graph~~CallGraph_edge52" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdsmm</title>
+<path fill="none" stroke="#000000" d="M752.24,-447.96C761.57,-445.15 770.71,-441.56 779,-437 799.38,-425.78 794.66,-410.29 815,-399 834.16,-388.36 858,-383.09 877.92,-380.48"/>
+<polygon fill="#000000" stroke="#000000" points="878.4,-383.95 887.94,-379.34 877.61,-376.99 878.4,-383.95"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxdsmv -->
+<g id="call~~graph~~CallGraph_edge53" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxdsmv</title>
+<path fill="none" stroke="#000000" d="M742.49,-470.04C787.08,-477.65 842.99,-487.19 879.56,-493.44"/>
+<polygon fill="#000000" stroke="#000000" points="879.35,-496.95 889.8,-495.19 880.53,-490.05 879.35,-496.95"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxvcop -->
+<g id="call~~graph~~CallGraph_edge54" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M752.26,-465.76C761.64,-468.52 770.78,-472.18 779,-477 800.8,-489.78 793.24,-508.16 815,-521 895.94,-568.74 951.81,-497.66 1023,-559 1071.15,-600.49 1082.26,-680.69 1084.79,-719.66"/>
+<polygon fill="#000000" stroke="#000000" points="1081.31,-720.11 1085.31,-729.92 1088.3,-719.75 1081.31,-720.11"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxvdot -->
+<g id="call~~graph~~CallGraph_edge55" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxvdot</title>
+<path fill="none" stroke="#000000" d="M706.22,-470.01C729.36,-479.63 759.21,-495.14 779,-517 806.26,-547.11 790.46,-568.63 815,-601 835.46,-627.98 866.51,-651.41 889.17,-666.43"/>
+<polygon fill="#000000" stroke="#000000" points="887.41,-669.46 897.71,-671.96 891.22,-663.59 887.41,-669.46"/>
+</g>
+<!-- proc~update_tri_decomp_general&#45;&gt;proc~mxvset -->
+<g id="call~~graph~~CallGraph_edge56" class="edge">
+<title>proc~update_tri_decomp_general&#45;&gt;proc~mxvset</title>
+<path fill="none" stroke="#000000" d="M752.26,-462.58C841.48,-466.21 978.85,-467.02 1023,-441 1052.71,-423.49 1070.28,-385.75 1078.89,-361.69"/>
+<polygon fill="#000000" stroke="#000000" points="1082.27,-362.61 1082.13,-352.01 1075.63,-360.38 1082.27,-362.61"/>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvcop -->
+<g id="call~~graph~~CallGraph_edge57" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvcop</title>
+<path fill="none" stroke="#000000" d="M1004.69,-310.09C1011.53,-313.7 1017.8,-318.26 1023,-324 1076.4,-382.96 1084.18,-641.93 1085.31,-719.78"/>
+<polygon fill="#000000" stroke="#000000" points="1081.81,-719.95 1085.43,-729.91 1088.81,-719.87 1081.81,-719.95"/>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvort -->
+<g id="call~~graph~~CallGraph_edge58" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvort</title>
+<path fill="none" stroke="#000000" d="M967.43,-285.96C993.5,-279.35 1025.34,-271.27 1049.38,-265.17"/>
+<polygon fill="#000000" stroke="#000000" points="1050.34,-268.53 1059.17,-262.68 1048.61,-261.75 1050.34,-268.53"/>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvrot -->
+<g id="call~~graph~~CallGraph_edge59" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvrot</title>
+<path fill="none" stroke="#000000" d="M1008.56,-298C1022.95,-298 1037.1,-298 1049.26,-298"/>
+<polygon fill="#000000" stroke="#000000" points="1049.4,-301.5 1059.4,-298 1049.4,-294.5 1049.4,-301.5"/>
+</g>
+<!-- proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvset -->
+<g id="call~~graph~~CallGraph_edge60" class="edge">
+<title>proc~update_tri_decomp_orthogonal&#45;&gt;proc~mxvset</title>
+<path fill="none" stroke="#000000" d="M967.7,-310.01C985.11,-314.4 1004.95,-319.41 1023,-324 1031.58,-326.18 1040.83,-328.54 1049.5,-330.76"/>
+<polygon fill="#000000" stroke="#000000" points="1048.8,-334.19 1059.35,-333.29 1050.53,-327.41 1048.8,-334.19"/>
+</g>
+</g>
+</svg>
+</div>                <script>
+                  var pancallgraphCallGraph = svgPanZoom('#callgraphCallGraph',
+                    {zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true,}
+                  );
+                </script>          <div>
+            <a type="button" class="graph-help" data-bs-toggle="modal" href="#CallGraph-help-text">Help</a>
+          </div>
+          <div class="modal fade" id="CallGraph-help-text" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="28pt"
+ viewBox="0.00 0.00 641.00 27.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.86 0.86) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-28 741.5,-28 741.5,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node">
+<title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="70,-24 0,-24 0,0 70,0 70,-24"/>
+<text text-anchor="middle" x="35" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node">
+<title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="146,-24 88,-24 88,0 146,0 146,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node">
+<title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="225.5,-24 164.5,-24 164.5,0 225.5,0 225.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Type Bound Procedure -->
+<g id="node4" class="node">
+<title>Type Bound Procedure</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="374,-24 244,-24 244,0 374,0 374,-24"/>
+<text text-anchor="middle" x="309" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type Bound Procedure</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node5" class="node">
+<title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="537.5,-24 392.5,-24 392.5,0 537.5,0 537.5,-24"/>
+<text text-anchor="middle" x="465" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node6" class="node">
+<title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="614,-24 556,-24 556,0 614,0 614,-24"/>
+<text text-anchor="middle" x="585" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node7" class="node">
+<title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="737.5,-24 632.5,-24 632.5,0 737.5,0 737.5,-24"/>
+<text text-anchor="middle" x="685" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+ </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <hr>
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col">
+            <p>
+              psqp
+ was developed by Jacob Williams<br>              &copy; 2025 
+</p>
+          </div>
+          <div class="col">
+            <p class="text-end">
+              Documentation generated by
+              <a href="https://github.com/Fortran-FOSS-Programmers/ford">FORD</a>
+            </p>
+          </div>
+        </div>
+        <br>
+      </div> <!-- /container -->
+    </footer>
+  </body>
+</html>
