@@ -31,9 +31,10 @@ jobs:
       uses: ts-graphviz/setup-graphviz@v1
 
     - name: Setup Fortran Package Manager
-      uses: fortran-lang/setup-fpm@v7
+      uses: fortran-lang/setup-fpm@v9
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        fpm-version: latest
 
     - name: Install Python dependencies
       if: contains( matrix.os, 'ubuntu')
@@ -58,7 +59,8 @@ jobs:
     #   run: fpm build --profile release
 
     - name: Run tests
-      run: fpm test --profile debug --flag -coverage
+      # run: fpm test --profile debug --flag -coverage
+      run: fpm test --profile debug
 
     # - name: Create coverage report
     #   run: |
