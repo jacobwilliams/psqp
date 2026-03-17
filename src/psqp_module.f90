@@ -12,6 +12,7 @@
 module psqp_module
 
    use psqp_matrix_module
+   use psqp_sparse_module
    use psqp_kind_module, only: wp => psqp_wp
 
    implicit none
@@ -55,6 +56,11 @@ module psqp_module
 
       procedure(report_f),pointer :: report => null() !! iteration report function
 
+      ! Sparse Jacobian support
+      logical :: use_sparse = .false. !! Use sparse Jacobian mode
+      type(sparse_matrix_csr), allocatable :: jac_sparse !! Sparse constraint Jacobian matrix
+      procedure(sparse_jac_func), pointer :: sparse_jac => null() !! Sparse Jacobian callback
+
    contains
 
       private
@@ -67,6 +73,13 @@ module psqp_module
       procedure :: ops_after_constr_deletion
       procedure :: compute_con_and_dcon
       procedure :: extended_line_search
+
+      ! Sparse Jacobian helper methods
+      procedure, public :: set_jacobian_pattern
+      procedure, public :: set_sparse_jacobian_callback
+      procedure :: get_constraint_gradient
+      procedure :: constraint_gradient_dot
+      procedure :: set_constraint_gradient
 
    end type psqp_class
 
@@ -124,6 +137,19 @@ module psqp_module
          real(wp),intent(in) :: j              !! Objective function value
          real(wp),dimension(:),intent(in) :: f !! Constraint functions
       end subroutine report_f
+
+      subroutine sparse_jac_func(me, nf, nc, x, values)
+         !! Sparse Jacobian evaluation interface.
+         !! User fills in the non-zero values of the constraint Jacobian.
+         !! The sparsity pattern must be set beforehand via set_jacobian_pattern.
+         import :: wp, psqp_class
+         implicit none
+         class(psqp_class), intent(inout) :: me
+         integer, intent(in) :: nf        !! number of variables
+         integer, intent(in) :: nc        !! number of constraints
+         real(wp), intent(in) :: x(nf)    !! current variable values
+         real(wp), intent(out) :: values(:) !! non-zero Jacobian values (size = nnz)
+      end subroutine sparse_jac_func
 
    end interface
 
@@ -209,7 +235,7 @@ contains
       procedure(dobj_func) :: dobj !! computation of the gradient of the objective function
       procedure(con_func)  :: con  !! computation of the value of the constraint function
       procedure(dcon_func) :: dcon !! computation of the gradient of the constraint function
-      procedure(report_f),optional :: report !! iteration report function. Note: this is independent of `iprnt`. 
+      procedure(report_f),optional :: report !! iteration report function. Note: this is independent of `iprnt`.
                                              !! If this function is associated, each iteration will be reported
 
       integer :: lcfd, lcfo, lcg, lcp, lcr, lcz, lg, lgc, lgf, lgo, lh, lia, ls, lxo
@@ -226,25 +252,51 @@ contains
 
       if (present(report)) me%report => report
 
-      allocate (ia(nf), ra((nf + nc + 8)*nf + 3*nc + 1))
+      ! Conditional allocation based on sparse mode
+      if (me%use_sparse) then
+         ! Sparse mode: no need to allocate dense Jacobian storage
+         allocate (ia(nf), ra(8*nf + 3*nc + 1))
+      else
+         ! Dense mode: allocate space for cg(nf*nc)
+         allocate (ia(nf), ra((nf + nc + 8)*nf + 3*nc + 1))
+      end if
       allocate (ic(nc))
       allocate (ix(nf))
 
       ic = constraint_type ! make a copy of input
       ix = bound_type ! make a copy of input
-      lcg = 1
-      lcfo = lcg + nf*nc
-      lcfd = lcfo + nc + 1
-      lgc = lcfd + nc
-      lcr = lgc + nf
-      lcz = lcr + nf*(nf + 1)/2
-      lcp = lcz + nf
-      lgf = lcp + nc
-      lg = lgf + nf
-      lh = lg + nf
-      ls = lh + nf*(nf + 1)/2
-      lxo = ls + nf
-      lgo = lxo + nf
+
+      if (me%use_sparse) then
+         ! Sparse mode: lcg dummy, reduced memory layout
+         lcg = 1  ! dummy value, cg array not used in sparse mode
+         lcfo = 1
+         lcfd = lcfo + nc + 1
+         lgc = lcfd + nc
+         lcr = lgc + nf
+         lcz = lcr + nf*(nf + 1)/2
+         lcp = lcz + nf
+         lgf = lcp + nc
+         lg = lgf + nf
+         lh = lg + nf
+         ls = lh + nf*(nf + 1)/2
+         lxo = ls + nf
+         lgo = lxo + nf
+      else
+         ! Dense mode: normal memory layout with cg storage
+         lcg = 1  ! dense Jacobian storage starts here
+         lcfo = lcg + nf*nc
+         lcfd = lcfo + nc + 1
+         lgc = lcfd + nc
+         lcr = lgc + nf
+         lcz = lcr + nf*(nf + 1)/2
+         lcp = lcz + nf
+         lgf = lcp + nc
+         lg = lgf + nf
+         lh = lg + nf
+         ls = lh + nf*(nf + 1)/2
+         lxo = ls + nf
+         lgo = lxo + nf
+      end if
       lia = 1
       call me%psqp(nf, nb, nc, x, ix, xl, xu, cf, ic, cl, cu, ra, ra(lcfo), ra(lcfd), &
                    ra(lgc), ia, ra(lcr), ra(lcz), ra(lcp), ra(lgf), ra(lg), ra(lh), &
@@ -480,7 +532,7 @@ contains
          call me%compute_con_and_dcon(nf, nc, x, fc, cf, cl, cu, ic, gc, cg, cmax, kd, ld)
          cf(nc + 1) = f
          ! JW : seems to start with iter 0, so add 1 to iterations for report output
-         if (associated(me%report)) call me%report(me%nit+1,x(1:nf),j=f,f=cf(1:nc))    
+         if (associated(me%report)) call me%report(me%nit+1,x(1:nf),j=f,f=cf(1:nc))
          if (abs(iprnt) > 1) &
             write (6, '(1x,"nit=",i9,2x,"nfv=",i9,2x,"nfg=",i9,2x,"f=",g13.6,2x,"c=",e8.1,2x,"g=",e8.1)') &
             me%nit, me%nfv, me%nfg, f, cmax, gmax
@@ -615,7 +667,7 @@ contains
                      end if
                      ! preparation of variable metric update
                      call mxvcop(nf, gf, g)
-                     call dual_range_space_qp(nf, n, x, xo, ica, cg, cz, g, go, r, f, fo, p, po, &
+                     call dual_range_space_qp(me, nf, n, x, xo, ica, cg, cz, g, go, r, f, fo, p, po, &
                                               cmax, cmaxo, dmax, kd, ld, iters)
                      ! variable metric update
                      call bfgs_variable_metric_update(n, h, g, s, xo, go, r, po, me%nit, &
@@ -680,6 +732,13 @@ contains
 
       if (kd <= ld) return
       if (ld < 0) cmax = 0.0_wp
+
+      ! Optimization: Compute sparse Jacobian once before loop if needed
+      if (kd >= 1 .and. ld < 1 .and. me%use_sparse .and. associated(me%sparse_jac)) then
+         ! Call sparse Jacobian to get all constraint gradients at once
+         call me%sparse_jac(nf, nc, x, me%jac_sparse%values)
+      end if
+
       do kc = 1, nc
          if (kd >= 0) then
             if (ld < 0) then
@@ -697,10 +756,19 @@ contains
             end if
             if (kd >= 1) then
                if (ld >= 1) then
-                  call mxvcop(nf, cg((kc - 1)*nf + 1), gc)
+                  ! Retrieve previously computed gradient
+                  call me%get_constraint_gradient(nf, nc, kc, cg, gc)
                else
-                  call me%dcon(nf, kc, x, gc)
-                  call mxvcop(nf, gc, cg((kc - 1)*nf + 1))
+                  ! Compute gradient
+                  if (me%use_sparse .and. associated(me%sparse_jac)) then
+                     ! Sparse mode: extract gradient from pre-computed Jacobian
+                     call me%get_constraint_gradient(nf, nc, kc, cg, gc)
+                  else
+                     ! Dense mode: compute individual gradient via dcon
+                     call me%dcon(nf, kc, x, gc)
+                  end if
+                  ! Store gradient in cg array
+                  call me%set_constraint_gradient(nf, nc, kc, gc, cg)
                end if
             end if
          end if
@@ -823,7 +891,7 @@ contains
 
       real(wp) :: con, temp, step, step1, step2, dmax, par, snorm
       integer :: nca, ncr, i, j, k, iold, jold, inew, jnew, knew, &
-                 inf, ier, krem, kc, nred
+                 inf, ier, krem, kc, nred, nadd
 
       con = eta9
       if (idecf < 0) idecf = 1
@@ -862,7 +930,13 @@ contains
          do j = 1, nca
             kc = ica(j)
             if (kc > 0) then
-               call mxvdir(nf, cz(j), cg((kc - 1)*nf + 1), s, s)
+               ! s = s + cz(j) * constraint_gradient(kc)
+               if (me%use_sparse) then
+                  ! Sparse: use sparse row operations
+                  call sparse_axpy_row(me%jac_sparse, kc, cz(j), nf, s)
+               else
+                  call mxvdir(nf, cz(j), cg((kc - 1)*nf + 1), s, s)
+               end if
             else
                k = -kc
                s(k) = s(k) + cz(j)
@@ -878,7 +952,7 @@ contains
             ! check of feasibility
             inew = 0
             par = 0.0_wp
-            call determine_new_active_linear_constr(nf, nc, cf, cfd, ic, cl, cu, &
+            call determine_new_active_linear_constr(me, nf, nc, cf, cfd, ic, cl, cu, &
                                                     cg, s, eps9, par, kbc, inew, knew)
             call determine_new_active_simple_bound(nf, ix, x, xl, xu, s, kbf, inew, &
                                                    knew, eps9, par)
@@ -897,8 +971,8 @@ contains
 
                ! stepsize determination
 
-               call update_tri_decomp_general(nf, n, ica, cg, cr, h, s, g, eps7, gmax, umax, &
-                                              idecf, inew, me%nadd, ier, 1)
+               call update_tri_decomp_general(me, nf, nc, n, ica, cg, cr, h, s, g, eps7, gmax, umax, &
+                                              idecf, inew, nadd, ier, 1)
                call mxdprb(nca, cr, g, -1)
                if (knew < 0) call mxvneg(nca, g, g)
 
@@ -1020,10 +1094,12 @@ contains
 !
 !@note This routine was formerly called `pladr1`.
 
-   subroutine update_tri_decomp_general(nf, n, ica, cg, cr, h, s, g, eps7, &
+   subroutine update_tri_decomp_general(me, nf, nc, n, ica, cg, cr, h, s, g, eps7, &
                                         gmax, umax, idecf, inew, nadd, ier, job)
 
+      class(psqp_class), intent(in) :: me !! psqp class for sparse support
       integer :: nf       !! declared number of variables.
+      integer :: nc       !! number of constraints.
       integer :: n        !! actual number of variables.
       integer :: ica(*)   !! ica(nf)  vector containing indices of active constraints.
       integer :: idecf    !! decomposition indicator.
@@ -1065,12 +1141,24 @@ contains
       if (inew > 0) then
          jcg = (inew - 1)*nf + 1
          if (idecf == 1) then
-            call mxvcop(nf, cg(jcg), s)
+            ! Get constraint gradient and apply H^-1
+            if (me%use_sparse) then
+               call me%jac_sparse%get_row(inew, s(1:nf))
+            else
+               call mxvcop(nf, cg(jcg), s)
+            end if
             call mxdpgb(nf, h, s, 0)
          else
-            call mxdsmm(nf, h, cg(jcg), s)
+            ! Get constraint gradient and apply H
+            if (me%use_sparse) then
+               call me%jac_sparse%get_row(inew, g(1:nf))
+               call mxdsmm(nf, h, g, s)
+            else
+               call mxdsmm(nf, h, cg(jcg), s)
+            end if
          end if
-         gmax = mxvdot(nf, cg(jcg), s)
+         ! Compute dot product with constraint gradient
+         gmax = me%constraint_gradient_dot(nf, nc, inew, cg, s)
       else
          k = -inew
          if (idecf == 1) then
@@ -1085,7 +1173,8 @@ contains
       do j = 1, nca
          l = ica(j)
          if (l > 0) then
-            g(j) = mxvdot(nf, cg((l - 1)*nf + 1), s)
+            ! Dot product of constraint gradient with vector s
+            g(j) = me%constraint_gradient_dot(nf, nc, l, cg, s)
          else
             l = -l
             g(j) = s(l)
@@ -1126,9 +1215,10 @@ contains
 !
 !@note This routine was formerly called `plminn`.
 
-   subroutine determine_new_active_linear_constr(nf, nc, cf, cfd, ic, cl, cu, &
+   subroutine determine_new_active_linear_constr(me, nf, nc, cf, cfd, ic, cl, cu, &
                                                  cg, s, eps9, par, kbc, inew, knew)
 
+      class(psqp_class), intent(in) :: me !! psqp class for sparse support
       integer :: nf      !! number of variables.
       integer :: nc      !! number of constraints.
       integer :: ic(*)   !! ic(nc)  vector containing types of constraints.
@@ -1160,7 +1250,8 @@ contains
          jcg = 1
          do kc = 1, nc
             if (ic(kc) > 0) then
-               temp = mxvdot(nf, cg(jcg), s)
+               ! Compute dot product with constraint gradient
+               temp = me%constraint_gradient_dot(nf, nc, kc, cg, s)
                cfd(kc) = temp
                temp = cf(kc) + temp
                if (ic(kc) == 1 .or. ic(kc) >= 3) then
@@ -1986,9 +2077,10 @@ contains
 !
 !@note This routine was formerly called `pytrnd`.
 
-   subroutine dual_range_space_qp(nf, n, x, xo, ica, cg, cz, g, go, r, f, fo, &
+   subroutine dual_range_space_qp(me, nf, n, x, xo, ica, cg, cz, g, go, r, f, fo, &
                                   p, po, cmax, cmaxo, dmax, kd, ld, iters)
 
+      class(psqp_class), intent(in) :: me  !! psqp class for sparse support
       integer,intent(in) :: nf  !! declared number of variables.
       integer,intent(inout) :: n  !! actual number of variables.
       integer,intent(in) :: ica(*)  !! ica(nf)  vector containing indices of active constraints.
@@ -2016,7 +2108,12 @@ contains
       do j = 1, nf - n
          l = ica(j)
          if (l > 0) then
-            call mxvdir(nf, -cz(j), cg((l - 1)*nf + 1), g, g)
+            ! g = g - cz(j) * constraint_gradient(l)
+            if (me%use_sparse) then
+               call sparse_axpy_row(me%jac_sparse, l, -cz(j), nf, g)
+            else
+               call mxvdir(nf, -cz(j), cg((l - 1)*nf + 1), g, g)
+            end if
          else
             l = -l
             g(l) = g(l) - cz(j)
@@ -2041,6 +2138,150 @@ contains
       end do
       n = nf
    end subroutine dual_range_space_qp
+
+!***********************************************************************
+!>
+!  Set the sparsity pattern for the constraint Jacobian.
+!  This must be called before using sparse mode.
+!
+!### Example
+!```fortran
+!  ! Jacobian has 3 constraints, 5 variables
+!  ! Constraint 1: depends on vars 1, 3
+!  ! Constraint 2: depends on vars 2, 4, 5
+!  ! Constraint 3: depends on var 1
+!  integer :: rows(6) = [1, 1, 2, 2, 2, 3]
+!  integer :: cols(6) = [1, 3, 2, 4, 5, 1]
+!  call solver%set_jacobian_pattern(3, 5, rows, cols, 6)
+!```
+
+   subroutine set_jacobian_pattern(me, nc, nf, rows, cols, nnz)
+
+      class(psqp_class), intent(inout) :: me
+      integer, intent(in) :: nc   !! number of constraints
+      integer, intent(in) :: nf   !! number of variables
+      integer, intent(in) :: rows(nnz) !! row indices (constraint indices, 1-based)
+      integer, intent(in) :: cols(nnz) !! column indices (variable indices, 1-based)
+      integer, intent(in) :: nnz  !! number of non-zeros
+
+      ! Create sparse matrix structure from COO format
+      if (allocated(me%jac_sparse)) deallocate(me%jac_sparse)
+      allocate(me%jac_sparse)
+      call me%jac_sparse%from_coo(nc, nf, rows, cols, nnz)
+      me%use_sparse = .true.
+
+   end subroutine set_jacobian_pattern
+
+!***********************************************************************
+!>
+!  Set the sparse Jacobian callback function.
+!
+!  This should be called after set_jacobian_pattern to enable sparse mode.
+
+   subroutine set_sparse_jacobian_callback(me, sparse_jac)
+
+      class(psqp_class), intent(inout) :: me
+      procedure(sparse_jac_func) :: sparse_jac  !! sparse Jacobian evaluation callback
+
+      me%sparse_jac => sparse_jac
+
+   end subroutine set_sparse_jacobian_callback
+
+!***********************************************************************
+!>
+!  Get the gradient of a specific constraint (abstraction layer).
+!  Works in both dense and sparse modes.
+
+   subroutine get_constraint_gradient(me, nf, nc, kc, cg, gc)
+
+      class(psqp_class), intent(in) :: me
+      integer, intent(in) :: nf   !! number of variables
+      integer, intent(in) :: nc   !! number of constraints
+      integer, intent(in) :: kc   !! constraint index (1-based)
+      real(wp), intent(in) :: cg(*) !! dense Jacobian (if dense mode)
+      real(wp), intent(out) :: gc(nf) !! constraint gradient output
+
+      if (me%use_sparse) then
+         ! Extract row kc from sparse Jacobian
+         call me%jac_sparse%get_row(kc, gc)
+      else
+         ! Dense: copy from cg array
+         call mxvcop(nf, cg((kc - 1)*nf + 1), gc)
+      end if
+
+   end subroutine get_constraint_gradient
+
+!***********************************************************************
+!>
+!  Compute dot product of constraint gradient with a vector (abstraction layer).
+!  Works in both dense and sparse modes.
+
+   function constraint_gradient_dot(me, nf, nc, kc, cg, v) result(dotprod)
+
+      class(psqp_class), intent(in) :: me
+      integer, intent(in) :: nf   !! number of variables
+      integer, intent(in) :: nc   !! number of constraints
+      integer, intent(in) :: kc   !! constraint index (1-based)
+      real(wp), intent(in) :: cg(*) !! dense Jacobian (if dense mode)
+      real(wp), intent(in) :: v(nf) !! vector to dot with
+      real(wp) :: dotprod
+
+      if (me%use_sparse) then
+         ! Sparse row-vector dot product
+         dotprod = me%jac_sparse%row_dot(kc, v)
+      else
+         ! Dense
+         dotprod = mxvdot(nf, cg((kc - 1)*nf + 1), v)
+      end if
+
+   end function constraint_gradient_dot
+
+!***********************************************************************
+!>
+!  Set the gradient of a specific constraint (abstraction layer).
+!  Works in both dense and sparse modes.
+
+   subroutine set_constraint_gradient(me, nf, nc, kc, gc, cg)
+
+      class(psqp_class), intent(inout) :: me
+      integer, intent(in) :: nf   !! number of variables
+      integer, intent(in) :: nc   !! number of constraints
+      integer, intent(in) :: kc   !! constraint index (1-based)
+      real(wp), intent(in) :: gc(nf) !! constraint gradient to set
+      real(wp), intent(inout) :: cg(*) !! dense Jacobian (if dense mode)
+
+      if (me%use_sparse) then
+         ! Set row kc in sparse Jacobian
+         call me%jac_sparse%set_row(kc, gc)
+      else
+         ! Dense: copy to cg array
+         call mxvcop(nf, gc, cg((kc - 1)*nf + 1))
+      end if
+
+   end subroutine set_constraint_gradient
+
+!***********************************************************************
+!>
+!  Perform sparse axpy operation for a row: `y = y + alpha * row(A, irow)`.
+!  Helper for sparse Jacobian operations.
+
+   subroutine sparse_axpy_row(jac, irow, alpha, nf, y)
+
+      type(sparse_matrix_csr), intent(in) :: jac
+      integer, intent(in) :: irow   !! row index
+      real(wp), intent(in) :: alpha !! scalar coefficient
+      integer, intent(in) :: nf     !! size of vector
+      real(wp), intent(inout) :: y(nf) !! vector to update
+
+      integer :: k, j
+
+      ! y = y + alpha * jac(irow,:)
+      do k = jac%row_ptr(irow), jac%row_ptr(irow + 1) - 1
+         j = jac%col_ind(k)
+         y(j) = y(j) + alpha * jac%values(k)
+      end do
+
+   end subroutine sparse_axpy_row
 
 !***********************************************************************
 end module psqp_module
