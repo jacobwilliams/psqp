@@ -255,7 +255,9 @@ contains
       ! Conditional allocation based on sparse mode
       if (me%use_sparse) then
          ! Sparse mode: no need to allocate dense Jacobian storage
-         allocate (ia(nf), ra(8*nf + 3*nc + 1))
+         ! Still need space for: cfo(nc+1), cfd(nc), gc(nf), cr(nf*(nf+1)/2),
+         ! cz(nf), cp(nc), gf(nf), g(nf), h(nf*(nf+1)/2), s(nf), xo(nf), go(nf)
+         allocate (ia(nf), ra(nf*(nf + 8) + 3*nc + 1))
       else
          ! Dense mode: allocate space for cg(nf*nc)
          allocate (ia(nf), ra((nf + nc + 8)*nf + 3*nc + 1))
