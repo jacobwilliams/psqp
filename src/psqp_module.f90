@@ -61,13 +61,13 @@ module psqp_module
       type(sparse_matrix_csr), allocatable :: jac_sparse !! Sparse constraint Jacobian matrix
       procedure(sparse_jac_func), pointer :: sparse_jac => null() !! Sparse Jacobian callback
 
-      ! Adaptive penalty parameter control
-      logical, public :: rpf_adaptive = .true. !! Enable adaptive penalty parameter updates
-      real(wp), public :: rpf_min = 1.0e-6_wp !! Minimum penalty parameter value
-      real(wp), public :: rpf_max = 1.0e6_wp !! Maximum penalty parameter value
-      real(wp), public :: rpf_increase_factor = 10.0_wp !! Factor to increase rpf when stagnating
-      real(wp), public :: rpf_stagnation_threshold = 0.9_wp !! Threshold for detecting constraint stagnation
-      integer, public :: rpf_stagnation_limit = 3 !! Iterations of stagnation before increasing rpf
+      ! Adaptive penalty parameter control (set via psqpn optional arguments)
+      logical :: rpf_adaptive = .true. !! Enable adaptive penalty parameter updates
+      real(wp) :: rpf_min = 1.0e-6_wp !! Minimum penalty parameter value
+      real(wp) :: rpf_max = 1.0e6_wp !! Maximum penalty parameter value
+      real(wp) :: rpf_increase_factor = 10.0_wp !! Factor to increase rpf when stagnating
+      real(wp) :: rpf_stagnation_threshold = 0.9_wp !! Threshold for detecting constraint stagnation
+      integer :: rpf_stagnation_limit = 3 !! Iterations of stagnation before increasing rpf
 
       ! Internal state for adaptive penalty updates
       real(wp) :: cmax_previous = huge(1.0_wp) !! Previous major iteration's constraint violation
@@ -175,7 +175,9 @@ contains
 
    subroutine psqpn(me, nf, nb, nc, x, bound_type, xl, xu, cf, constraint_type, &
                     cl, cu, ipar, rpar, f, gmax, &
-                    cmax, iprnt, iterm, obj, dobj, con, dcon, report)
+                    cmax, iprnt, iterm, obj, dobj, con, dcon, report, &
+                    rpf_adaptive, rpf_min, rpf_max, rpf_increase_factor, &
+                    rpf_stagnation_threshold, rpf_stagnation_limit)
 
       class(psqp_class), intent(inout) :: me
       integer, intent(in) :: nf  !! number of variables
@@ -249,6 +251,12 @@ contains
       procedure(dcon_func) :: dcon !! computation of the gradient of the constraint function
       procedure(report_f),optional :: report !! iteration report function. Note: this is independent of `iprnt`.
                                              !! If this function is associated, each iteration will be reported
+      logical,optional,intent(in) :: rpf_adaptive !! Enable adaptive penalty parameter updates (default: .true.)
+      real(wp),optional,intent(in) :: rpf_min !! Minimum penalty parameter value (default: 1.0e-6)
+      real(wp),optional,intent(in) :: rpf_max !! Maximum penalty parameter value (default: 1.0e6)
+      real(wp),optional,intent(in) :: rpf_increase_factor !! Factor to increase rpf when stagnating (default: 10.0)
+      real(wp),optional,intent(in) :: rpf_stagnation_threshold !! Threshold for detecting constraint stagnation (default: 0.9)
+      integer,optional,intent(in) :: rpf_stagnation_limit !! Iterations of stagnation before increasing rpf (default: 3)
 
       integer :: lcfd, lcfo, lcg, lcp, lcr, lcz, lg, lgc, lgf, lgo, lh, lia, ls, lxo
       integer, dimension(:), allocatable :: ia
@@ -263,6 +271,18 @@ contains
       me%dcon => dcon
 
       if (present(report)) me%report => report
+
+      ! Set adaptive penalty parameters from optional arguments
+      if (present(rpf_adaptive)) me%rpf_adaptive = rpf_adaptive
+      if (present(rpf_min)) me%rpf_min = rpf_min
+      if (present(rpf_max)) me%rpf_max = rpf_max
+      if (present(rpf_increase_factor)) me%rpf_increase_factor = rpf_increase_factor
+      if (present(rpf_stagnation_threshold)) me%rpf_stagnation_threshold = rpf_stagnation_threshold
+      if (present(rpf_stagnation_limit)) me%rpf_stagnation_limit = rpf_stagnation_limit
+
+      ! Reset adaptive penalty state
+      me%cmax_previous = huge(1.0_wp)
+      me%rpf_stagnation_count = 0
 
       ! Conditional allocation based on sparse mode
       if (me%use_sparse) then

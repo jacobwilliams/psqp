@@ -96,20 +96,18 @@ program test_adaptive_penalty
            1.0e-6_wp, &            ! tolerance for Lagrangian gradient
            rpf_initial]            ! penalty coefficient (poor initial value)
 
-   ! Configure adaptive penalty parameters
-   solver%rpf_adaptive = .true.
-   solver%rpf_min = 1.0e-8_wp
-   solver%rpf_max = 1.0e6_wp
-   solver%rpf_increase_factor = 10.0_wp
-   solver%rpf_stagnation_threshold = 0.95_wp
-   solver%rpf_stagnation_limit = 2
-
    write(*,'(A)') 'Solving...'
    write(*,'(A)') ''
 
-   ! Solve (callbacks passed as arguments)
+   ! Solve (pass adaptive penalty configuration as optional arguments)
    call solver%psqpn(nf, 0, nc, x, ix, xl, xu, cf, ic, cl, cu, ipar, rpar, &
-                     f, gmax, cmax, iprnt, iterm, obj_func, dobj_func, con_func, dcon_func)
+                     f, gmax, cmax, iprnt, iterm, obj_func, dobj_func, con_func, dcon_func, &
+                     rpf_adaptive=.true., &
+                     rpf_min=1.0e-8_wp, &
+                     rpf_max=1.0e6_wp, &
+                     rpf_increase_factor=10.0_wp, &
+                     rpf_stagnation_threshold=0.95_wp, &
+                     rpf_stagnation_limit=2)
 
    write(*,'(A)') ''
    write(*,'(A,I4)') 'Optimization complete. iterm:', iterm
