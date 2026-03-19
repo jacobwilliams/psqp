@@ -73,6 +73,12 @@ module psqp_module
       real(wp) :: cmax_previous = huge(1.0_wp) !! Previous major iteration's constraint violation
       integer :: rpf_stagnation_count = 0 !! Counter for consecutive stagnations
 
+      ! Line search method selection (set via psqpn optional arguments)
+      integer :: line_search_method = 1 !! Line search method: 1=extended(default), 2=Wolfe
+      real(wp) :: wolfe_c1 = 1.0e-4_wp !! Wolfe condition parameter c1 (sufficient decrease)
+      real(wp) :: wolfe_c2 = 0.9_wp !! Wolfe condition parameter c2 (curvature)
+      integer :: wolfe_max_iter = 20 !! Maximum iterations for Wolfe line search
+
    contains
 
       private
@@ -85,6 +91,7 @@ module psqp_module
       procedure :: ops_after_constr_deletion
       procedure :: compute_con_and_dcon
       procedure :: extended_line_search
+      procedure :: wolfe_line_search
 
       ! Sparse Jacobian helper methods
       procedure, public :: set_jacobian_pattern
@@ -177,7 +184,8 @@ contains
                     cl, cu, ipar, rpar, f, gmax, &
                     cmax, iprnt, iterm, obj, dobj, con, dcon, report, &
                     rpf_adaptive, rpf_min, rpf_max, rpf_increase_factor, &
-                    rpf_stagnation_threshold, rpf_stagnation_limit)
+                    rpf_stagnation_threshold, rpf_stagnation_limit, &
+                    line_search_method, wolfe_c1, wolfe_c2, wolfe_max_iter)
 
       class(psqp_class), intent(inout) :: me
       integer, intent(in) :: nf  !! number of variables
@@ -257,6 +265,10 @@ contains
       real(wp),optional,intent(in) :: rpf_increase_factor !! Factor to increase rpf when stagnating (default: 10.0)
       real(wp),optional,intent(in) :: rpf_stagnation_threshold !! Threshold for detecting constraint stagnation (default: 0.9)
       integer,optional,intent(in) :: rpf_stagnation_limit !! Iterations of stagnation before increasing rpf (default: 3)
+      integer,optional,intent(in) :: line_search_method !! Line search method: 1=extended (default), 2=Wolfe
+      real(wp),optional,intent(in) :: wolfe_c1 !! Wolfe condition c1 parameter (sufficient decrease, default: 1.0e-4)
+      real(wp),optional,intent(in) :: wolfe_c2 !! Wolfe condition c2 parameter (curvature, default: 0.9)
+      integer,optional,intent(in) :: wolfe_max_iter !! Maximum iterations for Wolfe line search (default: 20)
 
       integer :: lcfd, lcfo, lcg, lcp, lcr, lcz, lg, lgc, lgf, lgo, lh, lia, ls, lxo
       integer, dimension(:), allocatable :: ia
@@ -283,6 +295,12 @@ contains
       ! Reset adaptive penalty state
       me%cmax_previous = huge(1.0_wp)
       me%rpf_stagnation_count = 0
+
+      ! Set line search parameters from optional arguments
+      if (present(line_search_method)) me%line_search_method = line_search_method
+      if (present(wolfe_c1)) me%wolfe_c1 = wolfe_c1
+      if (present(wolfe_c2)) me%wolfe_c2 = wolfe_c2
+      if (present(wolfe_max_iter)) me%wolfe_max_iter = wolfe_max_iter
 
       ! Conditional allocation based on sparse mode
       if (me%use_sparse) then
@@ -452,6 +470,7 @@ contains
                  iters, kbc, kbf, kc, kd, kit, ld, mred, mtesf, &
                  mtesx, n, k, ntesx, iest, inits, kters, maxst, &
                  isys, mfp, nred, ipom, lds
+      logical :: line_search_success
 
       if (abs(iprnt) > 1) write (6, '(1x,"entry to psqp :")')
 
@@ -711,10 +730,41 @@ contains
 
                line_search: do
 
-                  ! line search without directional derivatives
-                  call me%extended_line_search(r, ro, rp, f, fo, fp, po, pp, fmin, fmax, &
-                                               rmin, rmax, tols, kd, ld, me%nit, kit, nred, &
-                                               mred, maxst, iest, inits, iters, kters, mes, isys)
+                  if (me%line_search_method == 2) then
+                     ! Wolfe line search with directional derivatives
+                     ! Searches along the augmented Lagrangian merit function
+                     r = min(1.0_wp, rmax) ! initial step length
+                     call me%wolfe_line_search(nf, n, nc, xo, s, fo, g, cf, ic, ica, cl, cu, cz, &
+                                               rpf, gc, cg, f, gf, r, line_search_success, iext)
+
+                     if (line_search_success .and. r > 0.0_wp) then
+                        ! Update point
+                        call mxvdir(nf, r,s, xo, x)
+                        iters = 2 ! Indicate successful step
+                        kd = 1
+                        ld = -1
+                        isys = 0
+                     else
+                        ! Wolfe line search failed, fallback
+                        r = 0.0_wp
+                        f = fo
+                        p = po
+                        call mxvcop(nf, xo, x)
+                        call mxvcop(nf, cr, gf)
+                        call mxvcop(nc + 1, cfo, cf)
+                        irest = 1
+                        iters = 0
+                        isys = 0
+                        ld = 1
+                        cycle restart
+                     end if
+                  else
+                     ! Extended line search without directional derivatives (original method)
+                     call me%extended_line_search(r, ro, rp, f, fo, fp, po, pp, fmin, fmax, &
+                                                  rmin, rmax, tols, kd, ld, me%nit, kit, nred, &
+                                                  mred, maxst, iest, inits, iters, kters, mes, isys)
+                  end if
+
                   if (isys == 0) then
                      kd = 1
                      ! decision after unsuccessful line search
@@ -2028,6 +2078,270 @@ contains
       ld = -1
       isys = 1
    end subroutine extended_line_search
+
+!***********************************************************************
+!> date: 2026/03/18
+!
+! Line search using strong Wolfe conditions with directional derivatives.
+!
+! This is an improved line search method that uses gradient information
+! to satisfy the strong Wolfe conditions:
+!   1. Sufficient decrease (Armijo): f(αₖ) ≤ f(0) + c₁αₖf'(0)
+!   2. Curvature condition: |f'(αₖ)| ≤ c₂|f'(0)|
+!
+! Based on Algorithm 3.5 from Nocedal & Wright (2006).
+!
+!@note This routine provides better step lengths than extended_line_search
+!      by using directional derivative information, potentially reducing
+!      the total number of function evaluations.
+
+   subroutine wolfe_line_search(me, nf, n, nc, x, s, f, g, cf, ic, ica, cl, cu, cz, &
+                                rpf, gc, cg, f_new, g_new, alpha, success, iext)
+
+      class(psqp_class), intent(inout) :: me
+      integer, intent(in) :: nf !! number of variables
+      integer, intent(in) :: n  !! dimension of constraint null space
+      integer, intent(in) :: nc !! number of constraints
+      real(wp), dimension(nf), intent(in) :: x !! current point
+      real(wp), dimension(nf), intent(in) :: s !! search direction
+      real(wp), intent(in) :: f !! augmented Lagrangian value at x
+      real(wp), dimension(nf), intent(in) :: g !! gradient of augmented Lagrangian at x
+      real(wp), dimension(*), intent(inout) :: cf !! constraint values (workspace)
+      integer, dimension(*), intent(in) :: ic !! constraint types
+      integer, dimension(*), intent(in) :: ica !! active constraint indices
+      real(wp), dimension(*), intent(in) :: cl !! constraint lower bounds
+      real(wp), dimension(*), intent(in) :: cu !! constraint upper bounds
+      real(wp), dimension(*), intent(in) :: cz !! Lagrange multipliers
+      real(wp), intent(in) :: rpf !! penalty parameter
+      real(wp), dimension(nf), intent(inout) :: gc !! constraint gradient workspace
+      real(wp), dimension(*), intent(inout) :: cg !! constraint gradient matrix
+      real(wp), intent(out) :: f_new !! augmented Lagrangian value at x + alpha*s
+      real(wp), dimension(nf), intent(out) :: g_new !! gradient at x + alpha*s
+      real(wp), intent(inout) :: alpha !! step length (input: initial, output: final)
+      logical, intent(out) :: success !! true if Wolfe conditions satisfied
+      integer, intent(in) :: iext !! type of extremum (0=min, 1=max)
+
+      real(wp), dimension(nf) :: x_trial, g_trial
+      real(wp) :: phi0, dphi0, phi_alpha, dphi_alpha
+      real(wp) :: alpha_prev, phi_prev, dphi_prev
+      real(wp) :: alpha_lo, alpha_hi, phi_lo, phi_hi, dphi_lo
+      real(wp) :: alpha_max, alpha_trial
+      real(wp) :: ff_trial, fc_trial, cmax_trial
+      integer :: iter, kd_local, ld_local
+      logical :: done
+
+      ! Compute initial directional derivative (on augmented Lagrangian)
+      phi0 = f
+      dphi0 = dot_product(g, s)
+
+      ! Check if search direction is a descent direction
+      if (dphi0 >= 0.0_wp) then
+         success = .false.
+         alpha = 0.0_wp
+         f_new = f
+         g_new = g
+         return
+      end if
+
+      ! Initialize
+      alpha_max = 10.0_wp * alpha
+      alpha_prev = 0.0_wp
+      phi_prev = phi0
+      dphi_prev = dphi0
+      done = .false.
+      success = .false.
+
+      do iter = 1, me%wolfe_max_iter
+
+         ! Evaluate objective, gradient, and constraints at trial point
+         x_trial = x + alpha * s
+         kd_local = 1  ! Request both function and gradient
+         ld_local = -1 ! Fresh evaluation
+         call me%compute_obj_and_dobj(nf, x_trial, g_trial, g_new, ff_trial, f_new, kd_local, ld_local, iext)
+         ! Evaluate constraints
+         call me%compute_con_and_dcon(nf, nc, x_trial, fc_trial, cf, cl, cu, ic, gc, cg, cmax_trial, kd_local, ld_local)
+
+         ! Compute augmented Lagrangian merit function
+         cf(nc + 1) = f_new
+         call compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc_trial, f_new)
+
+         phi_alpha = f_new
+         dphi_alpha = dot_product(g_new, s)
+
+         ! Check Armijo condition (sufficient decrease)
+         if (phi_alpha > phi0 + me%wolfe_c1 * alpha * dphi0 .or. &
+             (iter > 1 .and. phi_alpha >= phi_prev)) then
+            ! Zoom between alpha_prev and alpha
+            call zoom(alpha_prev, alpha, phi_prev, phi_alpha, dphi_prev, &
+                     alpha_lo, phi_lo, dphi_lo, done)
+            if (done) then
+               alpha = alpha_lo
+               success = .true.
+               exit
+            end if
+         end if
+
+         ! Check curvature condition
+         if (abs(dphi_alpha) <= -me%wolfe_c2 * dphi0) then
+            ! Strong Wolfe conditions satisfied
+            success = .true.
+            done = .true.
+            exit
+         end if
+
+         ! Check if we've ascended
+         if (dphi_alpha >= 0.0_wp) then
+            ! Zoom between alpha and alpha_prev
+            call zoom(alpha, alpha_prev, phi_alpha, phi_prev, dphi_alpha, &
+                     alpha_lo, phi_lo, dphi_lo, done)
+            if (done) then
+               alpha = alpha_lo
+               x_trial = x + alpha * s
+               kd_local = 1
+               ld_local = -1
+               call me%compute_obj_and_dobj(nf, x_trial, g_trial, g_new, ff_trial, f_new, kd_local, ld_local, iext)
+               ! Evaluate constraints
+               call me%compute_con_and_dcon(nf, nc, x_trial, fc_trial, cf, cl, cu, ic, gc, cg, cmax_trial, kd_local, ld_local)
+
+               ! Compute augmented Lagrangian
+               cf(nc + 1) = f_new
+               call compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc_trial, f_new)
+
+               success = .true.
+               exit
+            end if
+         end if
+
+         ! Choose new trial step (extrapolate)
+         alpha_prev = alpha
+         phi_prev = phi_alpha
+         dphi_prev = dphi_alpha
+         alpha_trial = min(2.0_wp * alpha, alpha_max)
+
+         ! Safety check for unbounded growth
+         if (alpha_trial >= alpha_max) then
+            success = phi_alpha < phi0 + me%wolfe_c1 * alpha * dphi0
+            exit
+         end if
+
+         alpha = alpha_trial
+
+      end do
+
+      ! If max iterations reached without success, use current point if it reduces objective
+      if (.not. success .and. phi_alpha < phi0) then
+         success = .true.
+      end if
+
+   contains
+
+      subroutine zoom(alpha_lo_in, alpha_hi_in, phi_lo_in, phi_hi_in, dphi_lo_in, &
+                     alpha_out, phi_out, dphi_out, converged)
+         real(wp), intent(in) :: alpha_lo_in, alpha_hi_in
+         real(wp), intent(in) :: phi_lo_in, phi_hi_in, dphi_lo_in
+         real(wp), intent(out) :: alpha_out, phi_out, dphi_out
+         logical, intent(out) :: converged
+
+         real(wp) :: alpha_lo, alpha_hi, phi_lo, phi_hi, dphi_lo
+         real(wp) :: alpha_j, phi_j, dphi_j, ff_j, fc_j, cmax_j
+         real(wp), dimension(nf) :: x_j, g_j, g_j_trial
+         integer :: zoom_iter, kd_zoom, ld_zoom
+         integer, parameter :: max_zoom_iter = 10
+
+         alpha_lo = alpha_lo_in
+         alpha_hi = alpha_hi_in
+         phi_lo = phi_lo_in
+         phi_hi = phi_hi_in
+         dphi_lo = dphi_lo_in
+         converged = .false.
+
+         do zoom_iter = 1, max_zoom_iter
+
+            ! Cubic interpolation to find trial point
+            alpha_j = cubic_interp(alpha_lo, alpha_hi, phi_lo, phi_hi, dphi_lo)
+
+            ! Safeguard: ensure alpha_j is in (alpha_lo, alpha_hi)
+            alpha_j = max(alpha_lo + 0.1_wp*(alpha_hi - alpha_lo), &
+                         min(alpha_j, alpha_hi - 0.1_wp*(alpha_hi - alpha_lo)))
+
+            ! Evaluate at trial point
+            x_j = x + alpha_j * s
+            kd_zoom = 1
+            ld_zoom = -1
+            call me%compute_obj_and_dobj(nf, x_j, g_j_trial, g_j, ff_j, phi_j, kd_zoom, ld_zoom, iext)
+            ! Evaluate constraints
+            call me%compute_con_and_dcon(nf, nc, x_j, fc_j, cf, cl, cu, ic, gc, cg, cmax_j, kd_zoom, ld_zoom)
+
+            ! Compute augmented Lagrangian
+            cf(nc + 1) = phi_j
+            call compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc_j, phi_j)
+
+            dphi_j = dot_product(g_j, s)
+
+            ! Check Armijo condition
+            if (phi_j > phi0 + me%wolfe_c1 * alpha_j * dphi0 .or. phi_j >= phi_lo) then
+               alpha_hi = alpha_j
+               phi_hi = phi_j
+            else
+               ! Check curvature condition
+               if (abs(dphi_j) <= -me%wolfe_c2 * dphi0) then
+                  alpha_out = alpha_j
+                  phi_out = phi_j
+                  dphi_out = dphi_j
+                  converged = .true.
+                  return
+               end if
+
+               if (dphi_j * (alpha_hi - alpha_lo) >= 0.0_wp) then
+                  alpha_hi = alpha_lo
+                  phi_hi = phi_lo
+               end if
+
+               alpha_lo = alpha_j
+               phi_lo = phi_j
+               dphi_lo = dphi_j
+            end if
+
+            ! Check for convergence based on interval size
+            if (abs(alpha_hi - alpha_lo) < 1.0e-6_wp) then
+               alpha_out = alpha_lo
+               phi_out = phi_lo
+               dphi_out = dphi_lo
+               converged = .true.
+               return
+            end if
+
+         end do
+
+         ! Max zoom iterations reached
+         alpha_out = alpha_lo
+         phi_out = phi_lo
+         dphi_out = dphi_lo
+         converged = .true.
+
+      end subroutine zoom
+
+      pure function cubic_interp(a, b, fa, fb, dfa) result(alpha)
+         !! Cubic interpolation between two points
+         real(wp), intent(in) :: a, b, fa, fb, dfa
+         real(wp) :: alpha
+         real(wp) :: d1, d2, d3, z
+
+         d1 = dfa + dfa - 3.0_wp*(fa - fb)/(a - b)
+         d2 = sign(1.0_wp, b - a) * sqrt(d1*d1 - dfa*dfa)
+         d3 = dfa + d2 - d1
+
+         if (abs(d3) < 1.0e-12_wp) then
+            ! Fallback to bisection if cubic fails
+            alpha = 0.5_wp * (a + b)
+         else
+            z = d2 + d3
+            alpha = b - (b - a) * z / (z + d2)
+         end if
+
+      end function cubic_interp
+
+   end subroutine wolfe_line_search
 
 !***********************************************************************
 !> date: 92/12/01
