@@ -76,7 +76,7 @@ module psqp_module
       ! Line search method selection (set via psqpn optional arguments)
       integer :: line_search_method = 1 !! Line search method: 1=extended(default), 2=Wolfe
       real(wp) :: wolfe_c1 = 1.0e-4_wp !! Wolfe condition parameter c1 (sufficient decrease)
-      real(wp) :: wolfe_c2 = 0.9_wp !! Wolfe condition parameter c2 (curvature)
+      real(wp) :: wolfe_c2 = 0.1_wp !! Wolfe condition parameter c2 (curvature, 0.1-0.4 for quasi-Newton)
       integer :: wolfe_max_iter = 20 !! Maximum iterations for Wolfe line search
 
    contains
@@ -2085,15 +2085,24 @@ contains
 ! Line search using strong Wolfe conditions with directional derivatives.
 !
 ! This is an improved line search method that uses gradient information
-! to satisfy the strong Wolfe conditions:
-!   1. Sufficient decrease (Armijo): f(αₖ) ≤ f(0) + c₁αₖf'(0)
-!   2. Curvature condition: |f'(αₖ)| ≤ c₂|f'(0)|
+! to satisfy the strong Wolfe conditions on the augmented Lagrangian merit function:
+!   1. Sufficient decrease (Armijo): φ(αₖ) ≤ φ(0) + c₁αₖφ'(0)
+!   2. Curvature condition: |φ'(αₖ)| ≤ c₂|φ'(0)|
+!
+! where φ is the augmented Lagrangian merit function.
 !
 ! Based on Algorithm 3.5 from Nocedal & Wright (2006).
 !
-!@note This routine provides better step lengths than extended_line_search
-!      by using directional derivative information, potentially reducing
-!      the total number of function evaluations.
+!@note For constrained optimization with penalty methods, this line search
+!      may use more function evaluations than extended_line_search due to
+!      the non-smooth nature of the augmented Lagrangian merit function
+!      (absolute value terms create non-differentiable points). The curvature
+!      condition struggles with non-smoothness. Extended line search is
+!      recommended as default (more robust for penalty-based methods).
+!
+!@note For smooth unconstrained problems or interior-point methods,
+!      Wolfe line search may outperform extended_line_search through
+!      better step length selection.
 
    subroutine wolfe_line_search(me, nf, n, nc, x, s, f, g, cf, ic, ica, cl, cu, cz, &
                                 rpf, gc, cg, f_new, g_new, alpha, success, iext)
@@ -2121,7 +2130,7 @@ contains
       logical, intent(out) :: success !! true if Wolfe conditions satisfied
       integer, intent(in) :: iext !! type of extremum (0=min, 1=max)
 
-      real(wp), dimension(nf) :: x_trial, g_trial
+      real(wp), dimension(nf) :: x_trial, g_trial, g_prev
       real(wp) :: phi0, dphi0, phi_alpha, dphi_alpha
       real(wp) :: alpha_prev, phi_prev, dphi_prev
       real(wp) :: alpha_lo, alpha_hi, phi_lo, phi_hi, dphi_lo
@@ -2148,6 +2157,7 @@ contains
       alpha_prev = 0.0_wp
       phi_prev = phi0
       dphi_prev = dphi0
+      g_prev = g
       done = .false.
       success = .false.
 
@@ -2172,10 +2182,11 @@ contains
          if (phi_alpha > phi0 + me%wolfe_c1 * alpha * dphi0 .or. &
              (iter > 1 .and. phi_alpha >= phi_prev)) then
             ! Zoom between alpha_prev and alpha
-            call zoom(alpha_prev, alpha, phi_prev, phi_alpha, dphi_prev, &
-                     alpha_lo, phi_lo, dphi_lo, done)
+            call zoom(alpha_prev, alpha, phi_prev, phi_alpha, dphi_prev, g_prev, &
+                     alpha_lo, phi_lo, dphi_lo, g_new, done)
             if (done) then
                alpha = alpha_lo
+               f_new = phi_lo
                success = .true.
                exit
             end if
@@ -2192,21 +2203,11 @@ contains
          ! Check if we've ascended
          if (dphi_alpha >= 0.0_wp) then
             ! Zoom between alpha and alpha_prev
-            call zoom(alpha, alpha_prev, phi_alpha, phi_prev, dphi_alpha, &
-                     alpha_lo, phi_lo, dphi_lo, done)
+            call zoom(alpha, alpha_prev, phi_alpha, phi_prev, dphi_alpha, g_new, &
+                     alpha_lo, phi_lo, dphi_lo, g_new, done)
             if (done) then
                alpha = alpha_lo
-               x_trial = x + alpha * s
-               kd_local = 1
-               ld_local = -1
-               call me%compute_obj_and_dobj(nf, x_trial, g_trial, g_new, ff_trial, f_new, kd_local, ld_local, iext)
-               ! Evaluate constraints
-               call me%compute_con_and_dcon(nf, nc, x_trial, fc_trial, cf, cl, cu, ic, gc, cg, cmax_trial, kd_local, ld_local)
-
-               ! Compute augmented Lagrangian
-               cf(nc + 1) = f_new
-               call compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc_trial, f_new)
-
+               f_new = phi_lo
                success = .true.
                exit
             end if
@@ -2216,6 +2217,7 @@ contains
          alpha_prev = alpha
          phi_prev = phi_alpha
          dphi_prev = dphi_alpha
+         g_prev = g_new
          alpha_trial = min(2.0_wp * alpha, alpha_max)
 
          ! Safety check for unbounded growth
@@ -2235,16 +2237,18 @@ contains
 
    contains
 
-      subroutine zoom(alpha_lo_in, alpha_hi_in, phi_lo_in, phi_hi_in, dphi_lo_in, &
-                     alpha_out, phi_out, dphi_out, converged)
+      subroutine zoom(alpha_lo_in, alpha_hi_in, phi_lo_in, phi_hi_in, dphi_lo_in, g_lo_in, &
+                     alpha_out, phi_out, dphi_out, g_out, converged)
          real(wp), intent(in) :: alpha_lo_in, alpha_hi_in
          real(wp), intent(in) :: phi_lo_in, phi_hi_in, dphi_lo_in
+         real(wp), dimension(nf), intent(in) :: g_lo_in
          real(wp), intent(out) :: alpha_out, phi_out, dphi_out
+         real(wp), dimension(nf), intent(out) :: g_out
          logical, intent(out) :: converged
 
          real(wp) :: alpha_lo, alpha_hi, phi_lo, phi_hi, dphi_lo
          real(wp) :: alpha_j, phi_j, dphi_j, ff_j, fc_j, cmax_j
-         real(wp), dimension(nf) :: x_j, g_j, g_j_trial
+         real(wp), dimension(nf) :: x_j, g_j, g_j_trial, g_lo
          integer :: zoom_iter, kd_zoom, ld_zoom
          integer, parameter :: max_zoom_iter = 10
 
@@ -2253,6 +2257,7 @@ contains
          phi_lo = phi_lo_in
          phi_hi = phi_hi_in
          dphi_lo = dphi_lo_in
+         g_lo = g_lo_in
          converged = .false.
 
          do zoom_iter = 1, max_zoom_iter
@@ -2288,6 +2293,7 @@ contains
                   alpha_out = alpha_j
                   phi_out = phi_j
                   dphi_out = dphi_j
+                  g_out = g_j
                   converged = .true.
                   return
                end if
@@ -2300,6 +2306,7 @@ contains
                alpha_lo = alpha_j
                phi_lo = phi_j
                dphi_lo = dphi_j
+               g_lo = g_j
             end if
 
             ! Check for convergence based on interval size
@@ -2307,6 +2314,7 @@ contains
                alpha_out = alpha_lo
                phi_out = phi_lo
                dphi_out = dphi_lo
+               g_out = g_lo
                converged = .true.
                return
             end if
@@ -2317,6 +2325,7 @@ contains
          alpha_out = alpha_lo
          phi_out = phi_lo
          dphi_out = dphi_lo
+         g_out = g_lo
          converged = .true.
 
       end subroutine zoom

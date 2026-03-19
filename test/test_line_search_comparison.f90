@@ -102,13 +102,10 @@ program test_line_search_comparison
    write(*,'(A)') 'Test 2: Wolfe Line Search (strong Wolfe conditions)'
    write(*,'(A)') '---------------------------------------------------------------'
 
-   call solver_wolfe%psqpn(nf, 0, nc, x_wolfe, ix, xl,xu, cf_wolfe, ic, cl, cu, &
+   call solver_wolfe%psqpn(nf, 0, nc, x_wolfe, ix, xl, xu, cf_wolfe, ic, cl, cu, &
                            ipar, rpar, f_wolfe, gmax_wolfe, cmax_wolfe, iprnt, iterm_wolfe, &
                            obj_rosenbrock, dobj_rosenbrock, con_circle, dcon_circle, &
-                           line_search_method=2, &
-                           wolfe_c1=1.0e-4_wp, &
-                           wolfe_c2=0.9_wp, &
-                           wolfe_max_iter=20)
+                           line_search_method=2)  ! Use default c1=1e-4, c2=0.1, max_iter=20
 
    write(*,'(A,I4)') 'Termination code: ', iterm_wolfe
    write(*,'(A,2F12.6)') 'Solution: x = ', x_wolfe

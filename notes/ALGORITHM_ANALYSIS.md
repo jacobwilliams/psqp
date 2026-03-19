@@ -142,10 +142,11 @@ PSQP is a classical Sequential Quadratic Programming (SQP) implementation from 1
 #### 7. **Improved Line Search** ⭐⭐ ✅ IMPLEMENTED (2026-03-18)
 - **Current**: ~~No directional derivatives used in line search~~ Now optional!
 - **Improvement**: ~~Strong Wolfe conditions with gradient information~~ DONE
-- **Benefit**: Better step acceptance, fewer function evaluations (typically 20-30% reduction)
+- **Benefit**: Better step acceptance for smooth problems; Extended remains better for penalty methods
 - **Effort**: Medium (modify `extended_line_search`)
 - **References**: Nocedal & Wright §3.1, Algorithm 3.5
-- **Implementation**: New `wolfe_line_search` method using strong Wolfe conditions with zoom algorithm. Selectable via `line_search_method` parameter (1=extended, 2=Wolfe). Extended line search remains default for backward compatibility.
+- **Implementation**: New `wolfe_line_search` method using strong Wolfe conditions with zoom algorithm. Selectable via `line_search_method` parameter (1=extended, 2=Wolfe). Extended line search remains default for backward compatibility and superior performance on constrained problems with non-smooth augmented Lagrangian merit functions.
+- **Note**: Wolfe struggles with absolute value penalty terms (|constraint_violations|) which create non-smoothness. Extended line search is more robust for penalty-based constrained optimization.
 
 #### 8. **Trust Region SQP Variant** ⭐
 - **Current**: Line search globalization only
