@@ -268,21 +268,7 @@ contains
         integer :: nf, kc
         real(wp) :: x(nf), gc(nf)
 
-        gc = 0.0_wp
-        select case (kc)
-        case(1)
-            gc(1) = 1.0_wp
-            gc(2) = 1.0_wp
-        case(2)
-            gc(2) = 1.0_wp
-            gc(3) = 1.0_wp
-        case(3)
-            gc(3) = 1.0_wp
-            gc(4) = 1.0_wp
-        case(4)
-            gc(4) = 1.0_wp
-            gc(5) = 1.0_wp
-        end select
+        error stop 'not used in sparse mode'
 
     end subroutine dcon_func
     !***************************************************************************

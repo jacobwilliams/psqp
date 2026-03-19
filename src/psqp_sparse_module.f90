@@ -56,6 +56,7 @@ module psqp_sparse_module
         procedure, public :: is_initialized => sparse_csr_is_initialized
         procedure, public :: get_nnz_in_row => sparse_csr_get_nnz_in_row
         procedure, public :: copy_structure => sparse_csr_copy_structure
+        procedure, public :: sparse_axpy_row
 
     end type sparse_matrix_csr
 
@@ -81,6 +82,29 @@ module psqp_sparse_module
     end type sparse_pattern
 
 contains
+
+!***********************************************************************
+!>
+!  Perform sparse axpy operation for a row: `y = y + alpha * row(A, irow)`.
+!  Helper for sparse Jacobian operations.
+
+   subroutine sparse_axpy_row(me, irow, alpha, nf, y)
+
+      class(sparse_matrix_csr), intent(in) :: me
+      integer, intent(in) :: irow   !! row index
+      real(wp), intent(in) :: alpha !! scalar coefficient
+      integer, intent(in) :: nf     !! size of vector
+      real(wp), intent(inout) :: y(nf) !! vector to update
+
+      integer :: k, j
+
+      ! y = y + alpha * jac(irow,:)
+      do k = me%row_ptr(irow), me%row_ptr(irow + 1) - 1
+         j = me%col_ind(k)
+         y(j) = y(j) + alpha * me%values(k)
+      end do
+
+   end subroutine sparse_axpy_row
 
 !*****************************************************************************************
 !>

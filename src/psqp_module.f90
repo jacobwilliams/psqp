@@ -935,7 +935,7 @@ contains
                ! s = s + cz(j) * constraint_gradient(kc)
                if (me%use_sparse) then
                   ! Sparse: use sparse row operations
-                  call sparse_axpy_row(me%jac_sparse, kc, cz(j), nf, s)
+                  call me%jac_sparse%sparse_axpy_row(kc, cz(j), nf, s)
                else
                   call mxvdir(nf, cz(j), cg((kc - 1)*nf + 1), s, s)
                end if
@@ -2112,7 +2112,7 @@ contains
          if (l > 0) then
             ! g = g - cz(j) * constraint_gradient(l)
             if (me%use_sparse) then
-               call sparse_axpy_row(me%jac_sparse, l, -cz(j), nf, g)
+               call me%jac_sparse%sparse_axpy_row(l, -cz(j), nf, g)
             else
                call mxvdir(nf, -cz(j), cg((l - 1)*nf + 1), g, g)
             end if
@@ -2261,29 +2261,6 @@ contains
       end if
 
    end subroutine set_constraint_gradient
-
-!***********************************************************************
-!>
-!  Perform sparse axpy operation for a row: `y = y + alpha * row(A, irow)`.
-!  Helper for sparse Jacobian operations.
-
-   subroutine sparse_axpy_row(jac, irow, alpha, nf, y)
-
-      type(sparse_matrix_csr), intent(in) :: jac
-      integer, intent(in) :: irow   !! row index
-      real(wp), intent(in) :: alpha !! scalar coefficient
-      integer, intent(in) :: nf     !! size of vector
-      real(wp), intent(inout) :: y(nf) !! vector to update
-
-      integer :: k, j
-
-      ! y = y + alpha * jac(irow,:)
-      do k = jac%row_ptr(irow), jac%row_ptr(irow + 1) - 1
-         j = jac%col_ind(k)
-         y(j) = y(j) + alpha * jac%values(k)
-      end do
-
-   end subroutine sparse_axpy_row
 
 !***********************************************************************
 end module psqp_module
