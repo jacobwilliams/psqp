@@ -61,6 +61,18 @@ module psqp_module
       type(sparse_matrix_csr), allocatable :: jac_sparse !! Sparse constraint Jacobian matrix
       procedure(sparse_jac_func), pointer :: sparse_jac => null() !! Sparse Jacobian callback
 
+      ! Adaptive penalty parameter control
+      logical, public :: rpf_adaptive = .true. !! Enable adaptive penalty parameter updates
+      real(wp), public :: rpf_min = 1.0e-6_wp !! Minimum penalty parameter value
+      real(wp), public :: rpf_max = 1.0e6_wp !! Maximum penalty parameter value
+      real(wp), public :: rpf_increase_factor = 10.0_wp !! Factor to increase rpf when stagnating
+      real(wp), public :: rpf_stagnation_threshold = 0.9_wp !! Threshold for detecting constraint stagnation
+      integer, public :: rpf_stagnation_limit = 3 !! Iterations of stagnation before increasing rpf
+
+      ! Internal state for adaptive penalty updates
+      real(wp) :: cmax_previous = huge(1.0_wp) !! Previous major iteration's constraint violation
+      integer :: rpf_stagnation_count = 0 !! Counter for consecutive stagnations
+
    contains
 
       private
@@ -625,6 +637,46 @@ contains
                   exit main
                end if
                call compute_new_penalty_parameters(nf, n, nc, ica, cz, cp)
+
+               ! Adaptive penalty parameter update
+               ! Increase rpf if constraints are not improving sufficiently
+               if (me%rpf_adaptive .and. me%nit > 0) then
+                  ! Check if constraint violation is stagnating (not improving enough)
+                  if (cmax > me%rpf_stagnation_threshold * me%cmax_previous) then
+                     me%rpf_stagnation_count = me%rpf_stagnation_count + 1
+                     if (me%rpf_stagnation_count >= me%rpf_stagnation_limit) then
+                        ! Increase penalty parameter
+                        rpf = min(rpf * me%rpf_increase_factor, me%rpf_max)
+                        me%rpf_stagnation_count = 0
+                        if (abs(iprnt) > 1) then
+                           write (6, '(1x,"Increased penalty parameter rpf to",1p,e11.4," (stagnation)")') rpf
+                        end if
+                     end if
+                  else
+                     ! Constraints improving - reset stagnation counter
+                     me%rpf_stagnation_count = 0
+                  end if
+
+                  ! Also check if Lagrange multipliers are large compared to rpf
+                  ! This indicates the penalty parameter is too small
+                  if (nf - n > 0) then
+                     ! Compute max magnitude of active Lagrange multipliers
+                     rp = 0.0_wp
+                     do i = 1, nf - n
+                        rp = max(rp, abs(cz(i)))
+                     end do
+                     ! If max multiplier >> rpf, increase rpf
+                     if (rp > 100.0_wp * rpf) then
+                        rpf = min(rp / 10.0_wp, me%rpf_max)
+                        me%rpf_stagnation_count = 0
+                        if (abs(iprnt) > 1) then
+                           write (6, '(1x,"Increased penalty parameter rpf to",1p,e11.4," (large multipliers)")') rpf
+                        end if
+                     end if
+                  end if
+               end if
+               me%cmax_previous = cmax
+
                call mxvina(nc, ic)
                call compute_augmented_lagrangian(nf, n, nc, cf, ic, ica, cl, cu, cz, rpf, fc, f)
                ! preparation of line search
