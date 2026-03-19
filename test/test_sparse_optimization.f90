@@ -243,14 +243,10 @@ contains
         real(wp) :: x(nf), fc
 
         select case (kc)
-        case(1)
-            fc = x(1) + x(2)
-        case(2)
-            fc = x(2) + x(3)
-        case(3)
-            fc = x(3) + x(4)
-        case(4)
-            fc = x(4) + x(5)
+        case(1); fc = x(1) + x(2)
+        case(2); fc = x(2) + x(3)
+        case(3); fc = x(3) + x(4)
+        case(4); fc = x(4) + x(5)
         case default
             error stop 'invalid constraint index'
         end select
